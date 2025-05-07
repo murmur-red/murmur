@@ -5,7 +5,10 @@ const ComingSoon = () => {
   return (
     <div className="coming-soon-container">
       <div className="grain-overlay"></div>
-      <h1 className="coming-soon-text">murmur coming soon</h1>
+      <div className="text-block">
+        <h1 className="murmur-title">murmur</h1>
+        <h2 className="coming-soon-sub">coming soon</h2>
+      </div>
     </div>
   );
 };
