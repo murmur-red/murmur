@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-import React from "react";
-import ComingSoon from "./pages/ComingSoon";
-
-function App() {
-  return <ComingSoon />;
-=======
 // App.jsx — 'murmur' locked center, poetic lines appear below
 
 import { useEffect, useRef, useState } from 'react';
@@ -184,17 +177,12 @@ function App() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
+  // Disable scroll
   useEffect(() => {
-    const handleScroll = (e) => {
-      e.preventDefault();
-      if (transitioning) return;
-      if (e.deltaY > 0) {
-        triggerSceneAdvance();
-      }
-    };
-    window.addEventListener("wheel", handleScroll, { passive: false });
-    return () => window.removeEventListener("wheel", handleScroll);
-  }, [transitioning]);
+    const disableScroll = (e) => e.preventDefault();
+    window.addEventListener("wheel", disableScroll, { passive: false });
+    return () => window.removeEventListener("wheel", disableScroll);
+  }, []);
 
   useEffect(() => {
     fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd")
@@ -224,33 +212,9 @@ function App() {
       });
   }, []);
 
-  const triggerSceneAdvance = () => {
-    if (currentScene.current >= videos.length - 1) return;
-    setTransitioning(true);
-    const current = sceneRefs.current[currentScene.current];
-    const next = sceneRefs.current[currentScene.current + 1];
-    const tl = gsap.timeline({
-      onComplete: () => {
-        currentScene.current += 1;
-        setTransitioning(false);
-      },
-    });
-    tl.to(current, {
-      opacity: 0,
-      duration: 1,
-      ease: "power2.inOut",
-      onStart: () => current.style.zIndex = 0,
-    });
-    tl.set(next, { pointerEvents: "auto", zIndex: 1 });
-    tl.to(next, {
-      opacity: 1,
-      duration: 1.4,
-      ease: "power2.inOut",
-    });
-  };
-
   return (
     <Main>
+      {/*
       <Header>
         <HeaderLeft>
           <span style={{ fontSize: '1.6rem', marginRight: '0.4rem' }}>about</span>
@@ -258,6 +222,7 @@ function App() {
         </HeaderLeft>
         <div></div>
       </Header>
+      */}
 
       {videos.map((src, i) => {
         const isFirst = i === 0;
@@ -268,9 +233,13 @@ function App() {
               <Title>murmur</Title>
             </MurmurContainer>
             <LinesContainer>
-              {aboutLines.split(/\n+/).filter(Boolean).map((line, index) => (
-                <AboutLine key={index}>{line}</AboutLine>
-              ))}
+              {aboutLines
+                .split(/\n+/)
+                .map((line, index) => line.replace(/^\d+\.\s*/, ''))
+                .filter(Boolean)
+                .map((line, index) => (
+                  <AboutLine key={index}>{line}</AboutLine>
+                ))}
             </LinesContainer>
             <ScrollHint ref={scrollHintRef}>▾</ScrollHint>
           </ActiveScene>
@@ -297,7 +266,6 @@ function App() {
       })}
     </Main>
   );
->>>>>>> main
 }
 
 export default App;
