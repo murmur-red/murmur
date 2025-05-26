@@ -5,8 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 const AIBlockWrapper = styled.section`
   height: 100vh;
   width: 100vw;
-  background: #0c0c0c;
-  color: white;
+  background: white;
+  color: black;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -40,10 +40,10 @@ const Card = styled.div`
   color: black;
   padding: 2rem;
   border-radius: 12px;
+  border: 2px solid black;
   width: 250px;
   text-align: left;
   cursor: pointer;
-  border: 2px solid black;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   &:hover {
     transform: translateY(-6px);
@@ -102,36 +102,104 @@ const DiveDeeperButton = styled.button`
 `;
 
 const ModalNavButton = styled.button`
-  margin-top: 1.5rem;
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  background: transparent;
-  border: 1px solid black;
+  margin-top: 1rem;
+  background: none;
+  border: none;
+  color: black;
+  font-size: 1rem;
   cursor: pointer;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: black;
-    color: white;
-  }
 `;
 
 const aiDetails = {
   'GPT‑4': {
     title: 'GPT‑4',
     summary: 'Advanced reasoning and creativity. Best for coding, writing, and summarizing.',
-    deep: 'GPT‑4 offers API access, supports multimodal input, and excels at zero-shot and few-shot learning tasks. Use cases include code generation, legal contract analysis, and advanced tutoring bots.'
+    deep: `
+🔍 Overview:
+GPT‑4 is OpenAI’s most powerful language model. It excels at complex reasoning, understanding context, and generating high-quality text.
+
+🧠 Strengths:
+• Code generation and debugging
+• Creative writing and storytelling
+• Multilingual support
+
+💡 Best Use Cases:
+• AI chat assistants
+• Legal, medical, and scientific summaries
+• Programming tools
+
+🧪 Sample Prompts:
+• "Summarize this legal contract in 5 bullet points."
+• "Write a poem that uses only emojis."
+
+🔧 Integration Options:
+• OpenAI API
+• Microsoft Copilot
+
+🔄 Known Limitations:
+• Prone to hallucination
+• Limited real-time knowledge unless integrated with browsing tools
+    `
   },
   'Claude 3': {
     title: 'Claude 3',
     summary: 'Trained with high interpretability in mind. Strong at document Q&A.',
-    deep: 'Claude 3 is designed to reduce hallucinations and explain its reasoning steps. It’s ideal for enterprise document search, legal/medical workflows, and collaborative assistants.'
+    deep: `
+🔍 Overview:
+Claude 3 is a model from Anthropic, designed for alignment and clarity. It focuses on human-centered design and safety.
+
+🧠 Strengths:
+• Long-form document question answering
+• Deep reasoning with low hallucination
+• Ethical guardrails
+
+💡 Best Use Cases:
+• Enterprise knowledge base assistants
+• Research-heavy Q&A
+• Transparent audit trails
+
+🧪 Sample Prompts:
+• "What were the top 3 findings in this 30-page research paper?"
+• "Explain this regulation in layman terms."
+
+🔧 Integration Options:
+• Anthropic API
+• Slack integrations
+
+🔄 Known Limitations:
+• Slightly less creative than GPT‑4
+• Limited availability outside enterprise tools
+    `
   },
   'Gemini': {
     title: 'Gemini',
     summary: "Google's multimodal AI. Great for images, docs, and web integration.",
-    deep: 'Gemini integrates deeply with Google services and supports image, text, and voice inputs. It’s powerful for education, productivity apps, and Google Workspace extensions.'
+    deep: `
+🔍 Overview:
+Gemini is Google DeepMind’s newest multimodal model built for text, images, audio, and video comprehension.
+
+🧠 Strengths:
+• Seamless integration of search results
+• Image and document interpretation
+• Powerful API via Google Cloud
+
+💡 Best Use Cases:
+• Productive research assistants
+• Live visual support
+• AI-powered UI/UX generation
+
+🧪 Sample Prompts:
+• "Summarize this PDF with graphs."
+• "Describe what’s in this uploaded photo."
+
+🔧 Integration Options:
+• Vertex AI (Google Cloud)
+• Workspace plugins (Docs, Sheets)
+
+🔄 Known Limitations:
+• Restricted in some geographies
+• Requires fine-tuning for some enterprise use cases
+    `
   }
 };
 
@@ -153,16 +221,16 @@ export default function AI() {
 
   const handlePrev = () => {
     const keys = Object.keys(aiDetails);
-    const currentIndex = keys.indexOf(selectedAI);
-    const prevIndex = (currentIndex - 1 + keys.length) % keys.length;
+    const index = keys.indexOf(selectedAI);
+    const prevIndex = (index - 1 + keys.length) % keys.length;
     setSelectedAI(keys[prevIndex]);
     setShowDeep(false);
   };
 
   const handleNext = () => {
     const keys = Object.keys(aiDetails);
-    const currentIndex = keys.indexOf(selectedAI);
-    const nextIndex = (currentIndex + 1) % keys.length;
+    const index = keys.indexOf(selectedAI);
+    const nextIndex = (index + 1) % keys.length;
     setSelectedAI(keys[nextIndex]);
     setShowDeep(false);
   };
@@ -199,7 +267,9 @@ export default function AI() {
             >
               <CloseButton onClick={() => setSelectedAI(null)}>×</CloseButton>
               <h2>{aiDetails[selectedAI].title}</h2>
-              <p>{showDeep ? aiDetails[selectedAI].deep : aiDetails[selectedAI].summary}</p>
+              <p style={{ whiteSpace: 'pre-line' }}>
+                {showDeep ? aiDetails[selectedAI].deep : aiDetails[selectedAI].summary}
+              </p>
               <DiveDeeperButton onClick={() => setShowDeep(prev => !prev)}>
                 {showDeep ? 'Show Less' : 'Dive Deeper'}
               </DiveDeeperButton>
