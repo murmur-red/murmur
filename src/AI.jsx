@@ -237,7 +237,7 @@ export default function AI() {
 
   return (
     <AIBlockWrapper>
-      <AIHeading>murmur: AI Knowledge Platform in Construction</AIHeading>
+      <AIHeading>murmur: AI Knowledge Platform under Construction</AIHeading>
       {openaiLine.split(/\n+/).map((line, i) => (
         <AIContent key={i}>{line.replace(/^\d+\.\s*/, '')}</AIContent>
       ))}
