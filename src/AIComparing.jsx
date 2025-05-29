@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
 const AIBlockWrapper = styled.section`
@@ -52,6 +51,21 @@ const Card = styled.div`
   }
 `;
 
+const aiDetails = {
+  'GPT‑4': {
+    title: 'GPT‑4',
+    summary: 'Advanced reasoning and creativity. Best for coding, writing, and summarizing.'
+  },
+  'Claude 3': {
+    title: 'Claude 3',
+    summary: 'Trained with high interpretability in mind. Strong at document Q&A.'
+  },
+  'Gemini': {
+    title: 'Gemini',
+    summary: "Google's multimodal AI. Great for images, docs, and web integration."
+  }
+};
+
 export default function AI() {
   const [openaiLine, setOpenaiLine] = useState('');
   const navigate = useNavigate();
@@ -67,6 +81,10 @@ export default function AI() {
       .catch(() => setOpenaiLine('AI is thinking weird stuff today...'));
   }, []);
 
+  const handleCardClick = () => {
+    navigate('/compare');
+  };
+
   return (
     <AIBlockWrapper>
       <AIHeading>murmur: AI Knowledge Platform under Construction</AIHeading>
@@ -75,22 +93,12 @@ export default function AI() {
       ))}
 
       <CardsWrapper>
-        <Card onClick={() => navigate('/gpt4')}>
-          <h3>GPT‑4</h3>
-          <p>Advanced reasoning and creativity. Best for coding, writing, and summarizing.</p>
-        </Card>
-        <Card onClick={() => navigate('/claude3')}>
-          <h3>Claude 3</h3>
-          <p>Trained with high interpretability in mind. Strong at document Q&A.</p>
-        </Card>
-        <Card onClick={() => navigate('/gemini')}>
-          <h3>Gemini</h3>
-          <p>Google's multimodal AI. Great for images, docs, and web integration.</p>
-        </Card>
-        <Card onClick={() => navigate('/compare')}>
-          <h3>Compare All</h3>
-          <p>Side-by-side comparison of GPT‑4, Claude 3, and Gemini.</p>
-        </Card>
+        {Object.entries(aiDetails).map(([key, { title, summary }]) => (
+          <Card key={key} onClick={handleCardClick}>
+            <h3>{title}</h3>
+            <p>{summary}</p>
+          </Card>
+        ))}
       </CardsWrapper>
     </AIBlockWrapper>
   );

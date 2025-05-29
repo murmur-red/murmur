@@ -1,101 +1,22 @@
-import { useEffect, useRef, useState } from 'react';
-import { gsap } from 'gsap';
-import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
-gsap.registerPlugin(ScrollToPlugin);
-import styled from 'styled-components';
-import AI from './AI';
+// App.jsx — Main app with full routing and comparison view
 
-const Main = styled.div`
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-  position: relative;
-  font-family: serif;
-`;
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import HomeScrollLayout from './HomeScrollLayout';
+import GPT4Page from './GPT4Page';
+import Claude3Page from './Claude3Page';
+import GeminiPage from './GeminiPage';
+import CompareTable from './CompareTable';
 
-const Scene = styled.section`
-  height: 100vh;
-  width: 100vw;
-  background: black;
-  color: white;
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 1;
-  pointer-events: none;
-  z-index: 0;
-`;
-
-const ActiveScene = styled(Scene)`
-  opacity: 1;
-  pointer-events: auto;
-  z-index: 1;
-`;
-
-function App() {
-  const sceneRefs = useRef([]);
-  const currentScene = useRef(0);
-  const [transitioning, setTransitioning] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = (e) => {
-      e.preventDefault();
-      if (transitioning) return;
-      if (e.deltaY > 0) {
-        triggerSceneAdvance();
-      } else if (e.deltaY < 0) {
-        triggerSceneBack();
-      }
-    };
-    window.addEventListener('wheel', handleScroll, { passive: false });
-    return () => window.removeEventListener('wheel', handleScroll);
-  }, [transitioning]);
-
-  const triggerSceneAdvance = () => {
-    if (currentScene.current >= sceneRefs.current.length - 1) return;
-    transitionToScene(currentScene.current + 1);
-  };
-
-  const triggerSceneBack = () => {
-    if (currentScene.current <= 0) return;
-    transitionToScene(currentScene.current - 1);
-  };
-
-  const transitionToScene = (nextIndex) => {
-    setTransitioning(true);
-    const current = sceneRefs.current[currentScene.current];
-    const next = sceneRefs.current[nextIndex];
-    const tl = gsap.timeline({
-      onComplete: () => {
-        currentScene.current = nextIndex;
-        setTransitioning(false);
-      }
-    });
-    tl.to(current, {
-      opacity: 0,
-      duration: 1,
-      ease: 'power2.inOut',
-      onStart: () => current.style.zIndex = 0,
-    });
-    tl.set(next, { pointerEvents: 'auto', zIndex: 1 });
-    tl.to(next, {
-      opacity: 1,
-      duration: 1.4,
-      ease: 'power2.inOut',
-    });
-  };
-
+export default function App() {
   return (
-    <Main>
-      {/* Block 2 (now primary) */}
-      <ActiveScene ref={(el) => (sceneRefs.current[0] = el)}>
-        <AI />
-      </ActiveScene>
-    </Main>
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomeScrollLayout />} />
+        <Route path="/gpt4" element={<GPT4Page />} />
+        <Route path="/claude3" element={<Claude3Page />} />
+        <Route path="/gemini" element={<GeminiPage />} />
+        <Route path="/compare" element={<CompareTable />} />
+      </Routes>
+    </Router>
   );
 }
-
-export default App;

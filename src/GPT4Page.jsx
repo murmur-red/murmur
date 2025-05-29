@@ -1,73 +1,87 @@
 import styled from 'styled-components';
 
-const Wrapper = styled.div`
+const PageWrapper = styled.div`
   min-height: 100vh;
-  padding: 4rem 2rem;
-  background: white;
-  color: black;
-  font-family: serif;
+  width: 100%;
+  background: #f9f9f9;
+  color: #1a1a1a;
+  font-family: 'serif';
+  padding: 4rem;
+  line-height: 1.7;
+  max-width: 900px;
+  margin: 0 auto;
+  overflow-y: auto;
 `;
-
 const Section = styled.section`
-  max-width: 800px;
-  margin: 0 auto 4rem auto;
+  margin-bottom: 3rem;
 `;
 
-const Heading = styled.h2`
-  font-size: 2.4rem;
-  margin-bottom: 1rem;
+const Title = styled.h1`
+  font-size: 2.6rem;
+  margin-bottom: 1.2rem;
 `;
 
-const Paragraph = styled.p`
-  font-size: 1.1rem;
-  line-height: 1.6;
-  margin-bottom: 1rem;
+const Subtitle = styled.h2`
+  font-size: 1.6rem;
+  margin: 1.6rem 0 0.8rem;
 `;
 
 const List = styled.ul`
-  padding-left: 1.5rem;
-`;
-
-const ListItem = styled.li`
-  margin-bottom: 0.75rem;
+  list-style-type: disc;
+  margin-left: 1.5rem;
 `;
 
 export default function GPT4Page() {
   return (
-    <Wrapper>
+    <PageWrapper>
+      <Title>GPT‑4 — Blueprint</Title>
+
       <Section>
-        <Heading>GPT‑4 Overview</Heading>
-        <Paragraph>
-          GPT‑4 is OpenAI's most advanced language model, known for its reasoning ability, fluency, and versatility. It can handle complex tasks in writing, code generation, summarization, and creative ideation.
-        </Paragraph>
+        <Subtitle>🔍 Core Identity</Subtitle>
+        <p>OpenAI’s most powerful and general-purpose model, capable of complex reasoning, creative output, and advanced problem solving.</p>
       </Section>
 
       <Section>
-        <Heading>Prompt Engineering Tips</Heading>
+        <Subtitle>🧠 Strengths</Subtitle>
         <List>
-          <ListItem>Be explicit about the style and tone you want.</ListItem>
-          <ListItem>Use delimiters (like triple quotes) for clarity.</ListItem>
-          <ListItem>Chain-of-thought prompts improve reasoning.</ListItem>
+          <li>Creative writing and storytelling</li>
+          <li>Highly effective in coding and debugging tasks</li>
+          <li>Multilingual capabilities and rich contextual memory</li>
+        </List>
+        <Subtitle>⚠️ Limitations</Subtitle>
+        <List>
+          <li>Occasional hallucinations</li>
+          <li>Needs prompt engineering for best results</li>
+          <li>No native web access or up-to-date knowledge</li>
         </List>
       </Section>
 
       <Section>
-        <Heading>Example Prompts</Heading>
+        <Subtitle>💡 Best Use Cases</Subtitle>
         <List>
-          <ListItem>"Summarize this article in 3 sentences, then give it a sarcastic title."</ListItem>
-          <ListItem>"Write a Python function that detects duplicates in a list."</ListItem>
-          <ListItem>"Explain quantum computing like I’m 12."</ListItem>
+          <li>AI-enhanced productivity apps</li>
+          <li>Education and tutoring tools</li>
+          <li>Legal and scientific summarization</li>
         </List>
       </Section>
 
       <Section>
-        <Heading>Best Use Cases</Heading>
+        <Subtitle>🛠️ API & Platform Behavior</Subtitle>
         <List>
-          <ListItem>Startup idea brainstorming</ListItem>
-          <ListItem>Advanced content rewriting</ListItem>
-          <ListItem>Conversational UX for apps and bots</ListItem>
+          <li>Accessed via OpenAI API</li>
+          <li>Model configuration via temperature and max tokens</li>
+          <li>Integration through ChatGPT and Copilot</li>
         </List>
       </Section>
-    </Wrapper>
+
+      <Section>
+        <Subtitle>📚 Educational Modules</Subtitle>
+        <List>
+          <li>Prompt engineering playground</li>
+          <li>Live creative writing challenge</li>
+          <li>Debugging assistant walkthrough</li>
+        </List>
+      </Section>
+    </PageWrapper>
   );
 }
