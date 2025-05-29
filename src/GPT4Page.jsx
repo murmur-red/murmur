@@ -1,28 +1,52 @@
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
 const PageWrapper = styled.div`
-  min-height: 100vh;
-  width: 100%;
   background: #f9f9f9;
   color: #1a1a1a;
   font-family: 'serif';
-  padding: 4rem;
-  line-height: 1.7;
-  max-width: 900px;
-  margin: 0 auto;
+  height: 100vh;
   overflow-y: auto;
 `;
-const Section = styled.section`
-  margin-bottom: 3rem;
+
+const StickyHeader = styled.header`
+  position: sticky;
+  top: 0;
+  background: white;
+  border-bottom: 1px solid #ddd;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
 `;
 
-const Title = styled.h1`
-  font-size: 2.6rem;
+const Logo = styled.h1`
+  font-size: 1.4rem;
+`;
+
+const NavButton = styled(Link)`
+  background: black;
+  color: white;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+`;
+
+const Section = styled.section`
+  padding: 4rem 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+`;
+
+const Title = styled.h2`
+  font-size: 2.2rem;
   margin-bottom: 1.2rem;
 `;
 
-const Subtitle = styled.h2`
-  font-size: 1.6rem;
+const Subtitle = styled.h3`
+  font-size: 1.4rem;
   margin: 1.6rem 0 0.8rem;
 `;
 
@@ -34,52 +58,50 @@ const List = styled.ul`
 export default function GPT4Page() {
   return (
     <PageWrapper>
-      <Title>GPT‑4 — Blueprint</Title>
+      <StickyHeader>
+        <Logo>GPT‑4</Logo>
+        <NavButton to="/">Back to Overview</NavButton>
+      </StickyHeader>
 
       <Section>
+        <Title>GPT‑4 — Blueprint</Title>
+
         <Subtitle>🔍 Core Identity</Subtitle>
-        <p>OpenAI’s most powerful and general-purpose model, capable of complex reasoning, creative output, and advanced problem solving.</p>
-      </Section>
+        <p>OpenAI’s flagship large language model, designed for reasoning, creativity, and deep contextual understanding. It is the most advanced and widely used LLM today.</p>
 
-      <Section>
         <Subtitle>🧠 Strengths</Subtitle>
         <List>
-          <li>Creative writing and storytelling</li>
-          <li>Highly effective in coding and debugging tasks</li>
-          <li>Multilingual capabilities and rich contextual memory</li>
+          <li>Code generation, debugging, and explanations</li>
+          <li>Creative writing and content ideation</li>
+          <li>Multilingual and style-adaptive responses</li>
         </List>
+
         <Subtitle>⚠️ Limitations</Subtitle>
         <List>
-          <li>Occasional hallucinations</li>
-          <li>Needs prompt engineering for best results</li>
-          <li>No native web access or up-to-date knowledge</li>
+          <li>Can hallucinate facts or citations</li>
+          <li>Limited access to up-to-date web info unless integrated</li>
+          <li>Some inconsistency with long outputs</li>
         </List>
-      </Section>
 
-      <Section>
         <Subtitle>💡 Best Use Cases</Subtitle>
         <List>
-          <li>AI-enhanced productivity apps</li>
-          <li>Education and tutoring tools</li>
-          <li>Legal and scientific summarization</li>
+          <li>Conversational AI tools and assistants</li>
+          <li>Technical summarization and document processing</li>
+          <li>Idea generation, brainstorming, and prototyping</li>
         </List>
-      </Section>
 
-      <Section>
         <Subtitle>🛠️ API & Platform Behavior</Subtitle>
         <List>
-          <li>Accessed via OpenAI API</li>
-          <li>Model configuration via temperature and max tokens</li>
-          <li>Integration through ChatGPT and Copilot</li>
+          <li>Access via OpenAI’s API and Azure OpenAI</li>
+          <li>Context window up to 32K tokens</li>
+          <li>Compatible with function calling and tool use</li>
         </List>
-      </Section>
 
-      <Section>
         <Subtitle>📚 Educational Modules</Subtitle>
         <List>
           <li>Prompt engineering playground</li>
-          <li>Live creative writing challenge</li>
-          <li>Debugging assistant walkthrough</li>
+          <li>System prompt training vs. user instruction demos</li>
+          <li>Multi-step reasoning challenges</li>
         </List>
       </Section>
     </PageWrapper>

@@ -1,8 +1,7 @@
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 const PageWrapper = styled.div`
-  min-height: 100vh;
-  width: 100%;
   background: #f9f9f9;
   color: #1a1a1a;
   font-family: 'serif';
@@ -10,7 +9,6 @@ const PageWrapper = styled.div`
   line-height: 1.7;
   max-width: 900px;
   margin: 0 auto;
-  overflow-y: auto;
 `;
 
 const Section = styled.section`
@@ -32,57 +30,92 @@ const List = styled.ul`
   margin-left: 1.5rem;
 `;
 
+const NavBar = styled.nav`
+  position: sticky;
+  top: 0;
+  background: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  z-index: 1000;
+`;
+
+const Logo = styled.h1`
+  font-size: 1.5rem;
+  font-weight: bold;
+`;
+
+const BackButton = styled.button`
+  padding: 0.5rem 1rem;
+  background: black;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+`;
+
 export default function GeminiPage() {
+  const navigate = useNavigate();
+
   return (
-    <PageWrapper>
-      <Title>Gemini — Blueprint</Title>
+    <div>
+      <NavBar>
+        <Logo>murmur</Logo>
+        <BackButton onClick={() => navigate('/')}>Back to Overview</BackButton>
+      </NavBar>
 
-      <Section>
-        <Subtitle>🔍 Core Identity</Subtitle>
-        <p>Google DeepMind’s multimodal model designed for seamless use across text, images, code, and more. Aims to integrate AI directly into your productivity and research workflows.</p>
-      </Section>
+      <PageWrapper>
+        <Title>Gemini — Blueprint</Title>
 
-      <Section>
-        <Subtitle>🧠 Strengths</Subtitle>
-        <List>
-          <li>Multimodal capabilities (text, image, audio, video)</li>
-          <li>Search-native understanding</li>
-          <li>Ideal for productivity tools and contextual assistance</li>
-        </List>
-        <Subtitle>⚠️ Limitations</Subtitle>
-        <List>
-          <li>Less consistent in longform logic reasoning</li>
-          <li>Still experimental in some geographies</li>
-          <li>Less transparency around architecture</li>
-        </List>
-      </Section>
+        <Section>
+          <Subtitle>🔍 Core Identity</Subtitle>
+          <p>Google DeepMind’s multimodal model, built for fluid interactions across text, images, code, and video. Designed for integration across the Google ecosystem.</p>
+        </Section>
 
-      <Section>
-        <Subtitle>💡 Best Use Cases</Subtitle>
-        <List>
-          <li>Research copilots</li>
-          <li>Real-time web content summarization</li>
-          <li>Document and image ingestion</li>
-        </List>
-      </Section>
+        <Section>
+          <Subtitle>🧠 Strengths</Subtitle>
+          <List>
+            <li>Multimodal reasoning (text, image, video)</li>
+            <li>Strong web and document comprehension</li>
+            <li>Powerful cloud-based integration options</li>
+          </List>
+          <Subtitle>⚠️ Limitations</Subtitle>
+          <List>
+            <li>Limited offline use cases</li>
+            <li>Requires API access via Google Cloud</li>
+            <li>Still being refined for complex workflows</li>
+          </List>
+        </Section>
 
-      <Section>
-        <Subtitle>🛠️ API & Platform Behavior</Subtitle>
-        <List>
-          <li>Vertex AI integration (Google Cloud)</li>
-          <li>Connected to Workspace (Docs, Sheets, Gmail)</li>
-          <li>Google Lens-style functionality in dev</li>
-        </List>
-      </Section>
+        <Section>
+          <Subtitle>💡 Best Use Cases</Subtitle>
+          <List>
+            <li>Multimodal knowledge agents</li>
+            <li>Image-to-text productivity tools</li>
+            <li>Integration into Docs, Sheets, Search</li>
+          </List>
+        </Section>
 
-      <Section>
-        <Subtitle>📚 Educational Modules</Subtitle>
-        <List>
-          <li>Multimodal input experiments</li>
-          <li>Gemini sandbox prompt lab</li>
-          <li>Content-aware spreadsheet automation</li>
-        </List>
-      </Section>
-    </PageWrapper>
+        <Section>
+          <Subtitle>🛠️ API & Platform Behavior</Subtitle>
+          <List>
+            <li>Deployed via Google Vertex AI</li>
+            <li>Gemini Pro and Gemini Ultra tiers</li>
+            <li>Built-in prompt tuning for custom tasks</li>
+          </List>
+        </Section>
+
+        <Section>
+          <Subtitle>📚 Educational Modules</Subtitle>
+          <List>
+            <li>Live doc annotation and interaction</li>
+            <li>Hands-on image querying tutorials</li>
+            <li>Gemini UI playground (early beta)</li>
+          </List>
+        </Section>
+      </PageWrapper>
+    </div>
   );
 }

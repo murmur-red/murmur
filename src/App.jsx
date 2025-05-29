@@ -1,5 +1,3 @@
-// App.jsx — Main app with full routing and comparison view
-
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomeScrollLayout from './HomeScrollLayout';
 import GPT4Page from './GPT4Page';

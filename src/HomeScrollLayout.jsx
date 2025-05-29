@@ -1,10 +1,10 @@
-// HomeScrollLayout.jsx
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 gsap.registerPlugin(ScrollToPlugin);
 import styled from 'styled-components';
 import AI from './AI';
+import Navbar from './Navbar';
 
 const Main = styled.div`
   height: 100vh;
@@ -36,23 +36,9 @@ const ActiveScene = styled(Scene)`
   z-index: 1;
 `;
 
-const CursorDot = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: white;
-  pointer-events: none;
-  z-index: 100;
-  mix-blend-mode: difference;
-  opacity: 1;
-  transition: opacity 0.3s ease;
-`;
-
 export default function HomeScrollLayout() {
   const cursorRef = useRef(null);
+  const scrollHintRef = useRef(null);
   const sceneRefs = useRef([]);
   const currentScene = useRef(0);
   const [transitioning, setTransitioning] = useState(false);
@@ -100,13 +86,13 @@ export default function HomeScrollLayout() {
       onComplete: () => {
         currentScene.current = nextIndex;
         setTransitioning(false);
-      },
+      }
     });
     tl.to(current, {
       opacity: 0,
       duration: 1,
       ease: 'power2.inOut',
-      onStart: () => (current.style.zIndex = 0),
+      onStart: () => current.style.zIndex = 0,
     });
     tl.set(next, { pointerEvents: 'auto', zIndex: 1 });
     tl.to(next, {
@@ -117,11 +103,13 @@ export default function HomeScrollLayout() {
   };
 
   return (
-    <Main>
-      <CursorDot ref={cursorRef} />
-      <ActiveScene ref={(el) => (sceneRefs.current[0] = el)}>
-        <AI />
-      </ActiveScene>
-    </Main>
+    <>
+      <Navbar />
+      <Main>
+        <ActiveScene ref={(el) => (sceneRefs.current[0] = el)}>
+          <AI />
+        </ActiveScene>
+      </Main>
+    </>
   );
 }
