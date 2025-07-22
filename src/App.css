@@ -1,17 +1,24 @@
-/* App.css — can be empty or include resets */
-html, body {
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-  overflow-x: hidden;
-  overflow-y: auto;
+:root {
+  --bg: white;
+  --text: black;
 }
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  @keyframes fadeIn {
+
+.dark {
+  --bg: #121212;
+  --text: #f5f5f5;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
 }

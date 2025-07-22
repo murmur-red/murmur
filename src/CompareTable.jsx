@@ -80,39 +80,39 @@ export default function CompareTable() {
         <tbody>
           <tr>
             <Td>🧠 Core Identity</Td>
-            <Td>{aiData['GPT-4']?.coreIdentity || '—'}</Td>
-            <Td>{aiData['Claude 3']?.coreIdentity || '—'}</Td>
-            <Td>{aiData['Gemini']?.coreIdentity || '—'}</Td>
+            <Td>{aiData['GPT-4'].coreIdentity}</Td>
+            <Td>{aiData['Claude 3'].coreIdentity}</Td>
+            <Td>{aiData['Gemini'].coreIdentity}</Td>
           </tr>
           <tr>
             <Td>💪 Strengths</Td>
-            <Td>{aiData['GPT-4']?.strengths || '—'}</Td>
-            <Td>{aiData['Claude 3']?.strengths || '—'}</Td>
-            <Td>{aiData['Gemini']?.strengths || '—'}</Td>
+            <Td>{aiData['GPT-4'].strengths}</Td>
+            <Td>{aiData['Claude 3'].strengths}</Td>
+            <Td>{aiData['Gemini'].strengths}</Td>
           </tr>
           <tr>
             <Td>⚠️ Limitations</Td>
-            <Td>{aiData['GPT-4']?.limitations || '—'}</Td>
-            <Td>{aiData['Claude 3']?.limitations || '—'}</Td>
-            <Td>{aiData['Gemini']?.limitations || '—'}</Td>
+            <Td>{aiData['GPT-4'].limitations}</Td>
+            <Td>{aiData['Claude 3'].limitations}</Td>
+            <Td>{aiData['Gemini'].limitations}</Td>
           </tr>
           <tr>
             <Td>💡 Best Use Cases</Td>
-            <Td>{aiData['GPT-4']?.useCases || '—'}</Td>
-            <Td>{aiData['Claude 3']?.useCases || '—'}</Td>
-            <Td>{aiData['Gemini']?.useCases || '—'}</Td>
+            <Td>{aiData['GPT-4'].useCases}</Td>
+            <Td>{aiData['Claude 3'].useCases}</Td>
+            <Td>{aiData['Gemini'].useCases}</Td>
           </tr>
           <tr>
             <Td>🛠️ Integration</Td>
-            <Td>{aiData['GPT-4']?.integration || '—'}</Td>
-            <Td>{aiData['Claude 3']?.integration || '—'}</Td>
-            <Td>{aiData['Gemini']?.integration || '—'}</Td>
+            <Td>{aiData['GPT-4'].integration}</Td>
+            <Td>{aiData['Claude 3'].integration}</Td>
+            <Td>{aiData['Gemini'].integration}</Td>
           </tr>
           <tr>
             <Td>🎓 Educational Modules</Td>
-            <Td>{aiData['GPT-4']?.education || '—'}</Td>
-            <Td>{aiData['Claude 3']?.education || '—'}</Td>
-            <Td>{aiData['Gemini']?.education || '—'}</Td>
+            <Td>{aiData['GPT-4'].education}</Td>
+            <Td>{aiData['Claude 3'].education}</Td>
+            <Td>{aiData['Gemini'].education}</Td>
           </tr>
         </tbody>
       </Table>

@@ -1,8 +1,6 @@
-// aiData.js — Full schema scaffold
-
 export const aiData = {
-  'GPT-4': {
-    title: 'GPT-4',
+  'GPT4': {
+    title: 'GPT4',
     identity: 'OpenAI’s flagship model focused on reasoning, logic, and language precision.',
     strengths: [
       'Advanced reasoning and logic',
@@ -29,8 +27,8 @@ export const aiData = {
     updated: '2025‑05‑29'
   },
 
-  'Claude 3': {
-    title: 'Claude 3',
+  'Claude3': {
+    title: 'Claude3',
     identity: 'Anthropic’s model focused on interpretability, alignment, and safe reasoning.',
     strengths: [
       'Document Q&A with long contexts (100K tokens)',
@@ -38,7 +36,7 @@ export const aiData = {
       'Emphasis on safe, aligned output'
     ],
     limitations: [
-      'Less expressive than GPT‑4',
+      'Less expressive than GPT4',
       'Limited tooling and exposure',
       'Focused mostly on text use cases'
     ],
@@ -67,7 +65,7 @@ export const aiData = {
     ],
     limitations: [
       'Currently requires tuning for custom enterprise use',
-      'Less accessible than GPT‑4 API',
+      'Less accessible than GPT4 API',
       'Some features still in rollout phase'
     ],
     useCases: [

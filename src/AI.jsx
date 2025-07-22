@@ -1,97 +1,112 @@
-import styled from 'styled-components';
-import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react'
+import { aiData } from './aiData'
+import PromptPlayground from './components/PromptPlayground'
 
-const AIBlockWrapper = styled.section`
-  height: 100vh;
-  width: 100vw;
-  background: white;
-  color: black;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 2rem;
-  font-family: serif;
-`;
+const AI = () => {
+  const [selectedModel, setSelectedModel] = useState(null)
+  const [view, setView] = useState('summary')
 
-const AIHeading = styled.h2`
-  font-size: 2.4rem;
-  margin-bottom: 1.5rem;
-`;
-
-const AIContent = styled.p`
-  font-size: 1.2rem;
-  max-width: 800px;
-  line-height: 1.6;
-`;
-
-const CardsWrapper = styled.div`
-  display: flex;
-  gap: 2rem;
-  margin-top: 3rem;
-  flex-wrap: wrap;
-  justify-content: center;
-`;
-
-const Card = styled.div`
-  background: white;
-  color: black;
-  padding: 2rem;
-  border-radius: 12px;
-  border: 2px solid black;
-  width: 250px;
-  text-align: left;
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  &:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+  const closeModal = () => {
+    setSelectedModel(null)
+    setView('summary')
   }
-`;
 
-export default function AI() {
-  const [openaiLine, setOpenaiLine] = useState('');
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    fetch('http://localhost:4000/api/openai', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({})
-    })
-      .then(res => res.json())
-      .then(data => setOpenaiLine(data.result || '...'))
-      .catch(() => setOpenaiLine('AI is thinking weird stuff today...'));
-  }, []);
+  const data = selectedModel ? aiData[selectedModel] : null
 
   return (
-    <AIBlockWrapper>
-      <AIHeading>murmur: AI Knowledge Platform under Construction</AIHeading>
-      {openaiLine.split(/\n+/).map((line, i) => (
-        <AIContent key={i}>{line.replace(/^\d+\.\s*/, '')}</AIContent>
-      ))}
+    <div className="w-full px-4 py-12">
+      <h1 className="text-3xl font-bold mb-8 text-center">Explore AI Mentors</h1>
 
-      <CardsWrapper>
-        <Card onClick={() => navigate('/gpt4')}>
-          <h3>GPT‑4</h3>
-          <p>Advanced reasoning and creativity. Best for coding, writing, and summarizing.</p>
-        </Card>
-        <Card onClick={() => navigate('/claude3')}>
-          <h3>Claude 3</h3>
-          <p>Trained with high interpretability in mind. Strong at document Q&A.</p>
-        </Card>
-        <Card onClick={() => navigate('/gemini')}>
-          <h3>Gemini</h3>
-          <p>Google's multimodal AI. Great for images, docs, and web integration.</p>
-        </Card>
-        <Card onClick={() => navigate('/compare')}>
-          <h3>Compare All</h3>
-          <p>Side-by-side comparison of GPT‑4, Claude 3, and Gemini.</p>
-        </Card>
-      </CardsWrapper>
-    </AIBlockWrapper>
-  );
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+        {Object.keys(aiData).map((modelKey) => (
+          <div
+            key={modelKey}
+            className="rounded-xl border p-6 shadow hover:shadow-xl cursor-pointer transition-all duration-200 dark:bg-zinc-900"
+            onClick={() => setSelectedModel(modelKey)}
+          >
+            <h2 className="text-xl font-semibold mb-2">{aiData[modelKey].title}</h2>
+            <p className="text-sm text-muted-foreground">{aiData[modelKey].identity}</p>
+          </div>
+        ))}
+      </div>
+
+      {selectedModel && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-zinc-900 max-w-3xl w-full p-6 rounded-xl shadow-lg relative overflow-y-auto max-h-[90vh]">
+            <button
+              className="absolute top-3 right-4 text-zinc-500 hover:text-zinc-800 dark:hover:text-white text-xl"
+              onClick={closeModal}
+            >
+              ×
+            </button>
+
+            <h2 className="text-2xl font-bold mb-2">{data.title}</h2>
+            <p className="mb-4 text-sm text-muted-foreground">{data.identity}</p>
+
+            <div className="flex gap-4 mb-6">
+              <button
+                className={`px-3 py-1 rounded ${
+                  view === 'summary' ? 'bg-black text-white' : 'bg-gray-200'
+                }`}
+                onClick={() => setView('summary')}
+              >
+                Summary
+              </button>
+              <button
+                className={`px-3 py-1 rounded ${
+                  view === 'details' ? 'bg-black text-white' : 'bg-gray-200'
+                }`}
+                onClick={() => setView('details')}
+              >
+                Deep Dive
+              </button>
+            </div>
+
+            {view === 'summary' ? (
+              <div className="text-sm leading-relaxed">
+                <h4 className="font-semibold mt-4 mb-1">Strengths:</h4>
+                <ul className="list-disc list-inside">
+                  {data.strengths.map((point, i) => (
+                    <li key={i}>{point}</li>
+                  ))}
+                </ul>
+
+                <h4 className="font-semibold mt-4 mb-1">Limitations:</h4>
+                <ul className="list-disc list-inside">
+                  {data.limitations.map((point, i) => (
+                    <li key={i}>{point}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <div className="text-sm leading-relaxed">
+                <h4 className="font-semibold mt-4 mb-1">Use Cases:</h4>
+                <ul className="list-disc list-inside">
+                  {data.useCases.map((point, i) => (
+                    <li key={i}>{point}</li>
+                  ))}
+                </ul>
+
+                <h4 className="font-semibold mt-4 mb-1">Example Prompts:</h4>
+                <ul className="list-disc list-inside">
+                  {data.prompts.map((point, i) => (
+                    <li key={i}>{point}</li>
+                  ))}
+                </ul>
+
+                <p className="mt-4"><strong>API:</strong> {data.api}</p>
+                <p><strong>Safety:</strong> {data.safety}</p>
+                <p><strong>Updated:</strong> {data.updated}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 🎯 Prompt Playground Section */}
+      <PromptPlayground />
+    </div>
+  )
 }
+
+export default AI
