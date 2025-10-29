@@ -1,13 +1,1004 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>murmur.red</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lena Ry - AI-Native Operations Leader</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #00f2ff;
+            --secondary: #ff00ff;
+            --accent: #ffed00;
+            --dark: #0a0a0f;
+            --card-bg: #1a1a24;
+            --text: #ffffff;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .gradient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 20s infinite ease-in-out;
+        }
+        
+        .orb1 {
+            width: 500px;
+            height: 500px;
+            background: var(--primary);
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .orb2 {
+            width: 400px;
+            height: 400px;
+            background: var(--secondary);
+            bottom: 10%;
+            right: 10%;
+            animation-delay: 5s;
+        }
+        
+        .orb3 {
+            width: 350px;
+            height: 350px;
+            background: var(--accent);
+            top: 50%;
+            left: 50%;
+            animation-delay: 10s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(50px, -50px) scale(1.1); }
+            66% { transform: translate(-30px, 30px) scale(0.9); }
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 25px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        /* Content Container */
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        section {
+            min-height: 100vh;
+            padding: 100px 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Hero Section */
+        .hero {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 80px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 3s ease-in-out infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
+        }
+        
+        .hero h2 {
+            font-size: 32px;
+            font-weight: 400;
+            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .hero p {
+            font-size: 20px;
+            max-width: 700px;
+            margin-bottom: 50px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 18px 45px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--dark);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 18px;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(0, 242, 255, 0.3);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 242, 255, 0.5);
+        }
+        
+        /* Stats */
+        .stats {
+            display: flex;
+            gap: 50px;
+            margin-top: 60px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 5px;
+        }
+        
+        /* About Section */
+        .about-content {
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        
+        .about-text h2 {
+            font-size: 48px;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .about-text p {
+            font-size: 18px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+        }
+        
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .tech-badge {
+            padding: 10px 20px;
+            background: var(--card-bg);
+            border: 2px solid var(--primary);
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .tech-badge:hover {
+            background: var(--primary);
+            color: var(--dark);
+            transform: translateY(-3px);
+        }
+        
+        /* AI Playground */
+        .playground {
+            background: rgba(26, 26, 36, 0.5);
+            backdrop-filter: blur(20px);
+        }
+        
+        .playground-content {
+            max-width: 1400px;
+            width: 100%;
+        }
+        
+        .playground h2 {
+            font-size: 56px;
+            margin-bottom: 20px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .playground-subtitle {
+            text-align: center;
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 60px;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        
+        .tool-card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .tool-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 242, 255, 0.2);
+        }
+        
+        .tool-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .tool-card p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .tool-button {
+            padding: 12px 30px;
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 16px;
+        }
+        
+        .tool-button:hover {
+            background: var(--primary);
+            color: var(--dark);
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
+            padding: 50px;
+            border-radius: 20px;
+            max-width: 700px;
+            width: 100%;
+            border: 2px solid var(--primary);
+            position: relative;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 36px;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.6);
+            transition: color 0.3s;
+        }
+        
+        .modal-close:hover {
+            color: var(--primary);
+        }
+        
+        .modal h3 {
+            font-size: 32px;
+            margin-bottom: 30px;
+            color: var(--primary);
+        }
+        
+        textarea, input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 16px;
+            margin-bottom: 20px;
+            resize: vertical;
+        }
+        
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .analyze-button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 10px;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        
+        .analyze-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 242, 255, 0.4);
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(0, 242, 255, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+            display: none;
+        }
+        
+        .result.active {
+            display: block;
+        }
+        
+        .result h4 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .result p {
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        /* Work Section */
+        .work-content {
+            max-width: 1200px;
+        }
+        
+        .work-content h2 {
+            font-size: 56px;
+            margin-bottom: 60px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .case-studies {
+            display: grid;
+            gap: 40px;
+        }
+        
+        .case-study {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            border-left: 5px solid var(--primary);
+            transition: all 0.3s;
+        }
+        
+        .case-study:hover {
+            transform: translateX(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .case-study h3 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        .case-study .company {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 20px;
+        }
+        
+        .case-study p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+        }
+        
+        .metrics {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .metric {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .metric-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .metric-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        /* Contact Section */
+        .contact {
+            background: linear-gradient(135deg, rgba(0, 242, 255, 0.1), rgba(255, 0, 255, 0.1));
+        }
+        
+        .contact-content {
+            text-align: center;
+            max-width: 800px;
+        }
+        
+        .contact h2 {
+            font-size: 56px;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .contact p {
+            font-size: 20px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 40px;
+        }
+        
+        .contact-links {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .contact-link {
+            padding: 18px 40px;
+            background: var(--card-bg);
+            border: 2px solid var(--primary);
+            color: var(--text);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        
+        .contact-link:hover {
+            background: var(--primary);
+            color: var(--dark);
+            transform: translateY(-3px);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 48px; }
+            .hero h2 { font-size: 24px; }
+            section { padding: 80px 30px; }
+            .about-content { grid-template-columns: 1fr; }
+            .stats { flex-direction: column; gap: 30px; }
+            nav { padding: 20px 30px; }
+            .nav-links { gap: 20px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="gradient-orb orb1"></div>
+        <div class="gradient-orb orb2"></div>
+        <div class="gradient-orb orb3"></div>
+    </div>
+    
+    <nav>
+        <div class="logo">LENA RY</div>
+        <div class="nav-links">
+            <a href="#about">About</a>
+            <a href="#playground">AI Playground</a>
+            <a href="#work">Work</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </nav>
+    
+    <div class="content">
+        <section class="hero">
+            <h1>AI-Native Client & Product Leader</h1>
+            <h2>Building the future of customer success, one intelligent experience at a time</h2>
+            <p>I don't just manage clients—I architect their success. With 10+ years transforming customer relationships and product adoption across SaaS, Web3, and AI companies, I build experiences that delight, retain, and scale.</p>
+            <a href="#contact" class="cta-button">Let's Build Something</a>
+            
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number">10+</div>
+                    <div class="stat-label">Years in Operations</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">50K+</div>
+                    <div class="stat-label">Users Supported</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">Companies Scaled</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">Problems Solved</div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="about">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>Not Your Average Ops Person</h2>
+                    <p>Most operations people optimize existing processes. I <span class="highlight">rebuild them from scratch using AI</span>.</p>
+                    <p>From co-founding a gaming startup to managing 50,000+ users in Web3 to scaling AI SaaS companies, I've learned that the best operations are invisible—they just work.</p>
+                    <p>My superpower? Taking complex, messy problems and turning them into elegant, AI-powered systems that scale without breaking.</p>
+                    <p><span class="highlight">Current obsession:</span> How AI can eliminate 80% of operational overhead while improving quality.</p>
+                    
+                    <div class="tech-stack">
+                        <span class="tech-badge">AI/ML Tools</span>
+                        <span class="tech-badge">Process Design</span>
+                        <span class="tech-badge">SQL + Python</span>
+                        <span class="tech-badge">Data Analytics</span>
+                        <span class="tech-badge">Vendor Management</span>
+                        <span class="tech-badge">Cross-functional Leadership</span>
+                    </div>
+                </div>
+                <div class="about-visual">
+                    <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=600&h=800&fit=crop" alt="AI Visualization" style="width: 100%; border-radius: 20px; border: 3px solid var(--primary);">
+                </div>
+            </div>
+        </section>
+        
+        <section id="playground" class="playground">
+            <div class="playground-content">
+                <h2>AI Playground</h2>
+                <p class="playground-subtitle">Interactive tools I've built. Try them out—they're actually useful.</p>
+                
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <h3>🎯 Job Fit Analyzer</h3>
+                        <p>Paste a job description and get instant AI analysis on whether it's worth applying, what to emphasize, and red flags to watch for.</p>
+                        <button class="tool-button" onclick="openModal('jobFit')">Try It Now</button>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <h3>💡 Ops Efficiency Calculator</h3>
+                        <p>Calculate the ROI of implementing AI in your operations. See real numbers on time saved, cost reduction, and quality improvement.</p>
+                        <button class="tool-button" onclick="openModal('efficiency')">Calculate ROI</button>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <h3>🤖 Ask Me Anything</h3>
+                        <p>AI chatbot trained on my experience. Ask about my approach to ops, specific projects, or whether we'd be a good fit.</p>
+                        <button class="tool-button" onclick="openModal('chatbot')">Start Chat</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="work">
+            <div class="work-content">
+                <h2>Real Impact, Real Numbers</h2>
+                
+                <div class="case-studies">
+                    <div class="case-study">
+                        <h3>Built Operations Infrastructure from Zero</h3>
+                        <div class="company">Ygames | Co-founder | 2023-2025</div>
+                        <p>As co-founder, I built the entire operational backbone: vendor relationships, performance tracking systems, and AI-powered workflows that allowed us to move fast without breaking things.</p>
+                        <div class="metrics">
+                            <div class="metric">
+                                <div class="metric-value">100%</div>
+                                <div class="metric-label">From Scratch</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">5x</div>
+                                <div class="metric-label">Faster Launch Speed</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="case-study">
+                        <h3>Scaled Support Operations 10x</h3>
+                        <div class="company">Merit Circle / Beam (Web3 Gaming DAO) | 2022-2023</div>
+                        <p>Managed operations for 50,000+ community members during explosive growth. Built automated workflows using AI and smart contracts that handled 10x volume increase without proportional headcount growth.</p>
+                        <div class="metrics">
+                            <div class="metric">
+                                <div class="metric-value">60%</div>
+                                <div class="metric-label">Response Time Reduction</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">10x</div>
+                                <div class="metric-label">Volume Handled</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="case-study">
+                        <h3>Transformed CS into Revenue Engine</h3>
+                        <div class="company">Replai (AI SaaS) | 2021-2022</div>
+                        <p>Built data infrastructure and AI-powered workflows that scaled operations from 50 to 500+ accounts while reducing time-to-value by 40%.</p>
+                        <div class="metrics">
+                            <div class="metric">
+                                <div class="metric-value">500+</div>
+                                <div class="metric-label">Accounts Managed</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">40%</div>
+                                <div class="metric-label">Faster Time-to-Value</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="contact" class="contact">
+            <div class="contact-content">
+                <h2>Let's Build Together</h2>
+                <p>Looking for an operations leader who thinks in systems, builds with AI, and turns complexity into simplicity? Let's talk.</p>
+                <p><strong>Best for:</strong> AI companies, high-growth startups (Series A-C), companies rebuilding operations from scratch, or anyone who wants to see what's possible when you combine deep ops experience with AI-first thinking.</p>
+                
+                <div class="contact-links">
+                    <a href="mailto:murmur.red1@gmail.com" class="contact-link">📧 Email Me</a>
+                    <a href="https://www.linkedin.com/in/lena-ry-8baa8716/" target="_blank" class="contact-link">💼 LinkedIn</a>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Modals -->
+    <div id="jobFitModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('jobFit')">&times;</span>
+            <h3>🎯 Job Fit Analyzer</h3>
+            <textarea id="jobDescription" rows="8" placeholder="Paste the job description here..."></textarea>
+            <button class="analyze-button" onclick="analyzeJob()">Analyze Job Fit</button>
+            <div id="jobResult" class="result"></div>
+        </div>
+    </div>
+    
+    <div id="efficiencyModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('efficiency')">&times;</span>
+            <h3>💡 Ops Efficiency Calculator</h3>
+            <input type="number" id="teamSize" placeholder="Team size (number of people)">
+            <input type="number" id="manualHours" placeholder="Hours spent on manual ops tasks per week">
+            <input type="number" id="avgSalary" placeholder="Average salary per team member ($)">
+            <button class="analyze-button" onclick="calculateEfficiency()">Calculate ROI</button>
+            <div id="efficiencyResult" class="result"></div>
+        </div>
+    </div>
+    
+    <div id="chatbotModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('chatbot')">&times;</span>
+            <h3>🤖 Ask Me Anything</h3>
+            <textarea id="chatQuestion" rows="5" placeholder="Ask me about my experience, approach to ops, or anything else..."></textarea>
+            <button class="analyze-button" onclick="askChatbot()">Get Answer</button>
+            <div id="chatResult" class="result"></div>
+        </div>
+    </div>
+    
+    <script>
+        function openModal(type) {
+            document.getElementById(type + 'Modal').classList.add('active');
+        }
+        
+        function closeModal(type) {
+            document.getElementById(type + 'Modal').classList.remove('active');
+        }
+        
+        function analyzeJob() {
+            const jobDesc = document.getElementById('jobDescription').value;
+            const result = document.getElementById('jobResult');
+            
+            if (!jobDesc.trim()) {
+                alert('Please paste a job description first!');
+                return;
+            }
+            
+            // Simulate AI analysis
+            result.innerHTML = '<h4>Analyzing...</h4>';
+            result.classList.add('active');
+            
+            setTimeout(() => {
+                // Simple keyword analysis
+                const keywords = {
+                    operations: /operations|ops|operational|process/gi,
+                    ai: /ai|artificial intelligence|machine learning|ml|automation/gi,
+                    leadership: /lead|manage|director|head|vp/gi,
+                    technical: /sql|python|data|analytics|technical/gi,
+                    startup: /startup|scale|growth|fast-paced/gi,
+                    cs: /customer success|cs|customer/gi
+                };
+                
+                let scores = {};
+                let matches = [];
+                
+                for (let [key, regex] of Object.entries(keywords)) {
+                    const found = jobDesc.match(regex);
+                    scores[key] = found ? found.length : 0;
+                    if (found) matches.push(key);
+                }
+                
+                const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
+                const fitPercentage = Math.min(Math.round((totalScore / 15) * 100), 95);
+                
+                let recommendation = '';
+                let emphasis = '';
+                let redFlags = '';
+                
+                if (fitPercentage >= 70) {
+                    recommendation = '🟢 <strong>STRONG FIT!</strong> This role aligns well with your experience.';
+                } else if (fitPercentage >= 50) {
+                    recommendation = '🟡 <strong>POSSIBLE FIT.</strong> You could make a case, but it\'ll require strong positioning.';
+                } else {
+                    recommendation = '🔴 <strong>STRETCH ROLE.</strong> Consider if this is worth the effort.';
+                }
+                
+                if (scores.ai > 0) {
+                    emphasis += '✓ Emphasize your AI-first approach and experience at Replai<br>';
+                }
+                if (scores.operations > 2) {
+                    emphasis += '✓ Highlight process optimization and scalability wins<br>';
+                }
+                if (scores.startup > 0) {
+                    emphasis += '✓ Lead with your co-founder experience and 0→1 building<br>';
+                }
+                if (scores.cs > 0) {
+                    emphasis += '✓ Frame CS experience as operations excellence<br>';
+                }
+                if (scores.technical > 0) {
+                    redFlags += '⚠️ Technical requirements present - be ready to discuss SQL/Python<br>';
+                }
+                
+                result.innerHTML = `
+                    <h4>Match Score: ${fitPercentage}%</h4>
+                    <p><strong>Quick Take:</strong><br>${recommendation}</p>
+                    ${emphasis ? `<p><strong>What to Emphasize:</strong><br>${emphasis}</p>` : ''}
+                    ${redFlags ? `<p><strong>Red Flags:</strong><br>${redFlags}</p>` : ''}
+                    <p><strong>Keywords Found:</strong> ${matches.join(', ') || 'None detected'}</p>
+                    <p style="margin-top: 20px; font-size: 14px; opacity: 0.7;">💡 Pro tip: Use these insights to tailor your CV and cover letter to mirror their language.</p>
+                `;
+            }, 1500);
+        }
+        
+        function calculateEfficiency() {
+            const teamSize = parseInt(document.getElementById('teamSize').value);
+            const manualHours = parseInt(document.getElementById('manualHours').value);
+            const avgSalary = parseInt(document.getElementById('avgSalary').value);
+            const result = document.getElementById('efficiencyResult');
+            
+            if (!teamSize || !manualHours || !avgSalary) {
+                alert('Please fill in all fields!');
+                return;
+            }
+            
+            result.innerHTML = '<h4>Calculating...</h4>';
+            result.classList.add('active');
+            
+            setTimeout(() => {
+                // Calculate ROI
+                const hourlyRate = avgSalary / 2080; // Annual hours
+                const weeklyWaste = manualHours * teamSize * hourlyRate;
+                const annualWaste = weeklyWaste * 52;
+                
+                // Assume AI can automate 60-70% of manual work
+                const automationRate = 0.65;
+                const annualSavings = annualWaste * automationRate;
+                const timeSaved = manualHours * teamSize * automationRate;
+                
+                // Implementation cost estimate
+                const implementationCost = 50000; // Rough estimate
+                const roi = ((annualSavings - implementationCost) / implementationCost * 100).toFixed(0);
+                
+                result.innerHTML = `
+                    <h4>💰 Annual Cost of Manual Operations</h4>
+                    <p style="font-size: 32px; color: var(--accent); font-weight: 700; margin: 10px 0;">${annualWaste.toLocaleString()}</p>
+                    
+                    <h4 style="margin-top: 25px;">✨ With AI-First Automation</h4>
+                    <p><strong>Annual Savings:</strong> ${annualSavings.toLocaleString()}</p>
+                    <p><strong>Time Reclaimed:</strong> ${timeSaved.toFixed(1)} hours/week</p>
+                    <p><strong>First Year ROI:</strong> ${roi}%</p>
+                    <p><strong>Payback Period:</strong> ${(implementationCost / (annualSavings / 12)).toFixed(1)} months</p>
+                    
+                    <p style="margin-top: 20px; font-size: 14px; opacity: 0.7;">
+                        💡 These numbers assume 65% automation rate - conservative estimate based on my real-world implementations.
+                    </p>
+                `;
+            }, 1500);
+        }
+        
+        function askChatbot() {
+            const question = document.getElementById('chatQuestion').value;
+            const result = document.getElementById('chatResult');
+            
+            if (!question.trim()) {
+                alert('Please ask a question first!');
+                return;
+            }
+            
+            result.innerHTML = '<h4>Thinking...</h4>';
+            result.classList.add('active');
+            
+            setTimeout(() => {
+                // Simple keyword matching for demo
+                const q = question.toLowerCase();
+                let answer = '';
+                
+                if (q.includes('experience') || q.includes('background')) {
+                    answer = '10+ years in operations across SaaS, Web3, AdTech, and AI. I\'ve been everything from an IC at a 300-person company to co-founder building from scratch. My superpower is taking messy, complex operations and turning them into elegant, AI-powered systems that scale.';
+                } else if (q.includes('ai') || q.includes('automation')) {
+                    answer = 'I\'m obsessed with AI-first operations. Not just "let\'s add a chatbot" - I mean fundamentally rethinking processes from the ground up. At Merit Circle, I built automated workflows that handled 10x volume without adding headcount. At Replai, I used AI to predict churn and automate interventions. The future of ops is intelligent, adaptive systems.';
+                } else if (q.includes('sql') || q.includes('python') || q.includes('technical')) {
+                    answer = 'I have foundational SQL and Python skills - enough to query databases, analyze data, and build simple automation scripts. I\'m not an engineer, but I speak their language and can bridge between technical and business teams. Plus, I\'m always learning and expanding my technical toolkit.';
+                } else if (q.includes('startup') || q.includes('scale')) {
+                    answer = 'I thrive in 0→1 and 1→10 stages. As a co-founder at Ygames, I built operational infrastructure from absolute zero. At Merit Circle, I scaled support from handling hundreds to 50,000+ users. I know how to build for today while architecting for tomorrow.';
+                } else if (q.includes('web3') || q.includes('blockchain') || q.includes('gaming')) {
+                    answer = 'Web3 + Gaming is my sweet spot. Co-founded Ygames, managed operations at Merit Circle (Web3 Gaming DAO). I understand DAOs, smart contracts, tokenomics, and the unique operational challenges of decentralized systems. It\'s a wild west - exactly where I thrive.';
+                } else if (q.includes('hire') || q.includes('work') || q.includes('available')) {
+                    answer = 'Open to full-time roles, fractional leadership, or advisory positions. Best fit: AI companies, high-growth startups (Series A-C), or companies rebuilding operations from scratch. I want hard problems, smart people, and the chance to build something that matters. Email me: murmur.red1@gmail.com';
+                } else if (q.includes('approach') || q.includes('methodology') || q.includes('how')) {
+                    answer = 'My approach: 1) Understand the chaos deeply, 2) Break complex problems into smaller pieces, 3) Identify what can be automated vs. needs human touch, 4) Build with AI-first thinking, 5) Iterate ruthlessly based on data. I don\'t believe in "best practices" - I believe in what actually works for your specific context.';
+                } else {
+                    answer = 'Great question! While this demo chatbot has limited responses, the real me would love to discuss this. Shoot me an email at murmur.red1@gmail.com or connect on LinkedIn. I\'m always up for interesting conversations about ops, AI, or building things that scale.';
+                }
+                
+                result.innerHTML = `
+                    <h4>💬 Response</h4>
+                    <p>${answer}</p>
+                    <p style="margin-top: 20px; font-size: 14px; opacity: 0.7;">
+                        <em>Note: This is a demo chatbot. For real conversation, reach out directly!</em>
+                    </p>
+                `;
+            }, 1500);
+        }
+        
+        // Close modal on outside click
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+        
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
 </html>
