@@ -393,6 +393,261 @@
             background: var(--primary);
             color: var(--dark);
         }
+
+        /* AI Workflows Section */
+        .workflows {
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px);
+        }
+
+        .workflows-content {
+            max-width: 1400px;
+            width: 100%;
+        }
+
+        .workflows h2 {
+            font-size: 56px;
+            margin-bottom: 20px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .workflows-subtitle {
+            text-align: center;
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 60px;
+        }
+
+        .workflow-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .workflow-card {
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 20px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .workflow-card.collapsed {
+            padding: 25px 35px;
+        }
+
+        .workflow-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 242, 255, 0.2);
+        }
+
+        .workflow-card.active {
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 242, 255, 0.3);
+        }
+
+        .workflow-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--primary);
+            position: relative;
+        }
+
+        .workflow-card.collapsed .workflow-header {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .workflow-expand-icon {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5em;
+            color: var(--primary);
+            transition: transform 0.3s ease;
+        }
+
+        .workflow-card.active .workflow-expand-icon {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .workflow-icon {
+            font-size: 2.5em;
+            margin-right: 15px;
+        }
+
+        .workflow-title h3 {
+            color: var(--primary);
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .workflow-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9em;
+        }
+
+        .workflow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 5000px;
+            overflow: hidden;
+            transition: max-height 0.5s ease, opacity 0.3s ease, margin-top 0.3s ease;
+            opacity: 1;
+            margin-top: 0;
+        }
+
+        .workflow-card.collapsed .workflow-steps {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
+        }
+
+        .workflow-step {
+            display: flex;
+            align-items: flex-start;
+            background: rgba(0, 242, 255, 0.05);
+            padding: 18px;
+            border-radius: 12px;
+            border-left: 3px solid var(--primary);
+            transition: all 0.3s;
+        }
+
+        .workflow-step:hover {
+            background: rgba(0, 242, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .step-num {
+            background: var(--primary);
+            color: var(--dark);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9em;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step-info {
+            flex: 1;
+        }
+
+        .step-name {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 3px;
+            font-size: 0.95em;
+        }
+
+        .step-tool {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.85em;
+            margin-bottom: 3px;
+        }
+
+        .step-desc {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8em;
+            line-height: 1.4;
+        }
+
+        .workflow-arrow {
+            text-align: center;
+            color: var(--primary);
+            font-size: 1.5em;
+            margin: -3px 0;
+        }
+
+        .workflow-result {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--dark);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-top: 10px;
+        }
+
+        /* Brain Activity Animation */
+        .brain-icon {
+            display: inline-block;
+            margin-left: 8px;
+            font-size: 1.2em;
+            animation: brainPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes brainPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.15);
+                opacity: 0.8;
+            }
+        }
+
+        .ideation-step {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ideation-step::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 237, 0, 0.1) 50%, 
+                transparent 100%);
+            animation: brainWave 3s ease-in-out infinite;
+        }
+
+        @keyframes brainWave {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .workflows-footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 30px;
+            background: rgba(0, 242, 255, 0.05);
+            border-radius: 15px;
+            border: 2px solid var(--primary);
+        }
+
+        .workflows-footer p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
         
         /* Modal */
         .modal {
@@ -456,12 +711,183 @@
             font-size: 16px;
             margin-bottom: 20px;
             resize: vertical;
+            transition: border-color 0.3s ease;
         }
         
         textarea:focus, input:focus {
             outline: none;
             border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
         }
+        
+        input::placeholder, textarea::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+        
+        #contactForm {
+            width: 100%;
+        }
+
+        /* CS Flow Diagram Styles */
+        .cs-flow-container {
+            width: 100%;
+            height: 600px;
+            background: #1a1a24;
+            border-radius: 15px;
+            position: relative;
+            overflow: auto;
+            border: 2px solid rgba(0, 242, 255, 0.2);
+        }
+
+        .flow-canvas {
+            width: 1200px;
+            height: 800px;
+            position: relative;
+            margin: 20px;
+        }
+
+        .flow-node {
+            position: absolute;
+            background: rgba(26, 26, 36, 0.9);
+            border: 2px solid var(--primary);
+            border-radius: 15px;
+            padding: 20px;
+            min-width: 150px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 242, 255, 0.2);
+        }
+
+        .flow-node:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 242, 255, 0.4);
+            border-color: var(--accent);
+            z-index: 10;
+        }
+
+        .flow-node.active {
+            border-color: var(--accent);
+            background: rgba(255, 237, 0, 0.1);
+            box-shadow: 0 10px 30px rgba(255, 237, 0, 0.4);
+        }
+
+        .flow-node-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .flow-node-title {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.95em;
+            margin-bottom: 5px;
+        }
+
+        .flow-node-subtitle {
+            font-size: 0.75em;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .flow-connection {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), transparent);
+            transform-origin: left center;
+            pointer-events: none;
+            opacity: 0.6;
+            animation: flowPulse 2s ease-in-out infinite;
+        }
+
+        .flow-connection.animated {
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            background-size: 200% 100%;
+            animation: flowMove 2s linear infinite;
+        }
+
+        @keyframes flowPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes flowMove {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .flow-details {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 242, 255, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+            display: none;
+        }
+
+        .flow-details.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .flow-details h4 {
+            color: var(--accent);
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .flow-details p {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .flow-details ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .flow-details li {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 5px;
+            font-size: 0.85em;
+        }
+
+        .flow-legend {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85em;
+        }
+
+        .legend-icon {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .legend-trigger { background: #00f2ff; }
+        .legend-action { background: #00ff88; }
+        .legend-notification { background: #ffed00; }
+        .legend-tool { background: #ff00ff; }
         
         .analyze-button {
             width: 100%;
@@ -477,9 +903,15 @@
             font-family: 'Space Grotesk', sans-serif;
         }
         
-        .analyze-button:hover {
+        .analyze-button:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 10px 30px rgba(0, 242, 255, 0.4);
+        }
+        
+        .analyze-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
         
         .result {
@@ -662,8 +1094,11 @@
         @media (max-width: 1024px) {
             .hero h1 { font-size: 60px; }
             .hero h2 { font-size: 28px; }
-            .playground h2, .work-content h2, .contact h2 { font-size: 48px; }
+            .playground h2, .workflows h2, .work-content h2, .contact h2 { font-size: 48px; }
             .about-text h2 { font-size: 40px; }
+            .workflow-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
         @media (max-width: 768px) {
@@ -774,11 +1209,11 @@
                 padding: 8px 16px;
             }
             
-            .playground h2, .work-content h2, .contact h2 {
+            .playground h2, .workflows h2, .work-content h2, .contact h2 {
                 font-size: 36px;
             }
             
-            .playground-subtitle, .contact p {
+            .playground-subtitle, .workflows-subtitle, .contact p {
                 font-size: 16px;
             }
             
@@ -797,6 +1232,36 @@
             
             .tool-card p {
                 font-size: 14px;
+            }
+
+            .workflow-grid {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+
+            .workflow-card {
+                padding: 25px;
+            }
+
+            .workflow-card.collapsed {
+                padding: 20px 25px;
+            }
+
+            .workflow-header {
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+            }
+
+            .workflow-icon {
+                font-size: 2em;
+            }
+
+            .workflow-title h3 {
+                font-size: 1.3em;
+            }
+
+            .workflow-step {
+                padding: 15px;
             }
             
             .modal-content {
@@ -878,7 +1343,7 @@
                 gap: 25px;
             }
             
-            .playground h2, .work-content h2, .contact h2 {
+            .playground h2, .workflows h2, .work-content h2, .contact h2 {
                 font-size: 28px;
             }
             
@@ -889,10 +1354,17 @@
             .result {
                 padding: 20px;
             }
+
+            .workflow-card {
+                padding: 20px;
+            }
+
+            .workflow-card.collapsed {
+                padding: 15px 20px;
+            }
         }
     </style>
-</head>
-<body>
+</head><body>
     <div class="bg-animation">
         <div class="gradient-orb orb1"></div>
         <div class="gradient-orb orb2"></div>
@@ -908,8 +1380,9 @@
         </div>
         <div class="nav-links" id="navLinks">
             <a href="#about" onclick="closeMenu()">About</a>
-            <a href="#playground" onclick="closeMenu()">AI Playground</a>
             <a href="#work" onclick="closeMenu()">Work</a>
+            <a href="#playground" onclick="closeMenu()">AI Playground</a>
+            <a href="#workflows" onclick="closeMenu()">AI Workflows</a>
             <a href="#contact" onclick="closeMenu()">Contact</a>
         </div>
     </nav>
@@ -918,7 +1391,7 @@
         <section class="hero">
             <h1>AI-Native Client & Product Leader</h1>
             <h2>Building the future of customer success, one intelligent experience at a time</h2>
-            <p>I don't just manage clients—I architect their success. With 10+ years transforming customer relationships and product adoption across SaaS, Web3, and AI companies, I build experiences that delight, retain, and scale.</p>
+            <p>I don't just manage clients. I architect their success. With 10+ years transforming customer relationships and product adoption across SaaS, Web3, and AI companies, I build experiences that delight, retain, and scale.</p>
             <a href="#contact" class="cta-button">Let's Build Something</a>
             
             <div class="stats">
@@ -946,7 +1419,7 @@
                 <div class="about-text">
                     <h2>Not Your Average Ops Person</h2>
                     <p>Most operations people optimize existing processes. I <span class="highlight">rebuild them from scratch using AI</span>.</p>
-                    <p>From co-founding a gaming startup to managing 50,000+ users in Web3 to scaling AI SaaS companies, I've learned that the best operations are invisible—they just work.</p>
+                    <p>From co-founding a gaming startup to managing 50,000+ users in Web3 to scaling AI SaaS companies, I've learned that the best operations are invisible. They just work.</p>
                     <p>My superpower? Taking complex, messy problems and turning them into elegant, AI-powered systems that scale without breaking.</p>
                     <p><span class="highlight">Current obsession:</span> How AI can eliminate 80% of operational overhead while improving quality.</p>
                     
@@ -964,57 +1437,24 @@
                 </div>
             </div>
         </section>
-        
-        <section id="playground" class="playground">
-            <div class="playground-content">
-                <h2>AI Playground</h2>
-                <p class="playground-subtitle">Interactive tools I've built. Try them out—they're actually useful.</p>
-                
-                <div class="tools-grid">
-                    <div class="tool-card">
-                        <h3>🎯 Job Fit Analyzer</h3>
-                        <p>Paste a job description and get instant AI analysis on whether it's worth applying, what to emphasize, and red flags to watch for.</p>
-                        <button class="tool-button" onclick="openModal('jobFit')">Try It Now</button>
-                    </div>
-                    
-                    <div class="tool-card">
-                        <h3>🚀 CS Health Predictor</h3>
-                        <p>AI-powered customer success health scoring. Predict churn risk, identify expansion opportunities, and get proactive intervention recommendations based on real engagement patterns.</p>
-                        <button class="tool-button" onclick="openModal('csHealth')">Analyze Health</button>
-                    </div>
-                    
-                    <div class="tool-card">
-                        <h3>💡 Ops Efficiency Calculator</h3>
-                        <p>Calculate the ROI of implementing AI in your operations. See real numbers on time saved, cost reduction, and quality improvement.</p>
-                        <button class="tool-button" onclick="openModal('efficiency')">Calculate ROI</button>
-                    </div>
-                    
-                    <div class="tool-card">
-                        <h3>🤖 Ask Me Anything</h3>
-                        <p>AI chatbot trained on my experience. Ask about my approach to ops, specific projects, or whether we'd be a good fit.</p>
-                        <button class="tool-button" onclick="openModal('chatbot')">Start Chat</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
+
         <section id="work">
             <div class="work-content">
                 <h2>Real Impact, Real Numbers</h2>
                 
                 <div class="case-studies">
                     <div class="case-study">
-                        <h3>Built Operations Infrastructure from Zero</h3>
+                        <h3>Built Game Studio Operations from Zero</h3>
                         <div class="company">Ygames | Co-founder | 2023-2025</div>
-                        <p>As co-founder, I built the entire operational backbone: vendor relationships, performance tracking systems, and AI-powered workflows that allowed us to move fast without breaking things.</p>
+                        <p>As co-founder, I handled all operational aspects: building the team from scratch, managing game design workflows, hiring decisions, and setting up core processes. I learned invaluable lessons about lean startup operations.</p>
                         <div class="metrics">
                             <div class="metric">
-                                <div class="metric-value">100%</div>
-                                <div class="metric-label">From Scratch</div>
+                                <div class="metric-value">0→1</div>
+                                <div class="metric-label">Built From Scratch</div>
                             </div>
                             <div class="metric">
-                                <div class="metric-value">5x</div>
-                                <div class="metric-label">Faster Launch Speed</div>
+                                <div class="metric-value">100%</div>
+                                <div class="metric-label">Hands-On Learning</div>
                             </div>
                         </div>
                     </div>
@@ -1054,6 +1494,162 @@
             </div>
         </section>
         
+        <section id="playground" class="playground">
+            <div class="playground-content">
+                <h2>AI Playground</h2>
+                <p class="playground-subtitle">Interactive tools I've built. Try them out, they're actually useful.</p>
+                
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <h3>🎯 Job Fit Analyzer</h3>
+                        <p>Paste a job description and get instant AI analysis on whether it's worth applying, what to emphasize, and red flags to watch for.</p>
+                        <button class="tool-button" onclick="openModal('jobFit')">Try It Now</button>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <h3>🚀 CS Health Predictor</h3>
+                        <p>AI-powered customer success health scoring. Predict churn risk, identify expansion opportunities, and get proactive intervention recommendations based on real engagement patterns.</p>
+                        <button class="tool-button" onclick="openModal('csHealth')">Analyze Health</button>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <h3>💡 Ops Efficiency Calculator</h3>
+                        <p>Calculate the ROI of implementing AI in your operations. See real numbers on time saved, cost reduction, and quality improvement.</p>
+                        <button class="tool-button" onclick="openModal('efficiency')">Calculate ROI</button>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <h3>🤖 Ask Me Anything</h3>
+                        <p>AI chatbot trained on my experience. Ask about my approach to ops, specific projects, or whether we'd be a good fit.</p>
+                        <button class="tool-button" onclick="openModal('chatbot')">Start Chat</button>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <h3>🔄 AI CS Automation Flow</h3>
+                        <p>Interactive workflow showing how AI automates customer success across Sales, CS, Product, and Operations teams with real triggers and actions.</p>
+                        <button class="tool-button" onclick="openModal('csFlow')">Explore Flow</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="workflows" class="workflows">
+            <div class="workflows-content">
+                <h2>AI Workflow Examples</h2>
+                <p class="workflows-subtitle">Real-world AI tool chains for different business scenarios, from concept to launch. Click any workflow to expand and see the full process.</p>
+
+                <div class="workflow-grid">
+                    <!-- Game Developer -->
+                    <div class="workflow-card collapsed" onclick="toggleWorkflow(this)">
+                        <div class="workflow-header">
+                            <div class="workflow-icon">🎮</div>
+                            <div class="workflow-title">
+                                <h3>Small Game Developer</h3>
+                                <p class="workflow-subtitle">From concept to launch - AI-powered development</p>
+                            </div>
+                            <div class="workflow-expand-icon">▼</div>
+                        </div>
+                        <div class="workflow-steps">
+                            <div class="workflow-step ideation-step">
+                                <div class="step-num">1</div>
+                                <div class="step-info">
+                                    <div class="step-name">Concept & Story <span class="brain-icon">🧠</span></div>
+                                    <div class="step-tool">ChatGPT / Claude</div>
+                                    <div class="step-desc">Generate game ideas, storylines, and quest designs</div>
+                                </div>
+                            </div>
+                            <div class="workflow-arrow">↓</div>
+                            <div class="workflow-step">
+                                <div class="step-num">2</div>
+                                <div class="step-info">
+                                    <div class="step-name">Project Management Setup</div>
+                                    <div class="step-tool">Notion AI / Linear / Jira</div>
+                                    <div class="step-desc">Create roadmap, track tasks, and manage sprints</div>
+                                </div>
+                            </div>
+                            <div class="workflow-arrow">↓</div>
+                            <div class="workflow-step ideation-step">
+                                <div class="step-num">3</div>
+                                <div class="step-info">
+                                    <div class="step-name">2D Art & Sprites <span class="brain-icon">💡</span></div>
+                                    <div class="step-tool">Midjourney / DALL-E</div>
+                                    <div class="step-desc">Create character designs and environment concepts</div>
+                                </div>
+                            </div>
+                            <div class="workflow-arrow">↓</div>
+                            <div class="workflow-step">
+                                <div class="step-num">4</div>
+                                <div class="step-info">
+                                    <div class="step-name">3D Assets</div>
+                                    <div class="step-tool">Meshy.ai / CSM.ai</div>
+                                    <div class="step-desc">Convert 2D to 3D models and textures</div>
+                                </div>
+                            </div>
+                            <div class="workflow-arrow">↓</div>
+                            <div class="workflow-step">
+                                <div class="step-num">5</div>
+                                <div class="step-info">
+                                    <div class="step-name">Code Development</div>
+                                    <div class="step-tool">GitHub Copilot / Cursor</div>
+                                    <div class="step-desc">AI-assisted coding for game logic and physics</div>
+                                </div>
+                            </div>
+                            <div class="workflow-arrow">↓</div>
+                            <div class="workflow-step">
+                                <div class="step-num">6</div>
+                                <div class="step-info">
+                                    <div class="step-name">Version Control</div>
+                                    <div class="step-tool">GitHub / GitLab</div>
+                                    <div class="step-desc">Manage code versions and collaborate with team</div>
+                                </div>
+                            </div>
+                            <div class="workflow-arrow">↓</div>
+                            <div class="workflow-step">
+                                <div class="step-num">7</div>
+                                <div class="step-info">
+                                    <div class="step-name">Audio & Music</div>
+                                    <div class="step-tool">Suno / ElevenLabs / Soundraw</div>
+                                    <div class="step-desc">Generate music, sound effects, and voice acting</div>
+                                </div>
+                            </div>
+                            <div class="workflow-arrow">↓</div>
+                            <div class="workflow-step">
+                                <div class="step-num">8</div>
+                                <div class="step-info">
+                                    <div class="step-name">QA & Testing</div>
+                                    <div class="step-tool">Testim / Applitools / PlaytestCloud</div>
+                                    <div class="step-desc">Automated testing and beta testing feedback</div>
+                                </div>
+                            </div>
+                            <div class="workflow-arrow">↓</div>
+                            <div class="workflow-step">
+                                <div class="step-num">9</div>
+                                <div class="step-info">
+                                    <div class="step-name">Community & Support</div>
+                                    <div class="step-tool">Discord AI Bots / Zendesk</div>
+                                    <div class="step-desc">Set up community channels and AI support</div>
+                                </div>
+                            </div>
+                            <div class="workflow-arrow">↓</div>
+                            <div class="workflow-step">
+                                <div class="step-num">10</div>
+                                <div class="step-info">
+                                    <div class="step-name">Launch & Analytics</div>
+                                    <div class="step-tool">Steam / Epic / Unity Analytics</div>
+                                    <div class="step-desc">Publish game and track player behavior</div>
+                                </div>
+                            </div>
+                            <div class="workflow-result">🎮 Launch Ready Game!</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflows-footer">
+                    <p><strong>💡 Pro Tip:</strong> These workflows can be combined and customized based on your specific needs. AI tools are constantly evolving, so always explore new options to stay ahead.</p>
+                </div>
+            </div>
+        </section>
+        
         <section id="contact" class="contact">
             <div class="contact-content">
                 <h2>Let's Build Together</h2>
@@ -1061,7 +1657,7 @@
                 <p><strong>Best for:</strong> AI companies, high-growth startups (Series A-C), companies rebuilding operations from scratch, or anyone who wants to see what's possible when you combine deep ops experience with AI-first thinking.</p>
                 
                 <div class="contact-links">
-                    <a href="mailto:murmur.red1@gmail.com" class="contact-link">📧 Email Me</a>
+                    <a href="#" class="contact-link" onclick="openModal('contactForm'); return false;">📧 Email Me</a>
                     <a href="https://www.linkedin.com/in/lena-ry-8baa8716/" target="_blank" class="contact-link">💼 LinkedIn</a>
                 </div>
             </div>
@@ -1121,6 +1717,160 @@
         </div>
     </div>
     
+    <div id="contactFormModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('contactForm')">&times;</span>
+            <h3>📧 Get In Touch</h3>
+            <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 25px; font-size: 16px;">I'd love to hear from you! Fill out the form below and I'll get back to you as soon as possible.</p>
+            <form id="contactForm" action="https://formspree.io/f/mwpwdyjw" method="POST" onsubmit="submitContactForm(event)">
+                <input type="text" id="contactName" name="name" placeholder="Your Name *" required>
+                <input type="email" id="contactEmail" name="email" placeholder="Your Email *" required>
+                <input type="text" id="contactCompany" name="company" placeholder="Company (Optional)">
+                <textarea id="contactMessage" name="message" rows="6" placeholder="Your Message *" required></textarea>
+                <input type="hidden" name="_subject" value="New Contact Form Submission from Website">
+                <input type="text" name="_gotcha" style="display:none">
+                <button type="submit" class="analyze-button" id="submitContactBtn">Send Message</button>
+            </form>
+            <div id="contactResult" class="result"></div>
+        </div>
+    </div>
+
+    <div id="csFlowModal" class="modal">
+        <div class="modal-content" style="max-width: 95%; max-height: 90vh; overflow-y: auto;">
+            <span class="modal-close" onclick="closeModal('csFlow')">&times;</span>
+            <h3>🔄 AI-Powered Customer Success Automation Flow</h3>
+            <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 15px; font-size: 14px;">Click on any node to see detailed triggers, actions, and cross-team coordination. This represents a real-world AI automation framework covering 22+ triggers across 7 phases.</p>
+            
+            <div class="flow-legend">
+                <div class="legend-item">
+                    <div class="legend-icon legend-trigger"></div>
+                    <span>Triggers</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-icon legend-action"></div>
+                    <span>AI Actions</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-icon legend-notification"></div>
+                    <span>Human Notifications</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-icon legend-tool"></div>
+                    <span>Tools/Systems</span>
+                </div>
+            </div>
+
+            <div class="cs-flow-container">
+                <div class="flow-canvas" id="flowCanvas">
+                    <!-- Trigger Nodes -->
+                    <div class="flow-node" style="left: 50px; top: 50px; border-color: #00f2ff;" onclick="showFlowDetails('trigger1')">
+                        <div class="flow-node-icon">⚠️</div>
+                        <div class="flow-node-title">No Login</div>
+                        <div class="flow-node-subtitle">7 Days</div>
+                    </div>
+
+                    <div class="flow-node" style="left: 50px; top: 200px; border-color: #00f2ff;" onclick="showFlowDetails('trigger2')">
+                        <div class="flow-node-icon">📊</div>
+                        <div class="flow-node-title">Low Usage</div>
+                        <div class="flow-node-subtitle">Detected</div>
+                    </div>
+
+                    <div class="flow-node" style="left: 50px; top: 350px; border-color: #00f2ff;" onclick="showFlowDetails('trigger3')">
+                        <div class="flow-node-icon">🎫</div>
+                        <div class="flow-node-title">Support Ticket</div>
+                        <div class="flow-node-subtitle">Created</div>
+                    </div>
+
+                    <div class="flow-node" style="left: 50px; top: 500px; border-color: #00f2ff;" onclick="showFlowDetails('trigger4')">
+                        <div class="flow-node-icon">😞</div>
+                        <div class="flow-node-title">Low NPS</div>
+                        <div class="flow-node-subtitle">0-6 Score</div>
+                    </div>
+
+                    <!-- AI Engine -->
+                    <div class="flow-node" style="left: 300px; top: 250px; border-color: #00ff88; min-width: 180px;" onclick="showFlowDetails('aiengine')">
+                        <div class="flow-node-icon">🤖</div>
+                        <div class="flow-node-title">AI Decision Engine</div>
+                        <div class="flow-node-subtitle">Analyzes & Routes</div>
+                    </div>
+
+                    <!-- Action Nodes -->
+                    <div class="flow-node" style="left: 550px; top: 50px; border-color: #00ff88;" onclick="showFlowDetails('action1')">
+                        <div class="flow-node-icon">✉️</div>
+                        <div class="flow-node-title">Auto Email</div>
+                        <div class="flow-node-subtitle">Re-engagement</div>
+                    </div>
+
+                    <div class="flow-node" style="left: 550px; top: 200px; border-color: #00ff88;" onclick="showFlowDetails('action2')">
+                        <div class="flow-node-icon">📅</div>
+                        <div class="flow-node-title">Book Call</div>
+                        <div class="flow-node-subtitle">CSM Meeting</div>
+                    </div>
+
+                    <div class="flow-node" style="left: 550px; top: 350px; border-color: #00ff88;" onclick="showFlowDetails('action3')">
+                        <div class="flow-node-icon">🎯</div>
+                        <div class="flow-node-title">Smart Route</div>
+                        <div class="flow-node-subtitle">Right Team</div>
+                    </div>
+
+                    <div class="flow-node" style="left: 550px; top: 500px; border-color: #00ff88;" onclick="showFlowDetails('action4')">
+                        <div class="flow-node-icon">🚨</div>
+                        <div class="flow-node-title">Escalate</div>
+                        <div class="flow-node-subtitle">Urgent Action</div>
+                    </div>
+
+                    <!-- Team Notifications -->
+                    <div class="flow-node" style="left: 800px; top: 100px; border-color: #ffed00;" onclick="showFlowDetails('csm')">
+                        <div class="flow-node-icon">👤</div>
+                        <div class="flow-node-title">CSM</div>
+                        <div class="flow-node-subtitle">Notified</div>
+                    </div>
+
+                    <div class="flow-node" style="left: 800px; top: 250px; border-color: #ffed00;" onclick="showFlowDetails('support')">
+                        <div class="flow-node-icon">🛠️</div>
+                        <div class="flow-node-title">Support</div>
+                        <div class="flow-node-subtitle">Team Alert</div>
+                    </div>
+
+                    <div class="flow-node" style="left: 800px; top: 400px; border-color: #ffed00;" onclick="showFlowDetails('product')">
+                        <div class="flow-node-icon">💡</div>
+                        <div class="flow-node-title">Product</div>
+                        <div class="flow-node-subtitle">Feedback</div>
+                    </div>
+
+                    <!-- Tool Systems -->
+                    <div class="flow-node" style="left: 1000px; top: 50px; border-color: #ff00ff;" onclick="showFlowDetails('crm')">
+                        <div class="flow-node-icon">💼</div>
+                        <div class="flow-node-title">CRM</div>
+                        <div class="flow-node-subtitle">HubSpot</div>
+                    </div>
+
+                    <div class="flow-node" style="left: 1000px; top: 200px; border-color: #ff00ff;" onclick="showFlowDetails('zendesk')">
+                        <div class="flow-node-icon">🎫</div>
+                        <div class="flow-node-title">Support</div>
+                        <div class="flow-node-subtitle">Zendesk</div>
+                    </div>
+
+                    <div class="flow-node" style="left: 1000px; top: 350px; border-color: #ff00ff;" onclick="showFlowDetails('jira')">
+                        <div class="flow-node-icon">📋</div>
+                        <div class="flow-node-title">Tasks</div>
+                        <div class="flow-node-subtitle">Jira</div>
+                    </div>
+
+                    <div class="flow-node" style="left: 1000px; top: 500px; border-color: #ff00ff;" onclick="showFlowDetails('slack')">
+                        <div class="flow-node-icon">💬</div>
+                        <div class="flow-node-title">Comms</div>
+                        <div class="flow-node-subtitle">Slack</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="flowDetails" class="flow-details">
+                <p style="text-align: center; color: rgba(255, 255, 255, 0.6);">Click on any node above to see detailed information about triggers, actions, notifications, and integrations.</p>
+            </div>
+        </div>
+    </div>
+    
     <script>
         function toggleMenu() {
             const navLinks = document.getElementById('navLinks');
@@ -1136,6 +1886,11 @@
             hamburger.classList.remove('active');
         }
         
+        function toggleWorkflow(element) {
+            element.classList.toggle('collapsed');
+            element.classList.toggle('active');
+        }
+        
         function openModal(type) {
             document.getElementById(type + 'Modal').classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -1144,6 +1899,491 @@
         function closeModal(type) {
             document.getElementById(type + 'Modal').classList.remove('active');
             document.body.style.overflow = 'auto';
+        }
+        
+        // CS Flow Details Data - Comprehensive framework from document
+        const flowDetailsData = {
+            trigger1: {
+                title: "No Login for 7 Days",
+                type: "trigger",
+                description: "Customer hasn't logged into the platform for 7 consecutive days - early warning sign of disengagement",
+                aiActions: [
+                    "Sends 'We miss you' email with personalized value reminders based on past usage",
+                    "Updates health score: Yellow flag in CRM automatically",
+                    "Analyzes last activity to personalize outreach message",
+                    "If 14 days no login → Escalates to Red flag + CSM intervention triggered"
+                ],
+                humanNotifications: [
+                    "CSM Alert: 'Dormant account - needs personal outreach within 48 hours'",
+                    "CS Manager notified if pattern detected across multiple accounts"
+                ],
+                tools: ["HubSpot/Salesforce CRM", "Customer.io", "Gainsight", "ChurnZero"],
+                crossTeam: "Marketing can retarget with educational content via paid ads. Product team analyzes if recent changes caused drop-off."
+            },
+            trigger2: {
+                title: "Low Feature Usage Detected",
+                type: "trigger",
+                description: "Customer using only 1-2 basic features, missing out on 80% of platform value - major expansion opportunity",
+                aiActions: [
+                    "Sends feature discovery email: 'You're missing out on [specific features]'",
+                    "Attaches personalized demo video of advanced features relevant to their use case",
+                    "Books optional product demo with calendar link",
+                    "Logs 'Expansion Opportunity' in CRM with specific feature recommendations",
+                    "Tracks if customer clicks on features to gauge interest"
+                ],
+                humanNotifications: [
+                    "CSM: 'Upsell potential - low feature adoption. Consider power user conversion call'",
+                    "Sales: Gets notified of expansion opportunity with $ value estimate",
+                    "Product: Receives data on which features aren't being adopted"
+                ],
+                tools: ["Mixpanel", "Amplitude", "Gainsight", "Pendo", "Productboard"],
+                crossTeam: "Product team investigates why features aren't being discovered. Marketing creates targeted feature adoption campaigns. CS designs better onboarding."
+            },
+            trigger3: {
+                title: "Support Ticket Created",
+                type: "trigger",
+                description: "Customer submits a support request through any channel (email, chat, phone, in-app)",
+                aiActions: [
+                    "AI checks knowledge base for instant answer using NLP matching",
+                    "Auto-responds if simple/FAQ (handles 60% of tickets automatically)",
+                    "Routes complex issues to appropriate support tier (L1, L2, specialist)",
+                    "Logs in Zendesk + creates Jira ticket if technical bug detected",
+                    "Sets SLA timer based on customer priority and issue severity",
+                    "Suggests related KB articles to support agent"
+                ],
+                humanNotifications: [
+                    "Support agent gets categorized ticket with AI-suggested solutions",
+                    "CSM notified if high-priority customer or 2nd+ ticket this week",
+                    "Engineering alerted immediately if P0/P1 bug with stack trace"
+                ],
+                tools: ["Zendesk", "Intercom", "Jira", "Linear", "Help Scout", "Freshdesk"],
+                crossTeam: "Product team receives aggregated bug reports weekly. Engineering gets critical bugs in real-time. CS tracks satisfaction scores post-resolution."
+            },
+            trigger4: {
+                title: "Low NPS Score (0-6)",
+                type: "trigger",
+                description: "Customer gives detractor score in NPS survey - critical churn risk requiring immediate intervention",
+                aiActions: [
+                    "Triggers immediate retention outreach email within 1 hour",
+                    "Books urgent retention call (CSM contacted within 48 hours)",
+                    "Updates CRM: Red flag 'Detractor' with churn probability score",
+                    "Opens automated 'Win-Back' campaign workflow",
+                    "Prepares retention offer (discount/extension) for CSM to deploy",
+                    "Analyzes feedback text for root cause using sentiment analysis"
+                ],
+                humanNotifications: [
+                    "CSM: CRITICAL - Detractor needs immediate personal attention",
+                    "CS Manager: Churn risk - leadership review required for accounts >$50K",
+                    "Product Team: Negative feedback - investigate root cause themes",
+                    "Executive team: Auto-alert for enterprise clients ($100K+ ARR)"
+                ],
+                tools: ["Delighted", "SurveyMonkey", "Gainsight", "ChurnZero", "Wootric"],
+                crossTeam: "Executive team loops in for key accounts. Finance prepares flexible retention pricing. Product analyzes feedback themes for roadmap priorities. Legal notified if threatening language."
+            },
+            aiengine: {
+                title: "AI Decision Engine",
+                type: "action",
+                description: "Central intelligence hub that processes all customer data, predicts outcomes, and orchestrates actions across the entire stack",
+                aiActions: [
+                    "Analyzes customer data from 10+ sources in real-time (CRM, product analytics, support, billing)",
+                    "Calculates health scores using ML models trained on historical churn data",
+                    "Predicts churn risk with 85%+ accuracy using behavioral patterns",
+                    "Determines optimal intervention timing based on customer lifecycle stage",
+                    "Routes actions to appropriate teams with context and recommendations",
+                    "Learns from outcomes to improve decision accuracy over time",
+                    "Identifies expansion opportunities by analyzing usage patterns vs. plan limits"
+                ],
+                humanNotifications: [
+                    "Generates daily CS team briefing: At-risk accounts, expansion opportunities, key metrics",
+                    "Flags high-risk accounts for immediate manager review",
+                    "Surfaces hidden expansion opportunities that humans might miss",
+                    "Sends weekly executive summary: health score trends, churn predictions, revenue impact"
+                ],
+                tools: ["Claude API", "OpenAI GPT-4", "Custom ML Models", "Zapier", "Make", "n8n", "Python Scripts"],
+                crossTeam: "Integrates with ALL departments for unified 360° customer view. Sales gets expansion alerts. Product gets usage insights. Finance gets revenue predictions. Marketing gets segmentation data."
+            },
+            action1: {
+                title: "Automated Re-engagement Email",
+                type: "action",
+                description: "Hyper-personalized email campaign to bring inactive users back, tailored to their specific usage history",
+                aiActions: [
+                    "Analyzes user's complete behavior history to personalize content",
+                    "Highlights features they previously used most (e.g., 'Your reports are waiting')",
+                    "Includes relevant case studies from similar companies in their industry",
+                    "Adapts tone based on previous interactions (formal vs. casual)",
+                    "Schedules 2-3 follow-up emails if first is ignored, with escalating urgency",
+                    "A/B tests subject lines and content to optimize open rates"
+                ],
+                humanNotifications: [
+                    "CSM sees email campaign status in real-time dashboard",
+                    "Alert if email bounces (bad email) or spam complaint received",
+                    "Notification if customer engages (opens/clicks) for immediate follow-up"
+                ],
+                tools: ["Customer.io", "Braze", "Iterable", "SendGrid", "Mailchimp", "ActiveCampaign"],
+                crossTeam: "Marketing provides A/B tested content templates and design. CS provides customer insights. Product highlights new features to showcase."
+            },
+            action2: {
+                title: "Auto-Book CSM Meeting",
+                type: "action",
+                description: "Automatically schedules intervention call with customer success manager using calendar intelligence",
+                aiActions: [
+                    "Scans both customer and CSM calendars to find mutual 30-min availability",
+                    "Sends calendar invite with clear agenda and Zoom link",
+                    "Prepares comprehensive customer briefing document for CSM with: health score, recent activity, support tickets, usage trends, talking points",
+                    "Sets up Zoom/Teams meeting link automatically",
+                    "Sends reminder 24 hours before call + 1 hour before",
+                    "If customer declines, suggests 3 alternative times"
+                ],
+                humanNotifications: [
+                    "CSM receives meeting prep document 24 hours in advance with AI-generated talking points",
+                    "Manager notified of all intervention calls scheduled for weekly planning",
+                    "Alert if customer reschedules 2+ times (possible churn signal)"
+                ],
+                tools: ["Calendly", "Chili Piper", "Google Calendar", "Outlook", "Zoom", "Gainsight"],
+                crossTeam: "Sales can optionally join high-value account calls. Product can join if feature-related issue. Finance standby for pricing discussions."
+            },
+            action3: {
+                title: "Smart Ticket Routing",
+                type: "action",
+                description: "AI-powered ticket categorization and intelligent routing to the right team member based on expertise",
+                aiActions: [
+                    "Analyzes ticket content using NLP to understand intent and technical details",
+                    "Categorizes by type (bug, feature request, how-to, billing, integration)",
+                    "Determines urgency level (P0-P3) based on language and customer priority",
+                    "Routes to specific agent based on: expertise, current workload, past performance",
+                    "Suggests 3-5 relevant KB articles to agent with confidence scores",
+                    "Predicts resolution time based on similar historical tickets",
+                    "Auto-translates if customer writes in non-English language"
+                ],
+                humanNotifications: [
+                    "Support agent receives pre-categorized ticket with AI insights and suggested solutions",
+                    "Team lead alerted if SLA at risk (approaching deadline)",
+                    "CSM notified automatically for VIP customers or repeat issues"
+                ],
+                tools: ["Zendesk AI", "Intercom", "Help Scout", "Freshdesk", "Front", "Kustomer"],
+                crossTeam: "Engineering for bugs (creates Jira automatically). Product for feature requests (logs in Productboard). Finance for billing issues. DevOps for infrastructure problems."
+            },
+            action4: {
+                title: "Urgent Escalation Protocol",
+                type: "action",
+                description: "Immediate escalation for critical situations requiring senior intervention - all hands on deck",
+                aiActions: [
+                    "Detects negative sentiment in communications using advanced sentiment analysis",
+                    "Identifies legal/compliance trigger words (lawsuit, lawyer, regulatory)",
+                    "Flags enterprise account risks (>$100K ARR) automatically",
+                    "Prepares executive briefing in <5 minutes with full context",
+                    "Notifies all stakeholders simultaneously via Slack, email, SMS",
+                    "Creates dedicated Slack war room channel with all relevant parties",
+                    "Pulls all historical context: tickets, calls, contracts, correspondence"
+                ],
+                humanNotifications: [
+                    "CS Manager: URGENT - Immediate review required within 1 hour",
+                    "Account Executive: Customer at CRITICAL risk - join war room",
+                    "VP CS: Executive intervention needed - schedule call ASAP",
+                    "Legal: If threatening language detected - review for compliance",
+                    "Finance: Prepare retention pricing options",
+                    "Product: If product-related crisis - investigate immediately"
+                ],
+                tools: ["PagerDuty", "Slack", "Gainsight", "ChurnZero", "Twilio (SMS)"],
+                crossTeam: "ALL HANDS ON DECK - Sales, CS, Product, Executive team, Legal if needed. Everyone gets context instantly. Coordinated response within hours."
+            },
+            csm: {
+                title: "Customer Success Manager (CSM)",
+                type: "notification",
+                description: "Primary human touchpoint for customer relationships - the quarterback of customer success",
+                responsibilities: [
+                    "Reviews AI-generated health scores and alerts every morning",
+                    "Conducts intervention calls for at-risk accounts (AI-scheduled)",
+                    "Facilitates Quarterly Business Reviews (QBRs) showing ROI",
+                    "Identifies and qualifies expansion opportunities for Sales",
+                    "Coordinates with Sales on upsells and renewals",
+                    "Provides product feedback to Product team from customer conversations",
+                    "Manages executive relationships for enterprise accounts",
+                    "Tracks adoption milestones and celebrates customer wins"
+                ],
+                aiSupport: [
+                    "Receives daily briefing: Top 10 accounts needing attention with specific action items",
+                    "Gets AI-generated talking points before every customer call",
+                    "AI summarizes all recent customer interactions across channels",
+                    "Automated meeting notes transcribed and action items extracted",
+                    "Renewal forecasts with probability scores",
+                    "Expansion opportunity identification with $ value estimates"
+                ],
+                tools: ["Gainsight", "ChurnZero", "Totango", "Planhat", "Slack", "Zoom", "Gmail"],
+                metrics: ["Customer Health Score (0-100)", "Net Promoter Score (NPS)", "Product Adoption Rate (%)", "Gross Renewal Rate (%)", "Net Revenue Retention (%)"]
+            },
+            support: {
+                title: "Support Team",
+                type: "notification",
+                description: "Frontline technical problem solvers - the guardians of customer satisfaction",
+                responsibilities: [
+                    "Resolve customer tickets within SLA (L1: 4hrs, L2: 24hrs, L3: 48hrs)",
+                    "Escalate bugs to Engineering with full reproduction steps",
+                    "Maintain and update knowledge base articles based on common issues",
+                    "Identify product improvement opportunities from recurring questions",
+                    "Track customer satisfaction (CSAT) after every interaction",
+                    "Provide tier-2 technical support for complex issues",
+                    "Train customers on best practices during support interactions"
+                ],
+                aiSupport: [
+                    "AI suggests solutions from knowledge base with 90% accuracy",
+                    "Automatic ticket categorization and priority assignment",
+                    "Sentiment analysis on customer responses (happy/frustrated/angry)",
+                    "Predictive SLA breach warnings (30min before deadline)",
+                    "Auto-drafted responses that agents can edit and send",
+                    "Similar ticket suggestions to learn from past resolutions"
+                ],
+                tools: ["Zendesk", "Intercom", "Jira", "Confluence", "Loom (screen recordings)", "GitHub"],
+                metrics: ["First Response Time (avg <2hrs)", "Resolution Time (avg <24hrs)", "CSAT Score (target >4.5/5)", "Ticket Volume (trend)", "% Auto-Resolved (60%+ goal)"]
+            },
+            product: {
+                title: "Product Team",
+                type: "notification",
+                description: "Builders of customer value - the architects of the product roadmap",
+                responsibilities: [
+                    "Prioritize feature requests from customers based on impact and frequency",
+                    "Investigate and fix reported bugs within SLA",
+                    "Analyze feature adoption metrics to improve UX",
+                    "Conduct user research and usability testing",
+                    "Communicate roadmap to customers through CS team",
+                    "Review NPS feedback weekly for product improvement themes",
+                    "Collaborate with Engineering on technical feasibility"
+                ],
+                aiSupport: [
+                    "AI aggregates and ranks feature requests by customer ARR, frequency, and strategic fit",
+                    "Usage pattern insights (which features drive retention?)",
+                    "Churn correlation analysis (what product issues cause churn?)",
+                    "Automated bug severity classification based on impact",
+                    "Sentiment analysis on feature feedback",
+                    "Competitive intel from customer conversations"
+                ],
+                tools: ["Jira", "Linear", "Productboard", "Canny", "Mixpanel", "Amplitude", "Figma"],
+                metrics: ["Feature Adoption Rate (% users)", "Bug Resolution Time (P0: <24hrs)", "User Engagement Score", "Feature Request Implementation Rate"]
+            },
+            crm: {
+                title: "CRM System (HubSpot/Salesforce)",
+                type: "tool",
+                description: "Single source of truth for all customer information - the brain of the operation",
+                capabilities: [
+                    "Stores comprehensive customer profiles: contacts, company data, firmographics",
+                    "Tracks ALL interactions across channels: emails, calls, meetings, chats",
+                    "Manages sales pipeline and opportunities with deal stages",
+                    "Calculates health scores using AI on 15+ data points",
+                    "Generates reports and dashboards for executives",
+                    "Integrates bi-directionally with ALL other tools",
+                    "Workflows automate repetitive tasks (e.g., create renewal opp 90 days out)",
+                    "Custom fields for industry-specific data"
+                ],
+                aiEnhancements: [
+                    "Predictive lead scoring (0-100) based on fit and engagement",
+                    "Automated data enrichment from Clearbit, ZoomInfo",
+                    "Smart field suggestions to reduce manual data entry",
+                    "Duplicate detection and intelligent merging",
+                    "Next best action recommendations for each account",
+                    "Revenue forecasting with ML models",
+                    "Churn risk prediction with 85%+ accuracy"
+                ],
+                integrations: ["Gmail/Outlook", "Slack", "Zendesk", "Calendly", "Zoom", "LinkedIn", "Stripe", "Mixpanel"],
+                dataFlow: "Hub-and-spoke model: CRM is the hub, all tools sync data bidirectionally. Customer updates propagate everywhere instantly."
+            },
+            zendesk: {
+                title: "Support Platform (Zendesk)",
+                type: "tool",
+                description: "Command center for customer support - where problems get solved",
+                capabilities: [
+                    "Multi-channel support: email, live chat, phone, social media, SMS",
+                    "Ticket management with customizable workflows and automation",
+                    "SLA tracking and breach warnings",
+                    "Self-service knowledge base (Help Center) with search",
+                    "Automated CSAT surveys after ticket resolution",
+                    "Advanced reporting and analytics dashboards",
+                    "Agent productivity tools (macros, saved replies)",
+                    "Customer portal for ticket status tracking"
+                ],
+                aiEnhancements: [
+                    "AI chatbot (Answer Bot) resolves 60% of tickets instantly using KB",
+                    "Smart ticket routing to best agent based on skills and workload",
+                    "Sentiment analysis on every message (frustrated customers prioritized)",
+                    "Suggested responses for agents (draft complete responses)",
+                    "Auto-tagging and categorization of tickets",
+                    "Predictive SLA breach alerts",
+                    "Auto-translation for 40+ languages"
+                ],
+                integrations: ["Salesforce/HubSpot", "Slack", "Jira", "Google Workspace", "Shopify", "Stripe"],
+                dataFlow: "Ticket data flows to CRM for account context. Bugs auto-create Jira tickets. Insights flow to Product team. CSAT scores tracked in Gainsight."
+            },
+            jira: {
+                title: "Project Management (Jira/Linear)",
+                type: "tool",
+                description: "Engineering command center - where bugs get fixed and features get built",
+                capabilities: [
+                    "Agile project management: Scrum boards, Kanban workflows",
+                    "Bug tracking with priority levels (P0-P3) and severity",
+                    "Sprint planning and capacity management",
+                    "Release tracking and deployment coordination",
+                    "Custom workflows for different issue types",
+                    "Time tracking for resource planning",
+                    "Roadmap visualization for stakeholders",
+                    "Dependencies and blockers management"
+                ],
+                aiEnhancements: [
+                    "Auto-create tickets from support emails or customer feedback",
+                    "Smart priority suggestions based on customer impact + ARR",
+                    "Duplicate bug detection to prevent redundant work",
+                    "Story point estimation using ML on historical data",
+                    "Sprint planning assistance (optimal ticket selection)",
+                    "Auto-linking related issues and dependencies",
+                    "Predictive bug likelihood based on code changes"
+                ],
+                integrations: ["GitHub/GitLab", "Zendesk", "Slack", "Confluence", "Figma", "Sentry"],
+                dataFlow: "Bugs from Support → Jira → Engineering fixes → QA validates → Deployment → CSM notifies customer. Full loop closed."
+            },
+            slack: {
+                title: "Communication Hub (Slack/Teams)",
+                type: "tool",
+                description: "Real-time nervous system of the organization - where coordination happens",
+                capabilities: [
+                    "Team channels organized by function, project, customer",
+                    "Direct messaging and group DMs",
+                    "File sharing and collaborative editing",
+                    "Video/audio calls and screen sharing",
+                    "App integrations bring data into conversations",
+                    "Searchable message history (never lose context)",
+                    "Custom bots and workflow automations",
+                    "Status updates and availability indicators"
+                ],
+                aiEnhancements: [
+                    "AI summarizes channel conversations (TL;DR on demand)",
+                    "Smart notification routing (only alert relevant people)",
+                    "Automated status updates from integrated tools",
+                    "Meeting scheduling bots (find time for 5 people instantly)",
+                    "Custom AI assistants for common questions",
+                    "Sentiment analysis on team morale",
+                    "Auto-archive inactive channels"
+                ],
+                integrations: ["EVERYTHING - Salesforce, Zendesk, Jira, Google Calendar, Zoom, GitHub, PagerDuty, etc."],
+                dataFlow: "Central nervous system: ALL tools send alerts here. Decisions made in Slack propagate back to tools. Real-time coordination hub for entire organization."
+            }
+        };
+
+        function showFlowDetails(nodeId) {
+            const detailsDiv = document.getElementById('flowDetails');
+            const data = flowDetailsData[nodeId];
+            
+            if (!data) {
+                detailsDiv.innerHTML = '<p style="text-align: center; color: rgba(255, 255, 255, 0.6);">Select a node to see details</p>';
+                detailsDiv.classList.remove('active');
+                return;
+            }
+
+            // Remove active class from all nodes
+            document.querySelectorAll('.flow-node').forEach(node => {
+                node.classList.remove('active');
+            });
+            
+            // Add active class to clicked node
+            event.target.closest('.flow-node').classList.add('active');
+
+            let html = `
+                <h4>${data.title}</h4>
+                <p><strong>Type:</strong> ${data.type.charAt(0).toUpperCase() + data.type.slice(1)}</p>
+                <p>${data.description}</p>
+            `;
+
+            if (data.aiActions) {
+                html += `
+                    <p style="margin-top: 15px;"><strong>🤖 AI Actions:</strong></p>
+                    <ul>
+                        ${data.aiActions.map(action => `<li>${action}</li>`).join('')}
+                    </ul>
+                `;
+            }
+
+            if (data.humanNotifications) {
+                html += `
+                    <p style="margin-top: 15px;"><strong>👤 Human Notifications:</strong></p>
+                    <ul>
+                        ${data.humanNotifications.map(notif => `<li>${notif}</li>`).join('')}
+                    </ul>
+                `;
+            }
+
+            if (data.responsibilities) {
+                html += `
+                    <p style="margin-top: 15px;"><strong>📋 Responsibilities:</strong></p>
+                    <ul>
+                        ${data.responsibilities.map(resp => `<li>${resp}</li>`).join('')}
+                    </ul>
+                `;
+            }
+
+            if (data.capabilities) {
+                html += `
+                    <p style="margin-top: 15px;"><strong>⚙️ Capabilities:</strong></p>
+                    <ul>
+                        ${data.capabilities.map(cap => `<li>${cap}</li>`).join('')}
+                    </ul>
+                `;
+            }
+
+            if (data.aiSupport) {
+                html += `
+                    <p style="margin-top: 15px;"><strong>🤖 AI Support:</strong></p>
+                    <ul>
+                        ${data.aiSupport.map(support => `<li>${support}</li>`).join('')}
+                    </ul>
+                `;
+            }
+
+            if (data.aiEnhancements) {
+                html += `
+                    <p style="margin-top: 15px;"><strong>✨ AI Enhancements:</strong></p>
+                    <ul>
+                        ${data.aiEnhancements.map(enh => `<li>${enh}</li>`).join('')}
+                    </ul>
+                `;
+            }
+
+            if (data.tools) {
+                html += `
+                    <p style="margin-top: 15px;"><strong>🛠️ Tools Used:</strong></p>
+                    <p style="color: var(--accent);">${Array.isArray(data.tools) ? data.tools.join(', ') : data.tools}</p>
+                `;
+            }
+
+            if (data.integrations) {
+                html += `
+                    <p style="margin-top: 15px;"><strong>🔗 Integrations:</strong></p>
+                    <p style="color: rgba(255, 255, 255, 0.7);">${Array.isArray(data.integrations) ? data.integrations.join(', ') : data.integrations}</p>
+                `;
+            }
+
+            if (data.metrics) {
+                html += `
+                    <p style="margin-top: 15px;"><strong>📊 Key Metrics:</strong></p>
+                    <p style="color: rgba(255, 255, 255, 0.7);">${Array.isArray(data.metrics) ? data.metrics.join(', ') : data.metrics}</p>
+                `;
+            }
+
+            if (data.crossTeam) {
+                html += `
+                    <p style="margin-top: 15px;"><strong>🔄 Cross-Team Coordination:</strong></p>
+                    <p style="color: rgba(255, 255, 255, 0.7);">${data.crossTeam}</p>
+                `;
+            }
+
+            if (data.dataFlow) {
+                html += `
+                    <p style="margin-top: 15px;"><strong>📊 Data Flow:</strong></p>
+                    <p style="color: rgba(255, 255, 255, 0.7);">${data.dataFlow}</p>
+                `;
+            }
+
+            detailsDiv.innerHTML = html;
+            detailsDiv.classList.add('active');
+
+            // Scroll to details smoothly
+            detailsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
         
         function analyzeJob() {
@@ -1237,13 +2477,11 @@
             result.classList.add('active');
             
             setTimeout(() => {
-                // Health scoring algorithm
                 let healthScore = 0;
                 let riskFactors = [];
                 let opportunities = [];
                 let actions = [];
                 
-                // Login frequency score (0-30 points)
                 if (loginFrequency >= 20) {
                     healthScore += 30;
                 } else if (loginFrequency >= 10) {
@@ -1256,7 +2494,6 @@
                     riskFactors.push('Very low engagement');
                 }
                 
-                // Feature usage score (0-25 points)
                 if (featureUsage >= 8) {
                     healthScore += 25;
                     opportunities.push('High feature adoption - potential for case study');
@@ -1271,7 +2508,6 @@
                     actions.push('Urgent: Implement onboarding program');
                 }
                 
-                // Support tickets (0-20 points - fewer is better)
                 if (supportTickets === 0) {
                     healthScore += 20;
                 } else if (supportTickets <= 2) {
@@ -1285,7 +2521,6 @@
                     actions.push('Critical: Schedule health check call');
                 }
                 
-                // NPS score (0-15 points)
                 if (npsScore >= 9) {
                     healthScore += 15;
                     opportunities.push('Promoter - request testimonial/referral');
@@ -1300,7 +2535,6 @@
                     actions.push('Executive escalation recommended');
                 }
                 
-                // Contract value consideration (0-10 points)
                 if (contractValue >= 100000) {
                     healthScore += 10;
                     opportunities.push('High-value account - prioritize for expansion');
@@ -1313,7 +2547,6 @@
                     opportunities.push('Upsell potential as usage grows');
                 }
                 
-                // Determine overall health status
                 let healthStatus = '';
                 let healthColor = '';
                 let churnRisk = '';
@@ -1441,9 +2674,9 @@
                 } else if (q.includes('sql') || q.includes('python') || q.includes('technical')) {
                     answer = 'I have foundational SQL and Python skills - enough to query databases, analyze data, and build simple automation scripts. I\'m not an engineer, but I speak their language and can bridge between technical and business teams. Plus, I\'m always learning and expanding my technical toolkit.';
                 } else if (q.includes('startup') || q.includes('scale')) {
-                    answer = 'I thrive in 0→1 and 1→10 stages. As a co-founder at Ygames, I built operational infrastructure from absolute zero. At Merit Circle, I scaled support from handling hundreds to 50,000+ users. I know how to build for today while architecting for tomorrow.';
+                    answer = 'I thrive in 0→1 and 1→10 stages. As a co-founder at Ygames, I built operations from scratch: team building, hiring decisions, and core workflows. I learned crucial lessons about lean operations. At Merit Circle, I scaled support from hundreds to 50,000+ users. I know how to build for today while planning for tomorrow.';
                 } else if (q.includes('web3') || q.includes('blockchain') || q.includes('gaming')) {
-                    answer = 'Web3 + Gaming is my sweet spot. Co-founded Ygames, managed operations at Merit Circle (Web3 Gaming DAO). I understand DAOs, smart contracts, tokenomics, and the unique operational challenges of decentralized systems. It\'s a wild west - exactly where I thrive.';
+                    answer = 'Web3 + Gaming is my sweet spot. Co-founded Ygames where I handled all operational aspects from team building to game design workflows. Also managed operations at Merit Circle (Web3 Gaming DAO). I understand DAOs, smart contracts, tokenomics, and the unique operational challenges of decentralized systems. It\'s a wild west and I learned a ton from the experience.';
                 } else if (q.includes('hire') || q.includes('work') || q.includes('available')) {
                     answer = 'Open to full-time roles, fractional leadership, or advisory positions. Best fit: AI companies, high-growth startups (Series A-C), or companies rebuilding operations from scratch. I want hard problems, smart people, and the chance to build something that matters. Email me: murmur.red1@gmail.com';
                 } else if (q.includes('approach') || q.includes('methodology') || q.includes('how')) {
@@ -1460,6 +2693,68 @@
                     </p>
                 `;
             }, 1500);
+        }
+        
+        function submitContactForm(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const name = document.getElementById('contactName').value;
+            const email = document.getElementById('contactEmail').value;
+            const result = document.getElementById('contactResult');
+            const submitBtn = document.getElementById('submitContactBtn');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    result.innerHTML = `
+                        <h4 style="color: #00ff00;">✅ Message Sent Successfully!</h4>
+                        <p>Thanks for reaching out, ${name}! I'll get back to you at ${email} as soon as possible.</p>
+                        <p style="margin-top: 15px; font-size: 14px; opacity: 0.7;">
+                            <em>💡 Tip: You can also connect with me on <a href="https://www.linkedin.com/in/lena-ry-8baa8716/" target="_blank" style="color: var(--primary);">LinkedIn</a> for a faster response!</em>
+                        </p>
+                    `;
+                    result.classList.add('active');
+                    form.reset();
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Send Message';
+                } else {
+                    response.json().then(data => {
+                        if (Object.hasOwn(data, 'errors')) {
+                            result.innerHTML = `
+                                <h4 style="color: #ff6600;">⚠️ Oops!</h4>
+                                <p>${data.errors.map(error => error.message).join(', ')}</p>
+                            `;
+                        } else {
+                            result.innerHTML = `
+                                <h4 style="color: #ff6600;">⚠️ Something went wrong</h4>
+                                <p>Please try again or email me directly at murmur.red1@gmail.com</p>
+                            `;
+                        }
+                        result.classList.add('active');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Send Message';
+                    });
+                }
+            })
+            .catch(error => {
+                result.innerHTML = `
+                    <h4 style="color: #ff6600;">⚠️ Connection Error</h4>
+                    <p>Please check your internet connection and try again, or email me directly at murmur.red1@gmail.com</p>
+                `;
+                result.classList.add('active');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Message';
+            });
         }
         
         window.onclick = function(event) {
