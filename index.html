@@ -1,959 +1,1448 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lena Ry - AI-Native Operations Leader</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lena Ry · Mobile UA & SaaS Growth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+<script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+<style>
+  :root {
+    --cyan: #00f0ff;
+    --pink: #ff0f80;
+    --green: #00ff88;
+    --purple: #bf00ff;
+    --yellow: #ffee00;
+    --bg: #080c1e;
+    --bg2: #0b1028;
+    --bg3: #0e1430;
+    --text: #f0f0ff;
+    --muted: rgba(200,200,255,0.45);
+    --border: rgba(0,240,255,0.08);
+    --border-active: rgba(0,240,255,0.28);
+    --card: rgba(0,240,255,0.03);
+    --gap: clamp(14px, 2vw, 22px);
+    --py: clamp(36px, 5vw, 64px);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; overflow-x: clip; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    min-width: 320px;
+  }
+
+  /* Scanlines overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+  }
+
+  /* Grid floor */
+  body::after {
+    content: '';
+    position: fixed; bottom: 0; left: 0; right: 0; height: 50vh;
+    z-index: 0; pointer-events: none;
+    background:
+      linear-gradient(to bottom, transparent 0%, rgba(0,240,255,0.04) 100%),
+      repeating-linear-gradient(90deg, rgba(0,240,255,0.04) 0 1px, transparent 1px 80px),
+      repeating-linear-gradient(0deg, rgba(0,240,255,0.04) 0 1px, transparent 1px 80px);
+    -webkit-mask-image: linear-gradient(to top, black 0%, transparent 100%);
+    mask-image: linear-gradient(to top, black 0%, transparent 100%);
+  }
+
+  /* Cursor */
+  .cursor, .cursor-ring { display: none; }
+  @media (pointer: fine) {
+    body { cursor: none; }
+    .cursor {
+      display: block; position: fixed; z-index: 9999; pointer-events: none;
+      width: 8px; height: 8px; background: var(--cyan); border-radius: 50%;
+      transform: translate(-50%,-50%);
+      transition: width .2s, height .2s, background .2s;
+      box-shadow: 0 0 10px var(--cyan), 0 0 20px var(--cyan);
+    }
+    .cursor-ring {
+      display: block; position: fixed; z-index: 9998; pointer-events: none;
+      width: 32px; height: 32px;
+      border: 1.5px solid rgba(0,240,255,0.5); border-radius: 50%;
+      transform: translate(-50%,-50%);
+      transition: width .25s, height .25s, border-color .25s;
+    }
+    body.hovering .cursor { width: 14px; height: 14px; background: var(--pink); box-shadow: 0 0 14px var(--pink), 0 0 28px var(--pink); }
+    body.hovering .cursor-ring { width: 48px; height: 48px; border-color: var(--pink); }
+  }
+
+  /* Orbs */
+  .orb { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; filter: blur(70px); }
+  .orb-1 { width: clamp(260px,38vw,500px); height: clamp(260px,38vw,500px); background: radial-gradient(circle, rgba(191,0,255,0.15), transparent 70%); top:-8%; right:-6%; animation: orbFloat 14s ease-in-out infinite; }
+  .orb-2 { width: clamp(220px,32vw,420px); height: clamp(220px,32vw,420px); background: radial-gradient(circle, rgba(0,240,255,0.1), transparent 70%); bottom:8%; left:-6%; animation: orbFloat 18s ease-in-out infinite reverse; }
+  .orb-3 { width: clamp(160px,24vw,320px); height: clamp(160px,24vw,320px); background: radial-gradient(circle, rgba(255,15,128,0.08), transparent 70%); top:45%; right:6%; animation: orbFloat 11s ease-in-out infinite 2s; }
+
+  @keyframes orbFloat {
+    0%,100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-24px) scale(1.04); }
+  }
+
+  /* Layout */
+  .container {
+    max-width: 1100px; margin: 0 auto;
+    padding: 0 clamp(20px,5vw,56px);
+    position: relative; z-index: 1; min-width: 0;
+  }
+
+  /* Nav */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: clamp(14px,2vw,20px) 0;
+    transition: background .4s, border-bottom .4s;
+  }
+  nav.scrolled {
+    background: rgba(4,4,14,0.92);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0,240,255,0.12);
+  }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .logo {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: clamp(15px,1.8vw,18px); text-decoration: none; color: var(--text);
+    letter-spacing: 0.02em; flex-shrink: 0;
+  }
+  .logo .dot-red { color: var(--pink); text-shadow: 0 0 12px var(--pink); }
+  .nav-links { display: flex; align-items: center; gap: clamp(20px,3vw,36px); list-style: none; }
+  .nav-links a {
+    color: var(--muted); text-decoration: none; font-size: 13px;
+    font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+    transition: color .25s; position: relative; white-space: nowrap;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -3px; left: 0; right: 100%;
+    height: 1px; background: var(--cyan); box-shadow: 0 0 6px var(--cyan);
+    transition: right .3s cubic-bezier(.4,0,.2,1);
+  }
+  .nav-links a:hover { color: var(--cyan); }
+  .nav-links a:hover::after { right: 0; }
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; background: none; border: none; flex-shrink: 0; }
+  .hamburger span { display: block; width: 22px; height: 1.5px; background: var(--text); transition: all .3s; }
+
+  /* Hero */
+  .hero {
+    display: flex; align-items: center;
+    padding: clamp(100px,14vw,140px) 0 clamp(72px,9vw,100px);
+    position: relative; overflow: hidden;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) minmax(0,min(420px,40%));
+    gap: clamp(28px,5vw,64px);
+    align-items: center; width: 100%;
+  }
+  .hero-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(38px,5vw,60px); letter-spacing: 0.06em;
+    color: var(--text); line-height: 1;
+    margin-bottom: 8px;
+    opacity: 0; animation: fadeUp .7s .05s cubic-bezier(.4,0,.2,1) forwards;
+  }
+  .hero-tag-line {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.16em;
+    color: var(--cyan); text-transform: uppercase;
+    margin-bottom: clamp(18px,2.5vw,28px);
+    opacity: 0; animation: fadeUp .8s .2s cubic-bezier(.4,0,.2,1) forwards;
+  }
+  .hero-tag-line::before { content: ''; width: 28px; height: 1px; background: var(--cyan); box-shadow: 0 0 6px var(--cyan); flex-shrink: 0; }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px,8vw,96px);
+    line-height: 0.95; letter-spacing: 0.02em;
+    margin-bottom: clamp(20px,2.5vw,32px);
+    opacity: 0; animation: fadeUp .9s .35s cubic-bezier(.4,0,.2,1) forwards;
+  }
+  .hero-title .line-accent {
+    display: block;
+    color: transparent;
+    -webkit-text-stroke: 2px var(--cyan);
+    text-shadow: 0 0 40px rgba(0,240,255,0.4);
+  }
+  .hero-title .line-solid { display: block; color: var(--text); }
+  .hero-title .line-pink {
+    display: block;
+    background: linear-gradient(90deg, var(--pink), var(--purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    filter: drop-shadow(0 0 20px rgba(255,15,128,0.5));
+  }
+  .hero-sub {
+    font-size: clamp(15px,2vw,18px); color: var(--muted); line-height: 1.7;
+    max-width: 460px; margin-bottom: clamp(28px,4vw,44px);
+    opacity: 0; animation: fadeUp .9s .5s cubic-bezier(.4,0,.2,1) forwards;
+  }
+  .hero-sub strong { color: var(--text); font-weight: 600; }
+  .hero-ctas {
+    display: flex; flex-direction: column; gap: 18px;
+    opacity: 0; animation: fadeUp .9s .65s cubic-bezier(.4,0,.2,1) forwards;
+  }
+  .cta-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+  /* Buttons */
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--cyan); color: #04040e;
+    font-family: 'Space Grotesk', sans-serif; font-size: clamp(13px,1.4vw,14px); font-weight: 700;
+    padding: clamp(13px,1.5vw,15px) clamp(22px,3vw,30px);
+    border-radius: 4px; border: none; cursor: pointer; text-decoration: none;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    position: relative; overflow: hidden;
+    transition: transform .25s cubic-bezier(.4,0,.2,1), box-shadow .25s;
+    box-shadow: 0 0 20px rgba(0,240,255,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .btn-primary::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+    opacity: 0; transition: opacity .25s;
+  }
+  @media (hover: hover) {
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(0,240,255,0.6), 0 8px 24px rgba(0,240,255,0.3); }
+    .btn-primary:hover::before { opacity: 1; }
+    .btn-primary:hover svg { transform: translateX(3px); }
+  }
+  .btn-primary:active { transform: scale(.97); }
+  .btn-primary svg { transition: transform .25s; flex-shrink: 0; }
+
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: transparent; color: var(--text);
+    font-family: 'Space Grotesk', sans-serif; font-size: clamp(13px,1.4vw,14px); font-weight: 700;
+    padding: clamp(12px,1.5vw,14px) clamp(20px,3vw,28px);
+    border-radius: 4px; border: 1.5px solid rgba(0,240,255,0.3);
+    cursor: pointer; text-decoration: none; letter-spacing: 0.06em; text-transform: uppercase;
+    transition: border-color .25s, background .25s, transform .25s, box-shadow .25s;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  @media (hover: hover) {
+    .btn-ghost:hover { border-color: var(--cyan); background: rgba(0,240,255,0.06); transform: translateY(-2px); box-shadow: 0 0 20px rgba(0,240,255,0.15); }
+  }
+  .btn-ghost:active { transform: scale(.97); }
+
+  .micro-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--muted); font-size: 13px; letter-spacing: 0.04em;
+    cursor: pointer; border: none; background: none;
+    font-family: 'Space Grotesk', sans-serif; transition: color .25s; padding: 4px 0;
+  }
+  @media (hover: hover) {
+    .micro-link:hover { color: var(--pink); }
+    .micro-link:hover svg { transform: translateX(4px); }
+  }
+  .micro-link svg { transition: transform .25s; flex-shrink: 0; }
+
+  /* Hero image */
+  .hero-img-wrap {
+    position: relative; min-width: 0;
+    opacity: 0; animation: fadeIn 1.2s .4s cubic-bezier(.4,0,.2,1) forwards;
+  }
+  .hero-img-glow {
+    position: absolute; inset: -30px;
+    background: radial-gradient(ellipse at 50% 80%, rgba(255,15,128,0.18), transparent 65%);
+    pointer-events: none;
+    animation: glowPulse 4s ease-in-out infinite;
+  }
+  @keyframes glowPulse {
+    0%,100% { opacity: .7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.04); }
+  }
+  .hero-img {
+    position: relative; width: 100%; border-radius: 8px; overflow: hidden;
+    border: 1px solid rgba(0,240,255,0.12);
+    aspect-ratio: 3/4;
+  }
+  .hero-img img {
+    width: 100%; height: 100%; object-fit: cover; object-position: center top;
+    display: block;
+    /* Fade edges so office background disappears into dark site */
+    -webkit-mask-image: radial-gradient(ellipse 88% 92% at 50% 40%, black 40%, transparent 100%);
+    mask-image: radial-gradient(ellipse 88% 92% at 50% 40%, black 40%, transparent 100%);
+    filter: contrast(1.05) brightness(0.88) saturate(0.9);
+  }
+  .hero-img::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to bottom, transparent 55%, var(--bg) 100%);
+    pointer-events: none;
+  }
+  /* Cyan scanline accent on image */
+  .hero-img::before {
+    content: ''; position: absolute; inset: 0; z-index: 1;
+    background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,240,255,0.02) 3px, rgba(0,240,255,0.02) 4px);
+    pointer-events: none;
+  }
+  .hero-badge {
+    position: absolute; bottom: 18px; left: 18px; z-index: 2;
+    background: rgba(4,4,14,0.85); backdrop-filter: blur(12px);
+    border: 1px solid rgba(0,240,255,0.2); border-radius: 4px;
+    padding: 7px 14px; font-size: 12px; font-weight: 600; color: var(--cyan);
+    display: flex; align-items: center; gap: 8px; letter-spacing: 0.06em; text-transform: uppercase;
+    box-shadow: 0 0 12px rgba(0,240,255,0.1);
+  }
+  .live-dot {
+    width: 7px; height: 7px; background: var(--green); border-radius: 50%; flex-shrink: 0;
+    box-shadow: 0 0 8px var(--green);
+    animation: livePulse 2s ease-in-out infinite;
+  }
+  @keyframes livePulse {
+    0%,100% { box-shadow: 0 0 4px var(--green); }
+    50% { box-shadow: 0 0 14px var(--green), 0 0 28px rgba(0,255,136,0.3); }
+  }
+
+  /* Section common */
+  section { position: relative; z-index: 1; }
+  .section-eyebrow {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--cyan); display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+  }
+  .section-eyebrow::before { content: ''; width: 18px; height: 1px; background: var(--cyan); box-shadow: 0 0 6px var(--cyan); flex-shrink: 0; }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(32px,5vw,60px);
+    line-height: 1; letter-spacing: 0.03em; margin-bottom: 16px;
+  }
+  .section-title .accent {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--pink);
+    filter: drop-shadow(0 0 12px rgba(255,15,128,0.5));
+  }
+  .divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(0,240,255,0.15), transparent);
+    margin: var(--py) 0;
+  }
+
+  /* Problem */
+  .problem-section { padding: var(--py) 0; }
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%,260px),1fr));
+    gap: clamp(36px,6vw,80px); align-items: start;
+  }
+  .problem-grid > * { min-width: 0; }
+  .pain-list { list-style: none; margin-top: 28px; }
+  .pain-item {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+    opacity: 0; transform: translateX(-18px); transition: opacity .6s, transform .6s;
+  }
+  .pain-item.visible { opacity: 1; transform: translateX(0); }
+  .pain-marker {
+    width: 20px; height: 20px; border-radius: 2px;
+    border: 1.5px solid rgba(0,240,255,0.3);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px; font-size: 10px; color: var(--cyan);
+    font-weight: 700;
+  }
+  .pain-item p { font-size: clamp(14px,1.8vw,16px); color: var(--muted); line-height: 1.5; }
+  .solution-box {
+    background: var(--card); border: 1px solid rgba(0,240,255,0.1);
+    border-radius: 8px; padding: clamp(24px,4vw,40px); position: relative; overflow: hidden;
+  }
+  .solution-box::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(to right, transparent, var(--cyan), var(--purple), transparent);
+    box-shadow: 0 0 12px rgba(0,240,255,0.5);
+  }
+  .solution-box p { font-size: clamp(15px,2vw,19px); line-height: 1.65; color: var(--text); }
+  .solution-box p .hl { color: var(--cyan); font-weight: 600; }
+  .solution-quote {
+    font-size: 13px; color: var(--muted); margin-top: 24px;
+    border-top: 1px solid var(--border); padding-top: 20px;
+    display: flex; align-items: center; gap: 12px; letter-spacing: 0.02em;
+  }
+  .solution-quote svg { flex-shrink: 0; opacity: .4; }
+
+  /* Growth */
+  .growth-section { padding: var(--py) 0; }
+  .growth-track { display: none; margin-top: clamp(28px,4vw,44px); }
+  .growth-track.active { display: block; }
+  .growth-track-head {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: clamp(18px,2.5vw,28px);
+  }
+  .growth-track-tag {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 5px 12px; border-radius: 3px; white-space: nowrap;
+  }
+  .growth-track-tag.mobile {
+    color: var(--pink); background: rgba(255,15,128,0.08); border: 1px solid rgba(255,15,128,0.2);
+  }
+  .growth-track-tag.saas {
+    color: var(--cyan); background: rgba(0,240,255,0.05); border: 1px solid rgba(0,240,255,0.15);
+  }
+  .growth-track-sub { font-size: 12px; color: var(--muted); letter-spacing: 0.03em; }
+  .growth-track-line { flex: 1; height: 1px; background: var(--border); }
+  /* Trajectory connector row */
+  .traj-flow {
+    display: flex; align-items: center;
+    margin-bottom: clamp(16px,2.5vw,24px);
+    overflow-x: auto; padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .traj-flow::-webkit-scrollbar { display: none; }
+  .traj-step {
+    display: flex; align-items: center; gap: 8px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .traj-dot {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    border: 1.5px solid rgba(255,15,128,0.3);
+    color: var(--pink); background: rgba(255,15,128,0.06);
+    transition: all .25s;
+  }
+  .saas-track .traj-dot {
+    border-color: rgba(0,240,255,0.25); color: var(--cyan); background: rgba(0,240,255,0.05);
+  }
+  .traj-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .traj-arrow {
+    flex: 1; min-width: 20px; max-width: 48px; height: 1px;
+    background: linear-gradient(to right, rgba(255,15,128,0.2), rgba(255,15,128,0.08));
+    position: relative; flex-shrink: 0;
+  }
+  .saas-track .traj-arrow {
+    background: linear-gradient(to right, rgba(0,240,255,0.15), rgba(0,240,255,0.05));
+  }
+  .traj-arrow::after {
+    content: ''; position: absolute; right: 0; top: -3px;
+    border: 4px solid transparent;
+    border-left: 6px solid rgba(255,15,128,0.3);
+  }
+  .saas-track .traj-arrow::after { border-left-color: rgba(0,240,255,0.2); }
+  .growth-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%,175px),1fr));
+    gap: var(--gap);
+  }
+  .growth-grid > * { min-width: 0; }
+  .growth-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: clamp(18px,3vw,28px) clamp(16px,2.5vw,24px);
+    cursor: pointer; position: relative; overflow: hidden;
+    transition: border-color .3s, transform .3s, box-shadow .3s;
+    opacity: 0; transform: translateY(18px);
+  }
+  .growth-card.visible { opacity: 1; transform: translateY(0); }
+  .growth-card::after {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(to right, var(--cyan), var(--purple));
+    transform: scaleX(0); transition: transform .35s cubic-bezier(.4,0,.2,1);
+    transform-origin: left; box-shadow: 0 0 8px rgba(0,240,255,0.5);
+  }
+  @media (hover: hover) {
+    .growth-card:hover { border-color: var(--border-active); transform: translateY(-4px); box-shadow: 0 8px 32px rgba(0,240,255,0.08); }
+    .growth-card:hover::after { transform: scaleX(1); }
+  }
+  .growth-card.expanded { border-color: var(--border-active); }
+  .growth-card.expanded::after { transform: scaleX(1); }
+  .card-num { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: var(--pink); text-transform: uppercase; margin-bottom: 12px; }
+  .card-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(22px,2.5vw,28px); letter-spacing: 0.04em; margin-bottom: 10px; line-height: 1; }
+  .card-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .card-expand { max-height: 0; overflow: hidden; transition: max-height .4s cubic-bezier(.4,0,.2,1); }
+  .growth-card.expanded .card-expand { max-height: 200px; }
+  .card-expand p { font-size: 13px; color: var(--muted); line-height: 1.7; padding-top: 14px; margin-top: 14px; border-top: 1px solid var(--border); }
+  .card-chevron { position: absolute; top: 18px; right: 16px; color: var(--muted); font-size: 16px; transition: transform .3s, color .3s; }
+  .growth-card.expanded .card-chevron { transform: rotate(180deg); color: var(--cyan); }
+
+  /* Why */
+  .why-section { padding: var(--py) 0; }
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%,280px),1fr));
+    gap: clamp(32px,6vw,60px); align-items: center;
+    margin-top: clamp(32px,5vw,56px);
+  }
+  .why-grid > * { min-width: 0; }
+  .why-stats { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
+  .why-stats > * { min-width: 0; }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: clamp(18px,3vw,28px) clamp(14px,2.5vw,24px);
+    transition: border-color .3s, box-shadow .3s;
+    opacity: 0; transform: scale(.95);
+  }
+  .stat-card.visible { opacity: 1; transform: scale(1); }
+  @media (hover: hover) {
+    .stat-card:hover { border-color: var(--border-active); box-shadow: 0 0 20px rgba(0,240,255,0.06); }
+  }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px,5vw,52px); letter-spacing: 0.02em;
+    color: var(--cyan); text-shadow: 0 0 20px rgba(0,240,255,0.5); line-height: 1;
+  }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.4; letter-spacing: 0.02em; }
+  .why-points { list-style: none; }
+  .why-point {
+    display: flex; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--border);
+    opacity: 0; transform: translateX(18px); transition: opacity .6s, transform .6s;
+  }
+  .why-point.visible { opacity: 1; transform: translateX(0); }
+  .why-icon {
+    width: 36px; height: 36px; border-radius: 4px;
+    border: 1px solid rgba(0,240,255,0.2);
+    background: rgba(0,240,255,0.06);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px; font-size: 16px;
+  }
+  .why-txt { min-width: 0; }
+  .why-txt h4 { font-weight: 700; font-size: 15px; margin-bottom: 4px; letter-spacing: 0.02em; }
+  .why-txt p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* How */
+  .how-section { padding: var(--py) 0; }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%,170px),1fr));
+    gap: var(--gap); margin-top: clamp(32px,5vw,56px);
+  }
+  .steps > * { min-width: 0; }
+  .step { opacity: 0; transform: translateY(18px); transition: opacity .7s, transform .7s; }
+  .step.visible { opacity: 1; transform: translateY(0); }
+  .step-num {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 1.5px solid rgba(0,240,255,0.3);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: var(--cyan);
+    background: rgba(0,240,255,0.06);
+    margin-bottom: 12px; transition: all .3s;
+  }
+  .step-label { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: var(--pink); text-transform: uppercase; margin-bottom: 10px; }
+  @media (hover: hover) {
+    .step:hover .step-num { background: var(--cyan); border-color: var(--cyan); color: #04040e; box-shadow: 0 0 16px rgba(0,240,255,0.6); }
+  }
+  .step-body {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: clamp(18px,2.5vw,24px) clamp(16px,2vw,22px);
+    transition: border-color .3s, transform .3s;
+  }
+  @media (hover: hover) {
+    .step:hover .step-body { border-color: rgba(0,240,255,0.2); transform: translateY(-3px); }
+  }
+  .step-body h3 { font-weight: 700; font-size: 15px; margin-bottom: 8px; letter-spacing: 0.02em; }
+  .step-body p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+  /* Where I've worked */
+  .where-section { padding: var(--py) 0; }
+  .where-connect {
+    font-size: clamp(14px,1.6vw,16px); color: var(--muted);
+    font-style: italic; margin-top: 10px; letter-spacing: 0.02em;
+  }
+  .where-framing {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%,240px),1fr));
+    gap: 12px; margin-top: clamp(24px,3vw,36px);
+  }
+  .where-framing-item {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 18px 22px;
+    display: flex; align-items: flex-start; gap: 14px;
+  }
+  .wf-num {
+    font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 0.02em;
+    line-height: 1; flex-shrink: 0; margin-top: 2px;
+  }
+  .wf-num.mobile { color: var(--pink); text-shadow: 0 0 16px rgba(255,15,128,0.4); }
+  .wf-num.saas { color: var(--cyan); text-shadow: 0 0 16px rgba(0,240,255,0.4); }
+  .wf-text strong { display: block; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .wf-text span { font-size: 12px; color: var(--muted); letter-spacing: 0.03em; }
+
+  /* Toggle */
+  .where-toggle {
+    display: flex; align-items: center; gap: 4px;
+    margin-top: clamp(32px,5vw,52px);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 6px; padding: 4px;
+    width: fit-content;
+  }
+  .toggle-btn {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 10px 22px; border-radius: 4px; border: none; cursor: pointer;
+    background: none; color: var(--muted);
+    transition: background .25s, color .25s, box-shadow .25s;
+    white-space: nowrap;
+  }
+  .toggle-btn.active.mobile-btn {
+    background: rgba(255,15,128,0.12); color: var(--pink);
+    box-shadow: 0 0 14px rgba(255,15,128,0.15);
+    border: 1px solid rgba(255,15,128,0.25);
+  }
+  .toggle-btn.active.saas-btn {
+    background: rgba(0,240,255,0.08); color: var(--cyan);
+    box-shadow: 0 0 14px rgba(0,240,255,0.12);
+    border: 1px solid rgba(0,240,255,0.2);
+  }
+  .toggle-btn:not(.active):hover { color: var(--text); }
+
+  /* Panels */
+  .where-panel { display: none; }
+  .where-panel.active { display: block; }
+
+  .where-panel-head {
+    display: flex; align-items: center; gap: 14px;
+    margin: clamp(28px,4vw,44px) 0 clamp(20px,3vw,32px);
+  }
+  .where-panel-tag {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 5px 12px; border-radius: 3px; white-space: nowrap;
+  }
+  .where-panel-tag.mobile {
+    color: var(--pink); background: rgba(255,15,128,0.08); border: 1px solid rgba(255,15,128,0.2);
+  }
+  .where-panel-tag.saas {
+    color: var(--cyan); background: rgba(0,240,255,0.05); border: 1px solid rgba(0,240,255,0.15);
+  }
+  .where-panel-sub {
+    font-size: 12px; color: var(--muted); letter-spacing: 0.04em;
+  }
+  .where-panel-line { flex: 1; height: 1px; background: var(--border); }
+
+  /* Cards */
+  .where-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%,280px),1fr));
+    gap: var(--gap);
+  }
+  .where-grid > * { min-width: 0; }
+  .where-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: clamp(22px,3vw,32px);
+    opacity: 0; transform: translateY(14px);
+    transition: opacity .6s, transform .6s, border-color .3s, box-shadow .3s;
+  }
+  .where-card.visible { opacity: 1; transform: translateY(0); }
+  @media (hover: hover) {
+    .mobile-panel .where-card:hover { border-color: rgba(255,15,128,0.2); box-shadow: 0 8px 28px rgba(255,15,128,0.06); }
+    .saas-panel .where-card:hover { border-color: rgba(0,240,255,0.18); box-shadow: 0 8px 28px rgba(0,240,255,0.05); }
+  }
+  .where-quote {
+    font-size: clamp(15px,1.8vw,17px); font-weight: 500; line-height: 1.5;
+    color: var(--text); margin-bottom: 16px;
+    quotes: 'C' 'D';
+  }
+  .where-what {
+    font-size: 13px; color: var(--muted); line-height: 1.7;
+    margin-bottom: 20px; padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .where-metrics {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .wm {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 5px 11px; border-radius: 3px;
+  }
+  .wm.mobile { color: var(--pink); background: rgba(255,15,128,0.08); border: 1px solid rgba(255,15,128,0.2); }
+  .wm.saas { color: var(--cyan); background: rgba(0,240,255,0.06); border: 1px solid rgba(0,240,255,0.15); }
+
+  /* Bottom CTA */
+  .cta-section { padding: clamp(72px,12vw,120px) 0; text-align: center; }
+  .cta-inner { max-width: 680px; margin: 0 auto; position: relative; }
+  .cta-glow {
+    position: absolute; inset: -80px;
+    background: radial-gradient(ellipse at center, rgba(0,240,255,0.07), transparent 70%);
+    pointer-events: none;
+  }
+  .cta-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px,7vw,72px);
+    line-height: 0.95; letter-spacing: 0.03em; margin-bottom: 20px; position: relative;
+  }
+  .cta-title .line-a { display: block; color: var(--text); }
+  .cta-title .line-b {
+    display: block;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--cyan);
+    text-shadow: 0 0 30px rgba(0,240,255,0.4);
+  }
+  .cta-sub { font-size: clamp(15px,2vw,18px); color: var(--muted); margin-bottom: 40px; position: relative; }
+  .cta-actions { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; position: relative; }
+  .btn-primary-lg {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: var(--cyan); color: #04040e;
+    font-family: 'Space Grotesk', sans-serif; font-size: clamp(14px,1.5vw,15px); font-weight: 700;
+    padding: clamp(14px,2vw,18px) clamp(28px,4vw,44px);
+    border-radius: 4px; border: none; cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase;
+    position: relative; overflow: hidden; white-space: nowrap;
+    transition: transform .3s cubic-bezier(.4,0,.2,1), box-shadow .3s;
+    box-shadow: 0 0 30px rgba(0,240,255,0.5), 0 4px 20px rgba(0,240,255,0.3);
+  }
+  .btn-primary-lg::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+    opacity: 0; transition: opacity .25s;
+  }
+  @media (hover: hover) {
+    .btn-primary-lg:hover { transform: translateY(-3px); box-shadow: 0 0 60px rgba(0,240,255,0.6), 0 12px 40px rgba(0,240,255,0.3); }
+    .btn-primary-lg:hover::before { opacity: 1; }
+  }
+  .btn-primary-lg:active { transform: scale(.97); }
+  .btn-primary-lg svg { flex-shrink: 0; }
+
+  /* Footer */
+  footer { border-top: 1px solid rgba(0,240,255,0.1); padding: clamp(28px,4vw,44px) 0; position: relative; z-index: 1; }
+  .footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.08em; color: var(--text);
+  }
+  .footer-logo span { color: var(--cyan); text-shadow: 0 0 12px rgba(0,240,255,0.5); }
+  .footer-logo sub { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 400; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; vertical-align: baseline; margin-left: 8px; }
+  .footer-nav { display: flex; align-items: center; gap: 8px; list-style: none; flex-wrap: wrap; }
+  .footer-nav li { display: flex; align-items: center; gap: 8px; }
+  .footer-nav li::before { content: '/'; color: rgba(0,240,255,0.2); font-size: 12px; }
+  .footer-nav li:first-child::before { display: none; }
+  .footer-nav a, .footer-nav button {
+    color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    text-decoration: none; background: none; border: none; cursor: pointer;
+    font-family: 'Space Grotesk', sans-serif; transition: color .25s;
+  }
+  .footer-nav a:hover, .footer-nav button:hover { color: var(--cyan); }
+  .footer-extras { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .social-btn {
+    width: 36px; height: 36px; border: 1px solid rgba(0,240,255,0.2); border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted); text-decoration: none;
+    transition: border-color .25s, color .25s, box-shadow .25s; flex-shrink: 0;
+  }
+  @media (hover: hover) {
+    .social-btn:hover { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 12px rgba(0,240,255,0.2); }
+  }
+  .game-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 7px 14px; background: rgba(191,0,255,0.08);
+    border: 1px solid rgba(191,0,255,0.3); border-radius: 4px;
+    color: var(--purple); font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;
+    transition: background .25s, border-color .25s, box-shadow .25s;
+    font-family: 'Space Grotesk', sans-serif; white-space: nowrap;
+    text-shadow: 0 0 8px rgba(191,0,255,0.5);
+  }
+  @media (hover: hover) {
+    .game-btn:hover { background: rgba(191,0,255,0.14); border-color: var(--purple); box-shadow: 0 0 20px rgba(191,0,255,0.25); }
+  }
+  .game-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--purple); flex-shrink: 0; box-shadow: 0 0 6px var(--purple); animation: livePulse 2s ease-in-out infinite; }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(4,4,14,0.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    z-index: 200; display: flex; align-items: center; justify-content: center;
+    padding: clamp(16px,3vw,24px);
+    opacity: 0; pointer-events: none; transition: opacity .3s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--bg2); border: 1px solid rgba(0,240,255,0.15); border-radius: 8px;
+    width: 100%; max-width: 700px;
+    padding: clamp(20px,3vw,36px); position: relative;
+    transform: scale(.95) translateY(10px);
+    transition: transform .35s cubic-bezier(.4,0,.2,1);
+    max-height: calc(100vh - 40px); overflow-y: auto;
+  }
+  .modal-overlay.open .modal { transform: scale(1) translateY(0); }
+  .modal::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(to right, transparent, var(--cyan), var(--purple), transparent);
+    box-shadow: 0 0 10px rgba(0,240,255,0.4);
+  }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    width: 36px; height: 36px; border: 1px solid rgba(0,240,255,0.2); border-radius: 4px;
+    background: none; cursor: pointer; color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; transition: border-color .25s, color .25s, transform .25s;
+  }
+  .modal-close:hover { border-color: var(--cyan); color: var(--cyan); transform: rotate(90deg); }
+  .modal-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: var(--cyan); text-transform: uppercase; margin-bottom: 14px; }
+  .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(28px,5vw,40px); line-height: 1; letter-spacing: 0.03em; margin-bottom: 10px; }
+  .modal-sub { font-size: 14px; color: var(--muted); margin-bottom: 28px; line-height: 1.65; }
+  .calendly-placeholder {
+    background: rgba(0,240,255,0.02); border: 1px dashed rgba(0,240,255,0.15);
+    border-radius: 6px; padding: clamp(24px,4vw,36px); text-align: center;
+  }
+  .calendly-placeholder p { color: var(--muted); font-size: 13px; margin-bottom: 16px; line-height: 1.6; }
+  .calendly-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--cyan); color: #04040e;
+    padding: 11px 22px; border-radius: 4px;
+    font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700;
+    text-decoration: none; letter-spacing: 0.06em; text-transform: uppercase;
+    transition: box-shadow .25s, transform .25s;
+  }
+  .calendly-cta:hover { box-shadow: 0 0 24px rgba(0,240,255,0.5); transform: translateY(-1px); }
+  .modal-note { font-size: 11px; color: var(--muted); margin-top: 14px; text-align: center; letter-spacing: 0.04em; }
+
+  /* Mobile menu */
+  .mobile-menu {
+    position: fixed; inset: 0; background: var(--bg); z-index: 150;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: clamp(22px,5vw,36px);
+    opacity: 0; pointer-events: none; transition: opacity .3s;
+  }
+  .mobile-menu.open { opacity: 1; pointer-events: all; }
+  .mobile-menu a {
+    font-family: 'Bebas Neue', sans-serif; font-size: clamp(32px,10vw,52px);
+    color: var(--text); text-decoration: none; transition: color .25s; letter-spacing: 0.04em;
+  }
+  .mobile-menu a:hover { color: var(--cyan); text-shadow: 0 0 20px rgba(0,240,255,0.5); }
+  .mobile-close {
+    position: absolute; top: 24px; right: 24px;
+    background: none; border: none; color: var(--muted); font-size: 28px; cursor: pointer;
+  }
+
+  /* Reveal */
+  .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s cubic-bezier(.4,0,.2,1), transform .7s cubic-bezier(.4,0,.2,1); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.2); border-radius: 2px; }
+
+  /* ── Breakpoints (em = zoom-aware) ── */
+  @media (max-width: 64em) {
+    .hero-grid { grid-template-columns: minmax(0,1fr) minmax(0,min(360px,36%)); }
+  }
+  @media (max-width: 53.75em) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .hero-content { order: 1; }
+    .hero-img-wrap { order: 2; max-width: min(300px,75vw); margin: 0 auto; }
+    .hero-sub { max-width: 100%; }
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+  }
+  @media (max-width: 40em) {
+    .cta-row { flex-direction: column; align-items: stretch; }
+    .btn-primary, .btn-ghost { width: 100%; justify-content: center; }
+    .footer-inner { flex-direction: column; align-items: flex-start; }
+    .cta-title .line-b br { display: none; }
+  }
+  @media (max-width: 26.25em) {
+    .btn-primary-lg { width: 100%; justify-content: center; }
+  }
+  /* Company strip */
+  .companies-strip {
+    padding: clamp(18px,2.5vw,28px) 0;
+    position: relative; z-index: 1;
+  }
+  .companies-strip .container {
+    display: flex; align-items: center; gap: clamp(16px,3vw,36px); flex-wrap: wrap;
+  }
+  .companies-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); white-space: nowrap; flex-shrink: 0;
+  }
+  .companies-list {
+    display: flex; align-items: center; gap: clamp(20px,4vw,48px); flex-wrap: wrap;
+  }
+  .companies-list span {
+    font-family: 'Space Grotesk', sans-serif; font-size: clamp(13px,1.6vw,16px);
+    font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    color: rgba(200,200,255,0.25);
+    transition: color .25s;
+  }
+  .companies-list span:hover { color: rgba(200,200,255,0.55); }
+</style>
 </head>
 <body>
-    <div class="bg-animation">
-        <div class="gradient-orb orb1"></div>
-        <div class="gradient-orb orb2"></div>
-        <div class="gradient-orb orb3"></div>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="calendlyModal" role="dialog" aria-modal="true">
+  <div class="modal">
+    <button class="modal-close" id="closeModal" aria-label="Close">✕</button>
+    <p class="modal-eyebrow">Book a call</p>
+    <h2 class="modal-title">Let's look at it together.</h2>
+    <p class="modal-sub">Pick a time. 30 minutes, no pitch, just a look at what's messy.</p>
+    <div class="calendly-inline-widget" data-url="https://calendly.com/murmur-red1/30min?hide_gdpr_banner=1&background_color=0b1028&text_color=ffffff&primary_color=00f0ff" style="min-width:280px;height:630px;"></div>
+  </div>
+</div>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true">
+  <button class="mobile-close" id="closeMobile" aria-label="Close">✕</button>
+  <a href="#what-i-do" onclick="closeMobileMenu()">What I Do</a>
+  <a href="#how-it-works" onclick="closeMobileMenu()">How It Works</a>
+  <a href="#case-studies" onclick="closeMobileMenu()">My Work</a>
+  <button class="btn-primary" onclick="openCalendly(); closeMobileMenu();" style="margin-top:8px;">Let's meet</button>
+</div>
+
+<!-- Nav -->
+<nav id="nav">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="#" class="logo">murmur<span class="dot-red">.red</span></a>
+      <ul class="nav-links">
+        <li><a href="#what-i-do">What I Do</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#case-studies">My Work</a></li>
+      </ul>
+      <button class="hamburger" id="hamburger" onclick="openMobileMenu()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
-    
-    <nav>
-        <div class="logo">LENA RY</div>
-        <div class="hamburger" onclick="toggleMenu()">
-            <span></span>
-            <span></span>
-            <span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div class="hero-content">
+        <p class="hero-name reveal-instant">Lena Ry</p>
+        <p class="hero-tag-line">Mobile UA & SaaS Growth Specialist</p>
+        <h1 class="hero-title">
+          <span class="line-solid">I come in</span>
+          <span class="line-accent">when growth</span>
+          <span class="line-pink">feels messy</span>
+          <span class="line-solid">and fix it.</span>
+        </h1>
+        <p class="hero-sub">
+          Most teams don't need more ideas.<br>
+          They need <strong>a system that actually works.</strong><br>
+          I build that. As part of your team or as an outside pair of hands.
+        </p>
+        <div class="hero-ctas">
+          <div class="cta-row">
+            <button class="btn-primary" onclick="openCalendly()">
+              Let's set up a meeting
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+            <a href="#how-it-works" class="btn-ghost">See how I work</a>
+          </div>
+          <button class="micro-link" onclick="openCalendly()">
+            Pick a time that works for you
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
         </div>
-        <div class="nav-links" id="navLinks">
-            <a href="#about" onclick="closeMenu()">About</a>
-            <a href="#work" onclick="closeMenu()">Work</a>
-            <a href="#playground" onclick="closeMenu()">AI Playground</a>
-            <a href="#workflows" onclick="closeMenu()">AI Workflows</a>
-            <a href="#contact" onclick="closeMenu()">Contact</a>
+      </div>
+      <div class="hero-img-wrap">
+        <div class="hero-img-glow"></div>
+        <div class="hero-img">
+          <img src="data:image/jpeg;base64,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" alt="Lena Growth Systems Consultant">
+          <div class="hero-badge"><div class="live-dot"></div>Open to full-time & freelance</div>
         </div>
-    </nav>
-    
-    <div class="content">
-        <section class="hero">
-            <h1>AI-Native Client & Product Leader</h1>
-            <h2>Building the future of customer success, one intelligent experience at a time</h2>
-            <p>I don't just manage clients. I architect their success. With 10+ years transforming customer relationships and product adoption across SaaS, Web3, and AI companies, I build experiences that delight, retain, and scale.</p>
-            <a href="#contact" class="cta-button">Let's Build Something</a>
-            
-            <div class="stats">
-                <div class="stat">
-                    <div class="stat-number">10+</div>
-                    <div class="stat-label">Years in Operations</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">15K+</div>
-                    <div class="stat-label">Users Supported</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">5</div>
-                    <div class="stat-label">Companies Scaled</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">∞</div>
-                    <div class="stat-label">Problems Solved</div>
-                </div>
-            </div>
-        </section>
-        
-        <section id="about">
-            <div class="about-content">
-                <div class="about-text">
-                    <h2>Not Your Average Ops Person</h2>
-                    <p>Most operations people optimize existing processes. I <span class="highlight">rebuild them from scratch using AI</span>.</p>
-                    <p>From co-founding a gaming startup to managing 50,000+ users in Web3 to scaling AI SaaS companies, I've learned that the best operations are invisible. They just work.</p>
-                    <p>My superpower? Taking complex, messy problems and turning them into elegant, AI-powered systems that scale without breaking.</p>
-                    <p><span class="highlight">Current obsession:</span> How AI can eliminate 80% of operational overhead while improving quality.</p>
-                    
-                    <div class="tech-stack">
-                        <span class="tech-badge">AI/ML Tools</span>
-                        <span class="tech-badge">Process Design</span>
-                        <span class="tech-badge">SQL + Python</span>
-                        <span class="tech-badge">Data Analytics</span>
-                        <span class="tech-badge">Vendor Management</span>
-                        <span class="tech-badge">Cross-functional Leadership</span>
-                    </div>
-                </div>
-                <div class="about-visual">
-                    <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=600&h=800&fit=crop" alt="AI Visualization" style="width: 100%; border-radius: 20px; border: 3px solid var(--primary);">
-                </div>
-            </div>
-        </section>
-
-        <section id="work">
-            <div class="work-content">
-                <h2>Real Impact, Real Numbers</h2>
-                
-                <div class="case-studies">
-                    <div class="case-study">
-                        <h3>Built Game Studio Operations from Zero</h3>
-                        <div class="company">Ygames | Co-founder | 2023-2025</div>
-                        <p>As co-founder, I handled all operational aspects: building the team from scratch, managing game design workflows, hiring decisions, and setting up core processes. I learned invaluable lessons about lean startup operations.</p>
-                        <div class="metrics">
-                            <div class="metric">
-                                <div class="metric-value">0→1</div>
-                                <div class="metric-label">Built From Scratch</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-value">100%</div>
-                                <div class="metric-label">Hands-On Learning</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="case-study">
-                        <h3>Scaled Support Operations 10x</h3>
-                        <div class="company">Merit Circle / Beam (Web3 Gaming DAO) | 2022-2023</div>
-                        <p>Managed operations for 50,000+ community members during explosive growth. Built automated workflows using AI and smart contracts that handled 10x volume increase without proportional headcount growth.</p>
-                        <div class="metrics">
-                            <div class="metric">
-                                <div class="metric-value">60%</div>
-                                <div class="metric-label">Response Time Reduction</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-value">10x</div>
-                                <div class="metric-label">Volume Handled</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="case-study">
-                        <h3>Transformed CS into Revenue Engine</h3>
-                        <div class="company">Replai (AI SaaS) | 2021-2022</div>
-                        <p>Built data infrastructure and AI-powered workflows that scaled operations from 50 to 500+ accounts while reducing time-to-value by 40%.</p>
-                        <div class="metrics">
-                            <div class="metric">
-                                <div class="metric-value">500+</div>
-                                <div class="metric-label">Accounts Managed</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-value">40%</div>
-                                <div class="metric-label">Faster Time-to-Value</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="case-study">
-                        <h3>Led Customer Success for Creative Platform</h3>
-                        <div class="company">LunaLabs / Unity (Creative Engine & Library) | Remote | 2019-2021</div>
-                        <p>Headed customer success operations for Unity's creative engine and asset library. Built scalable CS processes, managed enterprise relationships, and drove product adoption across thousands of game developers and creators.</p>
-                        <div class="metrics">
-                            <div class="metric">
-                                <div class="metric-value">92%</div>
-                                <div class="metric-label">Customer Retention</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-value">3x</div>
-                                <div class="metric-label">Enterprise Adoption</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="case-study">
-                        <h3>Drove Growth at AdTech SaaS Leader</h3>
-                        <div class="company">Chartboost (AdTech, SaaS) | On-site | 2015-2019</div>
-                        <p>Led growth initiatives for mobile advertising platform serving 90% of top-grossing mobile games. Managed partnerships, developer relations, and go-to-market strategy during critical scaling phase.</p>
-                        <div class="metrics">
-                            <div class="metric">
-                                <div class="metric-value">200%</div>
-                                <div class="metric-label">Developer Network Growth</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-value">$20M+</div>
-                                <div class="metric-label">Platform Revenue Impact</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <section id="playground" class="playground">
-            <div class="playground-content">
-                <h2>AI Playground</h2>
-                <p class="playground-subtitle">Interactive tools I've built. Try them out, they're actually useful.</p>
-                
-                <div class="tools-grid">
-                    <div class="tool-card">
-                        <h3>🔄 AI CS Automation Flow</h3>
-                        <p>Interactive workflow showing how AI automates customer success across Sales, CS, Product, and Operations teams with real triggers and actions.</p>
-                        <button class="tool-button" onclick="openModal('csFlow')">Explore Flow</button>
-                    </div>
-
-                    <div class="tool-card">
-                        <h3>🚀 CS Health Predictor</h3>
-                        <p>AI-powered customer success health scoring. Predict churn risk, identify expansion opportunities, and get proactive intervention recommendations based on real engagement patterns.</p>
-                        <button class="tool-button" onclick="openModal('csHealth')">Analyze Health</button>
-                    </div>
-
-                    <div class="tool-card">
-                        <h3>🎯 Job Fit Analyzer</h3>
-                        <p>Paste a job description and get instant AI analysis on whether it's worth applying, what to emphasize, and red flags to watch for.</p>
-                        <button class="tool-button" onclick="openModal('jobFit')">Try It Now</button>
-                    </div>
-                    
-                    <div class="tool-card">
-                        <h3>🤖 Ask Me Anything</h3>
-                        <p>AI chatbot trained on my experience. Ask about my approach to ops, specific projects, or whether we'd be a good fit.</p>
-                        <button class="tool-button" onclick="openModal('chatbot')">Start Chat</button>
-                    </div>
-                    
-                    
-                </div>
-            </div>
-        </section>
-
-        <section id="workflows" class="workflows">
-            <div class="workflows-content">
-                <h2>AI Workflow Examples</h2>
-                <p class="workflows-subtitle">Real-world AI tool chains for different business scenarios, from concept to launch. Click any workflow to expand and see the full process.</p>
-
-                <div class="workflow-grid">
-                    <!-- Game Developer -->
-                    <div class="workflow-card collapsed" onclick="toggleWorkflow(this)">
-                        <div class="workflow-header">
-                            <div class="workflow-icon">🎮</div>
-                            <div class="workflow-title">
-                                <h3>Small Game Developer</h3>
-                                <p class="workflow-subtitle">From concept to launch - AI-powered development</p>
-                            </div>
-                            <div class="workflow-expand-icon">▼</div>
-                        </div>
-                        <div class="workflow-steps">
-                            <div class="workflow-step ideation-step">
-                                <div class="step-num">1</div>
-                                <div class="step-info">
-                                    <div class="step-name">Concept & Story <span class="brain-icon">🧠</span></div>
-                                    <div class="step-tool">ChatGPT / Claude</div>
-                                    <div class="step-desc">Generate game ideas, storylines, and quest designs</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">2</div>
-                                <div class="step-info">
-                                    <div class="step-name">Project Management Setup</div>
-                                    <div class="step-tool">Notion AI / Linear / Jira</div>
-                                    <div class="step-desc">Create roadmap, track tasks, and manage sprints</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step ideation-step">
-                                <div class="step-num">3</div>
-                                <div class="step-info">
-                                    <div class="step-name">2D Art & Sprites <span class="brain-icon">💡</span></div>
-                                    <div class="step-tool">Midjourney / DALL-E</div>
-                                    <div class="step-desc">Create character designs and environment concepts</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">4</div>
-                                <div class="step-info">
-                                    <div class="step-name">3D Assets</div>
-                                    <div class="step-tool">Meshy.ai / CSM.ai</div>
-                                    <div class="step-desc">Convert 2D to 3D models and textures</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">5</div>
-                                <div class="step-info">
-                                    <div class="step-name">Code Development</div>
-                                    <div class="step-tool">GitHub Copilot / Cursor</div>
-                                    <div class="step-desc">AI-assisted coding for game logic and physics</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">6</div>
-                                <div class="step-info">
-                                    <div class="step-name">Version Control</div>
-                                    <div class="step-tool">GitHub / GitLab</div>
-                                    <div class="step-desc">Manage code versions and collaborate with team</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">7</div>
-                                <div class="step-info">
-                                    <div class="step-name">Audio & Music</div>
-                                    <div class="step-tool">Suno / ElevenLabs / Soundraw</div>
-                                    <div class="step-desc">Generate music, sound effects, and voice acting</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">8</div>
-                                <div class="step-info">
-                                    <div class="step-name">QA & Testing</div>
-                                    <div class="step-tool">Testim / Applitools / PlaytestCloud</div>
-                                    <div class="step-desc">Automated testing and beta testing feedback</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">9</div>
-                                <div class="step-info">
-                                    <div class="step-name">Community & Support</div>
-                                    <div class="step-tool">Discord AI Bots / Zendesk</div>
-                                    <div class="step-desc">Set up community channels and AI support</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">10</div>
-                                <div class="step-info">
-                                    <div class="step-name">Launch & Analytics</div>
-                                    <div class="step-tool">Steam / Epic / Unity Analytics</div>
-                                    <div class="step-desc">Publish game and track player behavior</div>
-                                </div>
-                            </div>
-                            <div class="workflow-result">🎮 Launch Ready Game!</div>
-                        </div>
-                    </div>
-
-                    <!-- SaaS Startup Launch -->
-                    <div class="workflow-card collapsed" onclick="toggleWorkflow(this)">
-                        <div class="workflow-header">
-                            <div class="workflow-icon">🚀</div>
-                            <div class="workflow-title">
-                                <h3>SaaS Startup Launch</h3>
-                                <p class="workflow-subtitle">Zero to one - Building your first product</p>
-                            </div>
-                            <div class="workflow-expand-icon">▼</div>
-                        </div>
-                        <div class="workflow-steps">
-                            <div class="workflow-step ideation-step">
-                                <div class="step-num">1</div>
-                                <div class="step-info">
-                                    <div class="step-name">Market Research <span class="brain-icon">🧠</span></div>
-                                    <div class="step-tool">ChatGPT / Perplexity / Claude</div>
-                                    <div class="step-desc">Analyze competitors, identify gaps, validate problem</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step ideation-step">
-                                <div class="step-num">2</div>
-                                <div class="step-info">
-                                    <div class="step-name">Product Spec & Wireframes <span class="brain-icon">💡</span></div>
-                                    <div class="step-tool">V0 / Figma AI / Claude</div>
-                                    <div class="step-desc">Generate user stories, create mockups, define MVP features</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">3</div>
-                                <div class="step-info">
-                                    <div class="step-name">Tech Stack Selection</div>
-                                    <div class="step-tool">ChatGPT / Stack Overflow AI</div>
-                                    <div class="step-desc">Choose frameworks, hosting, and tools based on requirements</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">4</div>
-                                <div class="step-info">
-                                    <div class="step-name">MVP Development</div>
-                                    <div class="step-tool">Cursor / GitHub Copilot / Replit</div>
-                                    <div class="step-desc">AI-assisted coding, rapid prototyping, iterative builds</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">5</div>
-                                <div class="step-info">
-                                    <div class="step-name">Landing Page & Marketing</div>
-                                    <div class="step-tool">Framer AI / Copy.ai / Midjourney</div>
-                                    <div class="step-desc">Create website, write copy, generate visuals</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">6</div>
-                                <div class="step-info">
-                                    <div class="step-name">Beta Testing Setup</div>
-                                    <div class="step-tool">Typeform / UserTesting / Hotjar</div>
-                                    <div class="step-desc">Recruit testers, collect feedback, track behavior</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">7</div>
-                                <div class="step-info">
-                                    <div class="step-name">Analytics & Monitoring</div>
-                                    <div class="step-tool">Mixpanel / PostHog / Sentry</div>
-                                    <div class="step-desc">Track events, monitor errors, analyze user journeys</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">8</div>
-                                <div class="step-info">
-                                    <div class="step-name">Launch Campaign</div>
-                                    <div class="step-tool">Product Hunt / Twitter / LinkedIn</div>
-                                    <div class="step-desc">Coordinate multi-channel launch, engage community</div>
-                                </div>
-                            </div>
-                            <div class="workflow-result">🚀 Product Live & Scaling!</div>
-                        </div>
-                    </div>
-
-                    <!-- Customer Success Automation -->
-                    <div class="workflow-card collapsed" onclick="toggleWorkflow(this)">
-                        <div class="workflow-header">
-                            <div class="workflow-icon">📊</div>
-                            <div class="workflow-title">
-                                <h3>Customer Success Automation</h3>
-                                <p class="workflow-subtitle">AI-powered retention and expansion engine</p>
-                            </div>
-                            <div class="workflow-expand-icon">▼</div>
-                        </div>
-                        <div class="workflow-steps">
-                            <div class="workflow-step">
-                                <div class="step-num">1</div>
-                                <div class="step-info">
-                                    <div class="step-name">Data Integration</div>
-                                    <div class="step-tool">Zapier / Make / n8n</div>
-                                    <div class="step-desc">Connect CRM, product analytics, support, billing systems</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step ideation-step">
-                                <div class="step-num">2</div>
-                                <div class="step-info">
-                                    <div class="step-name">Health Score Model <span class="brain-icon">🧠</span></div>
-                                    <div class="step-tool">Python / ChatGPT / Claude</div>
-                                    <div class="step-desc">Design scoring algorithm using engagement, usage, sentiment</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">3</div>
-                                <div class="step-info">
-                                    <div class="step-name">Trigger Configuration</div>
-                                    <div class="step-tool">Gainsight / ChurnZero / Custom</div>
-                                    <div class="step-desc">Set up 20+ automated triggers for customer lifecycle</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">4</div>
-                                <div class="step-info">
-                                    <div class="step-name">Email Automation</div>
-                                    <div class="step-tool">Customer.io / Braze / Iterable</div>
-                                    <div class="step-desc">AI-personalized campaigns for onboarding, engagement, retention</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">5</div>
-                                <div class="step-info">
-                                    <div class="step-name">Support Automation</div>
-                                    <div class="step-tool">Zendesk AI / Intercom / Ada</div>
-                                    <div class="step-desc">AI chatbot, smart routing, suggested responses</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">6</div>
-                                <div class="step-info">
-                                    <div class="step-name">Team Dashboards</div>
-                                    <div class="step-tool">Tableau / Looker / Metabase</div>
-                                    <div class="step-desc">Real-time visibility into health, churn risk, opportunities</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">7</div>
-                                <div class="step-info">
-                                    <div class="step-name">CSM Enablement</div>
-                                    <div class="step-tool">Gong / Chorus / AI Note-taker</div>
-                                    <div class="step-desc">AI meeting summaries, talking points, action items</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">8</div>
-                                <div class="step-info">
-                                    <div class="step-name">Continuous Optimization</div>
-                                    <div class="step-tool">A/B Testing / ML Models</div>
-                                    <div class="step-desc">Iterate on triggers, messaging, and workflows based on data</div>
-                                </div>
-                            </div>
-                            <div class="workflow-result">📊 Predictive CS Operating!</div>
-                        </div>
-                    </div>
-
-                    <!-- Marketing Campaign -->
-                    <div class="workflow-card collapsed" onclick="toggleWorkflow(this)">
-                        <div class="workflow-header">
-                            <div class="workflow-icon">🎯</div>
-                            <div class="workflow-title">
-                                <h3>AI Marketing Campaign</h3>
-                                <p class="workflow-subtitle">Content to conversion in days, not weeks</p>
-                            </div>
-                            <div class="workflow-expand-icon">▼</div>
-                        </div>
-                        <div class="workflow-steps">
-                            <div class="workflow-step ideation-step">
-                                <div class="step-num">1</div>
-                                <div class="step-info">
-                                    <div class="step-name">Campaign Strategy <span class="brain-icon">🧠</span></div>
-                                    <div class="step-tool">ChatGPT / Claude / Perplexity</div>
-                                    <div class="step-desc">Define target audience, positioning, key messages</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step ideation-step">
-                                <div class="step-num">2</div>
-                                <div class="step-info">
-                                    <div class="step-name">Content Generation <span class="brain-icon">💡</span></div>
-                                    <div class="step-tool">Copy.ai / Jasper / ChatGPT</div>
-                                    <div class="step-desc">Write blog posts, emails, social copy, landing pages</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step ideation-step">
-                                <div class="step-num">3</div>
-                                <div class="step-info">
-                                    <div class="step-name">Visual Assets <span class="brain-icon">🎨</span></div>
-                                    <div class="step-tool">Midjourney / DALL-E / Canva AI</div>
-                                    <div class="step-desc">Create hero images, social graphics, ad creatives</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">4</div>
-                                <div class="step-info">
-                                    <div class="step-name">Video Content</div>
-                                    <div class="step-tool">Synthesia / Descript / Runway</div>
-                                    <div class="step-desc">AI avatars, video editing, captions, translations</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">5</div>
-                                <div class="step-info">
-                                    <div class="step-name">Landing Pages</div>
-                                    <div class="step-tool">Unbounce AI / Instapage / Framer</div>
-                                    <div class="step-desc">Generate high-converting pages with A/B variants</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">6</div>
-                                <div class="step-info">
-                                    <div class="step-name">Email Sequences</div>
-                                    <div class="step-tool">Mailchimp / HubSpot / ActiveCampaign</div>
-                                    <div class="step-desc">Automated drip campaigns with dynamic personalization</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">7</div>
-                                <div class="step-info">
-                                    <div class="step-name">Ad Campaign Launch</div>
-                                    <div class="step-tool">Google Ads / Meta Ads / LinkedIn</div>
-                                    <div class="step-desc">AI-optimized targeting, bidding, and creative testing</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">8</div>
-                                <div class="step-info">
-                                    <div class="step-name">Performance Analytics</div>
-                                    <div class="step-tool">Google Analytics / Mixpanel / Amplitude</div>
-                                    <div class="step-desc">Track conversions, optimize spend, iterate messaging</div>
-                                </div>
-                            </div>
-                            <div class="workflow-result">🎯 Campaign Converting!</div>
-                        </div>
-                    </div>
-
-                    <!-- Operations Scale-Up -->
-                    <div class="workflow-card collapsed" onclick="toggleWorkflow(this)">
-                        <div class="workflow-header">
-                            <div class="workflow-icon">💼</div>
-                            <div class="workflow-title">
-                                <h3>Operations Scale-Up</h3>
-                                <p class="workflow-subtitle">1 to 10 - Building systems that don't break</p>
-                            </div>
-                            <div class="workflow-expand-icon">▼</div>
-                        </div>
-                        <div class="workflow-steps">
-                            <div class="workflow-step">
-                                <div class="step-num">1</div>
-                                <div class="step-info">
-                                    <div class="step-name">Process Audit</div>
-                                    <div class="step-tool">Miro / FigJam / Notion</div>
-                                    <div class="step-desc">Map current workflows, identify bottlenecks, document pain points</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step ideation-step">
-                                <div class="step-num">2</div>
-                                <div class="step-info">
-                                    <div class="step-name">Workflow Redesign <span class="brain-icon">🧠</span></div>
-                                    <div class="step-tool">ChatGPT / Claude / Process AI</div>
-                                    <div class="step-desc">AI-assisted process optimization and automation opportunities</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">3</div>
-                                <div class="step-info">
-                                    <div class="step-name">Tool Stack Evaluation</div>
-                                    <div class="step-tool">G2 / Capterra / Product Hunt</div>
-                                    <div class="step-desc">Compare solutions, check integrations, negotiate pricing</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">4</div>
-                                <div class="step-info">
-                                    <div class="step-name">Automation Implementation</div>
-                                    <div class="step-tool">Zapier / Make / n8n / Python</div>
-                                    <div class="step-desc">Build workflows connecting CRM, support, billing, analytics</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">5</div>
-                                <div class="step-info">
-                                    <div class="step-name">Documentation & SOPs</div>
-                                    <div class="step-tool">Notion / Confluence / Scribe</div>
-                                    <div class="step-desc">AI-generated guides, video tutorials, knowledge base</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">6</div>
-                                <div class="step-info">
-                                    <div class="step-name">Team Training</div>
-                                    <div class="step-tool">Loom / Guidde / Tango</div>
-                                    <div class="step-desc">Create walkthroughs, host workshops, provide ongoing support</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">7</div>
-                                <div class="step-info">
-                                    <div class="step-name">Monitoring & Alerts</div>
-                                    <div class="step-tool">DataDog / PagerDuty / Slack</div>
-                                    <div class="step-desc">Track KPIs, set up alerts, create executive dashboards</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">8</div>
-                                <div class="step-info">
-                                    <div class="step-name">Continuous Improvement</div>
-                                    <div class="step-tool">Retros / Feedback Loops / Analytics</div>
-                                    <div class="step-desc">Monthly reviews, team feedback, iterate on processes</div>
-                                </div>
-                            </div>
-                            <div class="workflow-result">💼 10x Capacity Unlocked!</div>
-                        </div>
-                    </div>
-
-                    <!-- Web3 Gaming DAO Operations -->
-                    <div class="workflow-card collapsed" onclick="toggleWorkflow(this)">
-                        <div class="workflow-header">
-                            <div class="workflow-icon">🌐</div>
-                            <div class="workflow-title">
-                                <h3>Web3 Gaming DAO Operations</h3>
-                                <p class="workflow-subtitle">Decentralized community management at scale</p>
-                            </div>
-                            <div class="workflow-expand-icon">▼</div>
-                        </div>
-                        <div class="workflow-steps">
-                            <div class="workflow-step">
-                                <div class="step-num">1</div>
-                                <div class="step-info">
-                                    <div class="step-name">Community Infrastructure</div>
-                                    <div class="step-tool">Discord / Telegram / Snapshot</div>
-                                    <div class="step-desc">Set up channels, roles, permissions, voting systems</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">2</div>
-                                <div class="step-info">
-                                    <div class="step-name">Smart Contract Integration</div>
-                                    <div class="step-tool">Etherscan / Polygonscan / Web3.js</div>
-                                    <div class="step-desc">Connect wallets, track transactions, verify holdings</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">3</div>
-                                <div class="step-info">
-                                    <div class="step-name">AI Moderation Bots</div>
-                                    <div class="step-tool">MEE6 / Dyno / Custom Bots</div>
-                                    <div class="step-desc">Auto-moderation, welcome messages, role assignment</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">4</div>
-                                <div class="step-info">
-                                    <div class="step-name">Support Automation</div>
-                                    <div class="step-tool">Discord AI / Zendesk / Intercom</div>
-                                    <div class="step-desc">FAQ bot, ticket routing, 24/7 coverage across time zones</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">5</div>
-                                <div class="step-info">
-                                    <div class="step-name">Governance Tools</div>
-                                    <div class="step-tool">Snapshot / Tally / Commonwealth</div>
-                                    <div class="step-desc">Proposal creation, voting, execution tracking</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">6</div>
-                                <div class="step-info">
-                                    <div class="step-name">Analytics & Insights</div>
-                                    <div class="step-tool">Dune Analytics / Nansen / Custom</div>
-                                    <div class="step-desc">Track engagement, holder metrics, community growth</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">7</div>
-                                <div class="step-info">
-                                    <div class="step-name">Rewards & Incentives</div>
-                                    <div class="step-tool">Collab.Land / Guild.xyz / Coordinape</div>
-                                    <div class="step-desc">Token gating, contribution tracking, reward distribution</div>
-                                </div>
-                            </div>
-                            <div class="workflow-arrow">↓</div>
-                            <div class="workflow-step">
-                                <div class="step-num">8</div>
-                                <div class="step-info">
-                                    <div class="step-name">Crisis Management</div>
-                                    <div class="step-tool">Alert Systems / War Rooms / PR Tools</div>
-                                    <div class="step-desc">24/7 monitoring, rapid response protocols, community comms</div>
-                                </div>
-                            </div>
-                            <div class="workflow-result">🌐 50K+ Community Thriving!</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="workflows-footer">
-                    <p><strong>💡 Pro Tip:</strong> These workflows can be combined and customized based on your specific needs. AI tools are constantly evolving, so always explore new options to stay ahead.</p>
-                </div>
-            </div>
-        </section>
-        
-        <section id="contact" class="contact">
-            <div class="contact-content">
-                <h2>Let's Build Together</h2>
-                <p>Looking for an operations leader who thinks in systems, builds with AI, and turns complexity into simplicity? Let's talk.</p>
-                <p><strong>Best for:</strong> AI companies, high-growth startups (Series A-C), companies rebuilding operations from scratch, or anyone who wants to see what's possible when you combine deep ops experience with AI-first thinking.</p>
-                
-                <div class="contact-links">
-                    <a href="#" class="contact-link" onclick="openModal('contactForm'); return false;">📧 Email Me</a>
-                    <a href="https://www.linkedin.com/in/lena-ry-8baa8716/" target="_blank" class="contact-link">💼 LinkedIn</a>
-                </div>
-            </div>
-        </section>
+      </div>
     </div>
-    
-    <footer>
-        <p>&copy; 2025 Lena Ry. All rights reserved.</p>
-        <p><a href="https://murmur.red">murmur.red</a></p>
-    </footer>
-    
-    <!-- Modals -->
-    <div id="jobFitModal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal('jobFit')">&times;</span>
-            <h3>🎯 Job Fit Analyzer</h3>
-            <textarea id="jobDescription" rows="8" placeholder="Paste the job description here..."></textarea>
-            <button class="analyze-button" onclick="analyzeJob()">Analyze Job Fit</button>
-            <div id="jobResult" class="result"></div>
-        </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- COMPANY STRIP -->
+<div class="companies-strip">
+  <div class="container">
+    <p class="companies-label">Previously at</p>
+    <div class="companies-list">
+      <span>Chartboost</span>
+      <span>LunaLabs / IronSource</span>
+      <span>Replai</span>
+      <span>Merit Circle</span>
+      <span>Ygames</span>
     </div>
-    
-    <div id="csHealthModal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal('csHealth')">&times;</span>
-            <h3>🚀 CS Health Predictor</h3>
-            <input type="text" id="customerName" placeholder="Customer Name">
-            <input type="number" id="loginFrequency" placeholder="Monthly logins (e.g., 15)">
-            <input type="number" id="featureUsage" placeholder="Features used (0-10)">
-            <input type="number" id="supportTickets" placeholder="Support tickets last 30 days">
-            <input type="number" id="npsScore" placeholder="NPS Score (0-10)">
-            <input type="number" id="contractValue" placeholder="Annual contract value ($)">
-            <button class="analyze-button" onclick="analyzeCSHealth()">Predict Health Score</button>
-            <div id="csHealthResult" class="result"></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PROBLEM -->
+<section class="problem-section" id="what-i-do">
+  <div class="container">
+    <div class="problem-grid">
+      <div>
+        <p class="section-eyebrow">If this feels familiar</p>
+        <h2 class="section-title reveal">We should <span class="accent">talk.</span></h2>
+        <ul class="pain-list">
+          <li class="pain-item"><div class="pain-marker">↗</div><p>Campaigns running but nobody really knows what's working</p></li>
+          <li class="pain-item"><div class="pain-marker">↗</div><p>Tracking is set up… kind of… but the numbers don't add up</p></li>
+          <li class="pain-item"><div class="pain-marker">↗</div><p>Product, marketing, data all doing their own thing</p></li>
+          <li class="pain-item"><div class="pain-marker">↗</div><p>Every decision feels like a guess</p></li>
+          <li class="pain-item"><div class="pain-marker">↗</div><p>Everything takes longer than it should</p></li>
+        </ul>
+      </div>
+      <div>
+        <p class="section-eyebrow reveal">My approach</p>
+        <div class="solution-box reveal">
+          <p>The job is to <span class="hl">make sense of the mess.</span><br><br>Not with slides. Not with "frameworks for frameworks." I actually build the setup with you so it works in real life.</p>
+          <p class="solution-quote">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M12 8v4l3 3"/></svg>
+            More than a decade connecting growth, product, and data dots.
+          </p>
         </div>
+      </div>
     </div>
-    
-    <div id="efficiencyModal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal('efficiency')">&times;</span>
-            <h3>💡 Ops Efficiency Calculator</h3>
-            <input type="number" id="teamSize" placeholder="Team size (number of people)">
-            <input type="number" id="manualHours" placeholder="Hours spent on manual ops tasks per week">
-            <input type="number" id="avgSalary" placeholder="Average salary per team member ($)">
-            <button class="analyze-button" onclick="calculateEfficiency()">Calculate ROI</button>
-            <div id="efficiencyResult" class="result"></div>
-        </div>
-    </div>
-    
-    <div id="chatbotModal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal('chatbot')">&times;</span>
-            <h3>🤖 Ask Me Anything</h3>
-            <textarea id="chatQuestion" rows="5" placeholder="Ask me about my experience, approach to ops, or anything else..."></textarea>
-            <button class="analyze-button" onclick="askChatbot()">Get Answer</button>
-            <div id="chatResult" class="result"></div>
-        </div>
-    </div>
-    
-    <div id="contactFormModal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal('contactForm')">&times;</span>
-            <h3>📧 Get In Touch</h3>
-            <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 25px; font-size: 16px;">I'd love to hear from you! Fill out the form below and I'll get back to you as soon as possible.</p>
-            <form id="contactForm" action="https://formspree.io/f/mwpwdyjw" method="POST" onsubmit="submitContactForm(event)">
-                <input type="text" id="contactName" name="name" placeholder="Your Name *" required>
-                <input type="email" id="contactEmail" name="email" placeholder="Your Email *" required>
-                <input type="text" id="contactCompany" name="company" placeholder="Company (Optional)">
-                <textarea id="contactMessage" name="message" rows="6" placeholder="Your Message *" required></textarea>
-                <input type="hidden" name="_subject" value="New Contact Form Submission from Website">
-                <input type="text" name="_gotcha" style="display:none">
-                <button type="submit" class="analyze-button" id="submitContactBtn">Send Message</button>
-            </form>
-            <div id="contactResult" class="result"></div>
-        </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- GROWTH -->
+<section class="growth-section" id="growth-system">
+  <div class="container">
+    <p class="section-eyebrow reveal">Growth System</p>
+    <h2 class="section-title reveal">How I think about <span class="accent">growth</span></h2>
+
+    <div class="where-toggle reveal" style="margin-top:clamp(28px,4vw,44px)">
+      <button class="toggle-btn mobile-btn active" onclick="switchGrowthTrack('mobile', this)">Mobile Games</button>
+      <button class="toggle-btn saas-btn" onclick="switchGrowthTrack('saas', this)">SaaS &amp; CS</button>
     </div>
 
-    <div id="csFlowModal" class="modal">
-        <div class="modal-content" style="max-width: 95%; max-height: 90vh; overflow-y: auto;">
-            <span class="modal-close" onclick="closeModal('csFlow')">&times;</span>
-            <h3>🔄 AI-Powered Customer Success Automation Flow</h3>
-            <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 15px; font-size: 14px;">Click on any node to see detailed triggers, actions, and cross-team coordination. This represents a real-world AI automation framework covering 22+ triggers across 7 phases.</p>
-            
-            <div class="flow-legend">
-                <div class="legend-item">
-                    <div class="legend-icon legend-trigger"></div>
-                    <span>Triggers</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-icon legend-action"></div>
-                    <span>AI Actions</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-icon legend-notification"></div>
-                    <span>Human Notifications</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-icon legend-tool"></div>
-                    <span>Tools/Systems</span>
-                </div>
-            </div>
-
-            <div class="cs-flow-container">
-                <div class="flow-canvas" id="flowCanvas">
-                    <div class="flow-node" style="left: 50px; top: 50px; border-color: #00f2ff;" onclick="showFlowDetails('trigger1')">
-                        <div class="flow-node-icon">⚠️</div>
-                        <div class="flow-node-title">No Login</div>
-                        <div class="flow-node-subtitle">7 Days</div>
-                    </div>
-                    <div class="flow-node" style="left: 50px; top: 200px; border-color: #00f2ff;" onclick="showFlowDetails('trigger2')">
-                        <div class="flow-node-icon">📊</div>
-                        <div class="flow-node-title">Low Usage</div>
-                        <div class="flow-node-subtitle">Detected</div>
-                    </div>
-                    <div class="flow-node" style="left: 50px; top: 350px; border-color: #00f2ff;" onclick="showFlowDetails('trigger3')">
-                        <div class="flow-node-icon">🎫</div>
-                        <div class="flow-node-title">Support Ticket</div>
-                        <div class="flow-node-subtitle">Created</div>
-                    </div>
-                    <div class="flow-node" style="left: 50px; top: 500px; border-color: #00f2ff;" onclick="showFlowDetails('trigger4')">
-                        <div class="flow-node-icon">😞</div>
-                        <div class="flow-node-title">Low NPS</div>
-                        <div class="flow-node-subtitle">0-6 Score</div>
-                    </div>
-                    <div class="flow-node" style="left: 300px; top: 250px; border-color: #00ff88; min-width: 180px;" onclick="showFlowDetails('aiengine')">
-                        <div class="flow-node-icon">🤖</div>
-                        <div class="flow-node-title">AI Decision Engine</div>
-                        <div class="flow-node-subtitle">Analyzes & Routes</div>
-                    </div>
-                    <div class="flow-node" style="left: 550px; top: 50px; border-color: #00ff88;" onclick="showFlowDetails('action1')">
-                        <div class="flow-node-icon">✉️</div>
-                        <div class="flow-node-title">Auto Email</div>
-                        <div class="flow-node-subtitle">Re-engagement</div>
-                    </div>
-                    <div class="flow-node" style="left: 550px; top: 200px; border-color: #00ff88;" onclick="showFlowDetails('action2')">
-                        <div class="flow-node-icon">📅</div>
-                        <div class="flow-node-title">Book Call</div>
-                        <div class="flow-node-subtitle">CSM Meeting</div>
-                    </div>
-                    <div class="flow-node" style="left: 550px; top: 350px; border-color: #00ff88;" onclick="showFlowDetails('action3')">
-                        <div class="flow-node-icon">🎯</div>
-                        <div class="flow-node-title">Smart Route</div>
-                        <div class="flow-node-subtitle">Right Team</div>
-                    </div>
-                    <div class="flow-node" style="left: 550px; top: 500px; border-color: #00ff88;" onclick="showFlowDetails('action4')">
-                        <div class="flow-node-icon">🚨</div>
-                        <div class="flow-node-title">Escalate</div>
-                        <div class="flow-node-subtitle">Urgent Action</div>
-                    </div>
-                    <div class="flow-node" style="left: 800px; top: 100px; border-color: #ffed00;" onclick="showFlowDetails('csm')">
-                        <div class="flow-node-icon">👤</div>
-                        <div class="flow-node-title">CSM</div>
-                        <div class="flow-node-subtitle">Notified</div>
-                    </div>
-                    <div class="flow-node" style="left: 800px; top: 250px; border-color: #ffed00;" onclick="showFlowDetails('support')">
-                        <div class="flow-node-icon">🛠️</div>
-                        <div class="flow-node-title">Support</div>
-                        <div class="flow-node-subtitle">Team Alert</div>
-                    </div>
-                    <div class="flow-node" style="left: 800px; top: 400px; border-color: #ffed00;" onclick="showFlowDetails('product')">
-                        <div class="flow-node-icon">💡</div>
-                        <div class="flow-node-title">Product</div>
-                        <div class="flow-node-subtitle">Feedback</div>
-                    </div>
-                    <div class="flow-node" style="left: 1000px; top: 50px; border-color: #ff00ff;" onclick="showFlowDetails('crm')">
-                        <div class="flow-node-icon">💼</div>
-                        <div class="flow-node-title">CRM</div>
-                        <div class="flow-node-subtitle">HubSpot</div>
-                    </div>
-                    <div class="flow-node" style="left: 1000px; top: 200px; border-color: #ff00ff;" onclick="showFlowDetails('zendesk')">
-                        <div class="flow-node-icon">🎫</div>
-                        <div class="flow-node-title">Support</div>
-                        <div class="flow-node-subtitle">Zendesk</div>
-                    </div>
-                    <div class="flow-node" style="left: 1000px; top: 350px; border-color: #ff00ff;" onclick="showFlowDetails('jira')">
-                        <div class="flow-node-icon">📋</div>
-                        <div class="flow-node-title">Tasks</div>
-                        <div class="flow-node-subtitle">Jira</div>
-                    </div>
-                    <div class="flow-node" style="left: 1000px; top: 500px; border-color: #ff00ff;" onclick="showFlowDetails('slack')">
-                        <div class="flow-node-icon">💬</div>
-                        <div class="flow-node-title">Comms</div>
-                        <div class="flow-node-subtitle">Slack</div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="flowDetails" class="flow-details">
-                <p style="text-align: center; color: rgba(255, 255, 255, 0.6);">Click on any node above to see detailed information about triggers, actions, notifications, and integrations.</p>
-            </div>
+    <!-- MOBILE TRAJECTORY -->
+    <div class="growth-track mobile-track active" id="gtrack-mobile">
+      <div class="growth-track-head">
+        <span class="growth-track-tag mobile">Mobile Games / UA</span>
+        <span class="growth-track-sub">From first install to sustainable revenue</span>
+        <div class="growth-track-line"></div>
+      </div>
+      <div class="traj-flow">
+        <div class="traj-step"><div class="traj-dot">1</div><span class="traj-label">MMP</span></div>
+        <div class="traj-arrow"></div>
+        <div class="traj-step"><div class="traj-dot">2</div><span class="traj-label">Acquire</span></div>
+        <div class="traj-arrow"></div>
+        <div class="traj-step"><div class="traj-dot">3</div><span class="traj-label">Engage</span></div>
+        <div class="traj-arrow"></div>
+        <div class="traj-step"><div class="traj-dot">4</div><span class="traj-label">Retain</span></div>
+        <div class="traj-arrow"></div>
+        <div class="traj-step"><div class="traj-dot">5</div><span class="traj-label">Monetise</span></div>
+      </div>
+      <div class="growth-grid" id="growthGrid1">
+        <div class="growth-card" onclick="toggleCard(this)">
+          <span class="card-chevron">↓</span>
+          <p class="card-num">01 MMP</p>
+          <h3 class="card-title">Right MMP Setup</h3>
+          <p class="card-desc">Every number downstream depends on getting this right first.</p>
+          <div class="card-expand"><p>MMP evaluation and selection Adjust, AppsFlyer, Singular, Kochava based on your game type, team size, and network mix. Event taxonomy design, cost data integration, postback configuration, SKAdNetwork setup for iOS, fraud prevention rules. Get this wrong and your D7, ROAS, and LTV are fiction. Most studios skip this step or rush it. It's the one you can't fix retroactively.</p></div>
         </div>
+        <div class="growth-card" onclick="toggleCard(this)">
+          <span class="card-chevron">↓</span>
+          <p class="card-num">02 Acquire</p>
+          <h3 class="card-title">UA & Attribution</h3>
+          <p class="card-desc">Are you buying the right users or just users?</p>
+          <div class="card-expand"><p>Channel attribution model, creative performance framework, click fraud detection, UA strategy across networks. Most UA problems start with bad data. I fix the measurement layer before touching spend because scaling bad attribution just costs more money.</p></div>
+        </div>
+        <div class="growth-card" onclick="toggleCard(this)">
+          <span class="card-chevron">↓</span>
+          <p class="card-num">03 Engage</p>
+          <h3 class="card-title">D1 Activation</h3>
+          <p class="card-desc">Do they get it on day one or do they leave?</p>
+          <div class="card-expand"><p>First-session funnel, tutorial drop analysis, aha-moment mapping, early behavioural signals that predict D7. D1 is where most games bleed users quietly. Fix the first session before optimising anything else.</p></div>
+        </div>
+        <div class="growth-card" onclick="toggleCard(this)">
+          <span class="card-chevron">↓</span>
+          <p class="card-num">04 Retain</p>
+          <h3 class="card-title">D7 / D30 Retention</h3>
+          <p class="card-desc">Are they forming a habit or just checking in once?</p>
+          <div class="card-expand"><p>Cohort analysis by install source, push notification strategy, re-engagement lifecycle, behavioural triggers for lapsing users. D7 and D30 benchmarks that mean something in your genre not industry averages from the wrong category.</p></div>
+        </div>
+        <div class="growth-card" onclick="toggleCard(this)">
+          <span class="card-chevron">↓</span>
+          <p class="card-num">05 Monetise</p>
+          <h3 class="card-title">Revenue & LTV</h3>
+          <p class="card-desc">Is the revenue model matching how users actually behave?</p>
+          <div class="card-expand"><p>IAP and subscription model review, paywall placement based on behavioural triggers not time gates, ad monetisation balance, LTV/CPI modelling by channel, payback period analysis. Revenue that grows with retention not despite it.</p></div>
+        </div>
+      </div>
     </div>
-    
-    <script src="script.js"></script>
+
+    <!-- SAAS TRAJECTORY -->
+    <div class="growth-track saas-track" id="gtrack-saas">
+      <div class="growth-track-head">
+        <span class="growth-track-tag saas">SaaS / Product / CS</span>
+        <span class="growth-track-sub">From first sign-up to expansion revenue</span>
+        <div class="growth-track-line"></div>
+      </div>
+      <div class="traj-flow">
+        <div class="traj-step"><div class="traj-dot">1</div><span class="traj-label">Demand</span></div>
+        <div class="traj-arrow"></div>
+        <div class="traj-step"><div class="traj-dot">2</div><span class="traj-label">Activate</span></div>
+        <div class="traj-arrow"></div>
+        <div class="traj-step"><div class="traj-dot">3</div><span class="traj-label">Adopt</span></div>
+        <div class="traj-arrow"></div>
+        <div class="traj-step"><div class="traj-dot">4</div><span class="traj-label">Expand</span></div>
+        <div class="traj-arrow"></div>
+        <div class="traj-step"><div class="traj-dot">5</div><span class="traj-label">Revenue</span></div>
+      </div>
+      <div class="growth-grid" id="growthGrid2">
+        <div class="growth-card" onclick="toggleCard(this)">
+          <span class="card-chevron">↓</span>
+          <p class="card-num">01 Demand</p>
+          <h3 class="card-title">SaaS Growth Motion</h3>
+          <p class="card-desc">How do the right companies find you and decide to try?</p>
+          <div class="card-expand"><p>PLG strategy, freemium-to-paid conversion, trial design, funnel instrumentation. Built around your actual motion sales-led, product-led, or hybrid. Most SaaS teams have a motion that doesn't match how their buyers actually decide.</p></div>
+        </div>
+        <div class="growth-card" onclick="toggleCard(this)">
+          <span class="card-chevron">↓</span>
+          <p class="card-num">02 Activate</p>
+          <h3 class="card-title">Time to Value</h3>
+          <p class="card-desc">Do they reach the aha moment before they close the tab?</p>
+          <div class="card-expand"><p>Onboarding flow design, time-to-value mapping, activation rate by cohort, first-session depth. Not installs adoption. The gap between sign-up and "this is actually useful" is where most SaaS trials die.</p></div>
+        </div>
+        <div class="growth-card" onclick="toggleCard(this)">
+          <span class="card-chevron">↓</span>
+          <p class="card-num">03 Adopt</p>
+          <h3 class="card-title">Product Stickiness</h3>
+          <p class="card-desc">Is it becoming part of how they work or just another tool they pay for?</p>
+          <div class="card-expand"><p>Feature adoption tracking, habit loop analysis, engagement depth by user type, retention cohorts. Adoption means the product is woven into a workflow. Stickiness is the only thing that makes expansion revenue possible.</p></div>
+        </div>
+        <div class="growth-card" onclick="toggleCard(this)">
+          <span class="card-chevron">↓</span>
+          <p class="card-num">04 Expand</p>
+          <h3 class="card-title">Customer Success</h3>
+          <p class="card-desc">Are you growing the accounts you already have?</p>
+          <div class="card-expand"><p>Health score frameworks, churn prediction signals, expansion playbooks, QBR design, AI-assisted CS tooling. CS is the growth engine most SaaS teams treat as a cost centre. NRR is the number and it lives here.</p></div>
+        </div>
+        <div class="growth-card" onclick="toggleCard(this)">
+          <span class="card-chevron">↓</span>
+          <p class="card-num">05 Revenue</p>
+          <h3 class="card-title">ARR & Pricing</h3>
+          <p class="card-desc">Does the business model actually work at scale?</p>
+          <div class="card-expand"><p>ARR/MRR instrumentation, pricing strategy, CAC payback by segment, expansion vs new ARR mix, LTV modelling. Revenue clarity is a data problem. I make the numbers tell the truth so you can make decisions with confidence.</p></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- WHY ME -->
+<section class="why-section">
+  <div class="container">
+    <div class="why-grid">
+      <div>
+        <p class="section-eyebrow">Why me</p>
+        <h2 class="section-title reveal">Here's what you <span class="accent">actually get.</span></h2>
+        <ul class="why-points">
+          <li class="why-point">
+            <div class="why-icon">🎯</div>
+            <div class="why-txt"><h4>I focus on results</h4><p>Not clinging to what sounds good. I'm here to make things actually work.</p></div>
+          </li>
+          <li class="why-point">
+            <div class="why-icon">🔗</div>
+            <div class="why-txt"><h4>I connect the dots</h4><p>Growth, product, and data talking to each other. When aligned, everything moves faster.</p></div>
+          </li>
+          <li class="why-point">
+            <div class="why-icon">⚡</div>
+            <div class="why-txt"><h4>I work fast</h4><p>More than a decade in startups means I know how to move at your pace with precision.</p></div>
+          </li>
+        </ul>
+      </div>
+      <div class="why-stats">
+        <div class="stat-card"><div class="stat-num">10+</div><div class="stat-label">Years in startup growth</div></div>
+        <div class="stat-card" style="transition-delay:.1s"><div class="stat-num">5</div><div class="stat-label">Companies scaled from the inside</div></div>
+        <div class="stat-card" style="transition-delay:.2s"><div class="stat-num">0</div><div class="stat-label">Useless frameworks delivered</div></div>
+        <div class="stat-card" style="transition-delay:.3s"><div class="stat-num">∞</div><div class="stat-label">Messes cleaned up</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how-it-works">
+  <div class="container">
+    <p class="section-eyebrow reveal">Process</p>
+    <h2 class="section-title reveal">How we <span class="accent">work</span></h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-label">Diagnose</div>
+        <div class="step-body"><h3>The Audit</h3><p>We look at what you have. Data, stack, processes, team. No judgment just clarity on what's actually happening.</p></div>
+      </div>
+      <div class="step" style="transition-delay:.1s">
+        <div class="step-num">2</div>
+        <div class="step-label">Map</div>
+        <div class="step-body"><h3>The System</h3><p>I design the growth system that fits your stage and goals. Specific, buildable, not theoretical.</p></div>
+      </div>
+      <div class="step" style="transition-delay:.2s">
+        <div class="step-num">3</div>
+        <div class="step-label">Build</div>
+        <div class="step-body"><h3>The Build</h3><p>We build it together. Hands-on. Whether I'm embedded in your team or working alongside it, I'm in the tools. Not writing a report.</p></div>
+      </div>
+      <div class="step" style="transition-delay:.3s">
+        <div class="step-num">4</div>
+        <div class="step-label">Ship</div>
+        <div class="step-body"><h3>The Handoff</h3><p>The team owns it. Documented, working, and built to run on its own. That's the point.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- WHERE I'VE WORKED -->
+<section class="where-section" id="case-studies">
+  <div class="container">
+    <p class="section-eyebrow reveal">Case Studies</p>
+    <h2 class="section-title reveal">Two types of problems.<br><span class="accent">One kind of fix.</span></h2>
+    <p class="where-connect reveal">I don't mix them. I connect them.</p>
+
+    <div class="where-framing reveal">
+      <div class="where-framing-item">
+        <div class="wf-num mobile">1</div>
+        <div class="wf-text">
+          <strong>Growth that brings users in</strong>
+          <span>Mobile games · UA · monetisation · attribution</span>
+        </div>
+      </div>
+      <div class="where-framing-item">
+        <div class="wf-num saas">2</div>
+        <div class="wf-text">
+          <strong>Systems that make those users matter</strong>
+          <span>SaaS · product · customer success · data</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="where-toggle reveal">
+      <button class="toggle-btn mobile-btn active" onclick="switchPanel('mobile', this)">Mobile Growth</button>
+      <button class="toggle-btn saas-btn" onclick="switchPanel('saas', this)">Product &amp; Systems</button>
+    </div>
+
+    <!-- MOBILE PANEL -->
+    <div class="where-panel mobile-panel active" id="panel-mobile">
+      <div class="where-panel-head">
+        <span class="where-panel-tag mobile">Mobile Games / UA</span>
+        <span class="where-panel-sub">Growth · UA · monetisation · attribution</span>
+        <div class="where-panel-line"></div>
+      </div>
+      <div class="where-grid">
+
+        <div class="where-card">
+          <p class="where-quote">We were buying users but had no idea which channels were actually working</p>
+          <p class="where-what">UA spend at €80k/month across three networks. MMP misconfigured since launch. One network flooding clicks. Campaigns optimised on installs instead of revenue events. Two channels looked profitable but were not.</p>
+          <div class="where-metrics">
+            <span class="wm mobile">↓ 40% CPI</span>
+          </div>
+        </div>
+
+        <div class="where-card" style="transition-delay:.08s">
+          <p class="where-quote">D7 retention plateaued at 18% for five months. We kept changing the creative. It wasn't the creative</p>
+          <p class="where-what">Casual mobile game. D1 retention was stable but D7 retention was flat. The assumption was weak content. The actual issue was a tutorial drop at step 4. Users never reached the core loop.</p>
+          <div class="where-metrics">
+            <span class="wm mobile">D7 retention +34%</span>
+            <span class="wm mobile">0 additional UA spend</span>
+          </div>
+        </div>
+
+        <div class="where-card" style="transition-delay:.16s">
+          <p class="where-quote">Revenue was growing but we had no idea if we could sustain the spend</p>
+          <p class="where-what">Hybrid monetisation with IAP and ads. Strong top line but no LTV to CPI model by channel. Paywall triggered at session 3 for every user regardless of behaviour. No visibility on revenue payback.</p>
+          <div class="where-metrics">
+            <span class="wm mobile">LTV model built by channel</span>
+            <span class="wm mobile">Paywall redesigned on behaviour</span>
+            <span class="wm mobile">Revenue payback visibility: week 1</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SAAS PANEL -->
+    <div class="where-panel saas-panel" id="panel-saas">
+      <div class="where-panel-head">
+        <span class="where-panel-tag saas">SaaS / Product / CS</span>
+        <span class="where-panel-sub">Adoption · data trust · value proof · decision making</span>
+        <div class="where-panel-line"></div>
+      </div>
+      <div class="where-grid">
+
+        <div class="where-card">
+          <p class="where-quote">Everyone was looking at different numbers. Every meeting started with a fight about the data</p>
+          <p class="where-what">B2B SaaS. Product, marketing, and CS each ran separate reports. No shared definition of a key metric. Decisions stalled because nobody trusted the source. The product was working the problem was visibility.</p>
+          <div class="where-metrics">
+            <span class="wm saas">3 dashboards → 1</span>
+            <span class="wm saas">Decision time −60%</span>
+            <span class="wm saas">Single source of truth</span>
+          </div>
+        </div>
+
+        <div class="where-card" style="transition-delay:.08s">
+          <p class="where-quote">The product was live across the whole organisation. Almost nobody was actually using it</p>
+          <p class="where-what">Enterprise rollout. Licences deployed, onboarding done, training delivered. But teams were still running their workflows outside the system in spreadsheets, in email, in old habits. Adoption had stalled at 30% of active users.</p>
+          <div class="where-metrics">
+            <span class="wm saas">Active usage +58%</span>
+            <span class="wm saas">Workflows moved into product</span>
+            <span class="wm saas">Time to impact: 6 weeks</span>
+          </div>
+        </div>
+
+        <div class="where-card" style="transition-delay:.16s">
+          <p class="where-quote">The client couldn't explain what the product was doing for their business. Neither could we</p>
+          <p class="where-what">Enterprise account. CS team managing the relationship but no framework for proving value. Renewal conversations were uncomfortable because the impact wasn't visible. The product was embedded but the business case wasn't documented.</p>
+          <div class="where-metrics">
+            <span class="wm saas">Value framework built</span>
+            <span class="wm saas">Impact tied to business outcomes</span>
+            <span class="wm saas">Renewal conversation changed</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- BOTTOM CTA -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-inner">
+      <div class="cta-glow"></div>
+      <p class="section-eyebrow reveal" style="justify-content:center;">Let's talk</p>
+      <h2 class="cta-title reveal">
+        <span class="line-a">Let's build something</span>
+        <span class="line-b">that actually works.</span>
+      </h2>
+      <p class="cta-sub reveal">Full-time, freelance, or a quick audit. I'm open. Let's talk.</p>
+      <div class="cta-actions reveal">
+        <button class="btn-primary-lg" onclick="openCalendly()">
+          Let's set up a meeting
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+      <div style="margin-top:18px;text-align:center;">
+        <button class="micro-link" onclick="openCalendly()" style="justify-content:center;">
+          Pick a time that works for you
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">LENA <span>RY</span><sub>Growth Systems</sub></div>
+      <ul class="footer-nav">
+        <li><a href="#what-i-do">What I Do</a></li>
+        <li><a href="#case-studies">My Work</a></li>
+        <li><button onclick="openCalendly()">Contact</button></li>
+      </ul>
+      <div class="footer-extras">
+        <a href="https://www.linkedin.com/in/lena-ry-8baa8716/" target="_blank" rel="noopener" class="social-btn" title="LinkedIn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
+        <a href="https://murmura.netlify.app/" target="_blank" rel="noopener" class="game-btn">
+          <div class="game-dot"></div>My Game
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+if (window.matchMedia('(pointer: fine)').matches) {
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx=0, my=0, rx=0, ry=0;
+  document.addEventListener('mousemove', e => {
+    mx=e.clientX; my=e.clientY;
+    cursor.style.left=mx+'px'; cursor.style.top=my+'px';
+  });
+  (function animRing() {
+    rx+=(mx-rx)*.12; ry+=(my-ry)*.12;
+    ring.style.left=rx+'px'; ring.style.top=ry+'px';
+    requestAnimationFrame(animRing);
+  })();
+  document.querySelectorAll('a,button,.growth-card,.case-card,.stat-card').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+  });
+}
+
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40);
+}, {passive: true});
+
+function openCalendly() {
+  document.getElementById('calendlyModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeCalendly() {
+  document.getElementById('calendlyModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('closeModal').addEventListener('click', closeCalendly);
+document.getElementById('calendlyModal').addEventListener('click', e => { if (e.target===e.currentTarget) closeCalendly(); });
+
+function openMobileMenu() { document.getElementById('mobileMenu').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeMobileMenu() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow=''; }
+document.getElementById('closeMobile').addEventListener('click', closeMobileMenu);
+
+document.addEventListener('keydown', e => { if (e.key==='Escape') { closeCalendly(); closeMobileMenu(); } });
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); }
+  });
+}, { threshold: 0.06, rootMargin: '0px 0px -28px 0px' });
+
+document.querySelectorAll('.reveal,.pain-item,.why-point,.stat-card,.step,.growth-card,.where-card').forEach((el,i) => {
+  // skip cards in hidden growth tracks, they animate when track is switched
+  if (el.classList.contains('growth-card') && !el.closest('.growth-track.active')) return;
+  if (el.classList.contains('where-card') && !el.closest('.where-panel.active')) return;
+  if (!el.classList.contains('reveal')) el.style.transitionDelay = (i%4)*.07+'s';
+  observer.observe(el);
+});
+document.querySelectorAll('#growthGrid1 .growth-card, #growthGrid2 .growth-card').forEach((c,i) => { c.style.transitionDelay = (i%4)*.07+'s'; });
+
+function switchPanel(id, btn) {
+  document.querySelectorAll('.where-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.where-toggle .toggle-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  btn.classList.add('active');
+  document.querySelectorAll('#panel-' + id + ' .where-card').forEach(c => {
+    if (!c.classList.contains('visible')) setTimeout(() => c.classList.add('visible'), 60);
+  });
+}
+
+function switchGrowthTrack(id, btn) {
+  document.querySelectorAll('.growth-track').forEach(t => t.classList.remove('active'));
+  btn.closest('.where-toggle').querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('gtrack-' + id).classList.add('active');
+  btn.classList.add('active');
+  document.querySelectorAll('#gtrack-' + id + ' .growth-card').forEach((c,i) => {
+    if (!c.classList.contains('visible')) setTimeout(() => c.classList.add('visible'), 60 + i * 70);
+  });
+}
+
+function toggleCard(card) {
+  const was = card.classList.contains('expanded');
+  document.querySelectorAll('.growth-card').forEach(c => c.classList.remove('expanded'));
+  if (!was) card.classList.add('expanded');
+}
+</script>
 </body>
 </html>
