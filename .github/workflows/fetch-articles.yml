@@ -1,0 +1,25 @@
+name: Sync Articles from Notion
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'  # Every Monday at 8am UTC
+  workflow_dispatch:       # Allow manual trigger
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch articles from Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: python3 fetch_articles.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "weekly-agent"
+          git config user.email "agent@murmur.red"
+          git add articles.json
+          git diff --cached --quiet || git commit -m "sync: update articles from Notion [$(date +%Y-%m-%d)]"
+          git push

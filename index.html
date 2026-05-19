@@ -864,6 +864,48 @@
     transition: color .25s;
   }
   .companies-list span:hover { color: rgba(200,200,255,0.55); }
+
+  /* Articles */
+  .articles-section { padding: var(--py) 0; }
+  .articles-sub { font-size: clamp(14px,1.8vw,16px); color: var(--muted); margin-bottom: 36px; max-width: 560px; }
+  .articles-filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 36px; }
+  .af-btn {
+    padding: 8px 20px; border-radius: 100px;
+    border: 1px solid var(--border); background: var(--card);
+    color: var(--muted); font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s;
+  }
+  .af-btn:hover { border-color: rgba(0,240,255,0.3); color: var(--text); }
+  .af-btn.active { background: rgba(0,240,255,0.08); border-color: var(--cyan); color: var(--cyan); }
+  .articles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%,320px), 1fr));
+    gap: clamp(14px,2vw,20px);
+  }
+  .article-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 24px;
+    display: flex; flex-direction: column; gap: 10px;
+    transition: border-color .25s, transform .25s;
+    cursor: default;
+  }
+  .article-card:hover { transform: translateY(-3px); }
+  .article-card[data-type="UA Digest"]:hover { border-color: rgba(255,15,128,0.4); }
+  .article-card[data-type="AI Agents Digest"]:hover { border-color: rgba(191,0,255,0.4); }
+  .article-card[data-type="Article"]:hover { border-color: rgba(0,240,255,0.4); }
+  .ac-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .ac-badge {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 3px 10px; border-radius: 3px;
+  }
+  .badge-ua { color: var(--pink); background: rgba(255,15,128,0.08); border: 1px solid rgba(255,15,128,0.2); }
+  .badge-ai { color: var(--purple); background: rgba(191,0,255,0.08); border: 1px solid rgba(191,0,255,0.2); }
+  .badge-article { color: var(--cyan); background: rgba(0,240,255,0.05); border: 1px solid rgba(0,240,255,0.15); }
+  .ac-date { font-size: 11px; color: var(--muted); font-family: 'Space Grotesk', monospace; }
+  .ac-title { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.35; }
+  .ac-topic { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .articles-loading { color: var(--muted); font-size: 14px; padding: 40px 0; }
+  .articles-empty { color: var(--muted); font-size: 14px; padding: 20px 0; }
 </style>
 </head>
 <body>
@@ -892,6 +934,7 @@
   <a href="#what-i-do" onclick="closeMobileMenu()">What I Do</a>
   <a href="#how-it-works" onclick="closeMobileMenu()">How It Works</a>
   <a href="#case-studies" onclick="closeMobileMenu()">My Work</a>
+  <a href="#articles" onclick="closeMobileMenu()">Writing</a>
   <button class="btn-primary" onclick="openCalendly(); closeMobileMenu();" style="margin-top:8px;">Let's meet</button>
 </div>
 
@@ -904,6 +947,7 @@
         <li><a href="#what-i-do">What I Do</a></li>
         <li><a href="#how-it-works">How It Works</a></li>
         <li><a href="#case-studies">My Work</a></li>
+        <li><a href="#articles">Writing</a></li>
       </ul>
       <button class="hamburger" id="hamburger" onclick="openMobileMenu()" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -1313,7 +1357,26 @@
   </div>
 </section>
 
+
 <div class="divider"></div>
+
+<!-- ARTICLES -->
+<section class="articles-section reveal" id="articles">
+  <div class="container">
+    <p class="section-eyebrow">Writing</p>
+    <h2 class="section-title reveal">Weekly <span class="accent">insights.</span></h2>
+    <p class="articles-sub reveal">UA strategy, AI agents, and what's actually moving the needle — published every week.</p>
+    <div class="articles-filters reveal" id="articlesFilters">
+      <button class="af-btn active" data-filter="all">All</button>
+      <button class="af-btn" data-filter="UA Digest">UA Digest</button>
+      <button class="af-btn" data-filter="AI Agents Digest">AI Agents</button>
+      <button class="af-btn" data-filter="Article">Articles</button>
+    </div>
+    <div class="articles-grid reveal" id="articlesGrid">
+      <p class="articles-loading">Loading articles…</p>
+    </div>
+  </div>
+</section>
 
 <!-- BOTTOM CTA -->
 <section class="cta-section">
@@ -1446,5 +1509,66 @@ function toggleCard(card) {
   if (!was) card.classList.add('expanded');
 }
 </script>
+
+// Articles
+(function() {
+  const ARTICLES_URL = 'https://raw.githubusercontent.com/murmur-red/murmur/main/articles.json';
+  let allArticles = [];
+
+  function badgeClass(type) {
+    if (type === 'UA Digest') return 'badge-ua';
+    if (type === 'AI Agents Digest') return 'badge-ai';
+    return 'badge-article';
+  }
+
+  function formatDate(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function renderArticles(articles) {
+    const grid = document.getElementById('articlesGrid');
+    if (!articles.length) {
+      grid.innerHTML = '<p class="articles-empty">No articles found.</p>';
+      return;
+    }
+    grid.innerHTML = articles.map(a => `
+      <div class="article-card" data-type="${a.type}">
+        <div class="ac-top">
+          <span class="ac-badge ${badgeClass(a.type)}">${a.type}</span>
+          <span class="ac-date">${formatDate(a.date)}</span>
+        </div>
+        <div class="ac-title">${a.title}</div>
+        ${a.topic ? `<div class="ac-topic">${a.topic}</div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  function filterArticles(type) {
+    const filtered = type === 'all' ? allArticles : allArticles.filter(a => a.type === type);
+    renderArticles(filtered);
+  }
+
+  // Filter buttons
+  document.getElementById('articlesFilters').addEventListener('click', function(e) {
+    const btn = e.target.closest('.af-btn');
+    if (!btn) return;
+    document.querySelectorAll('.af-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterArticles(btn.dataset.filter);
+  });
+
+  // Fetch articles
+  fetch(ARTICLES_URL)
+    .then(r => r.json())
+    .then(data => {
+      allArticles = data.articles || [];
+      renderArticles(allArticles);
+    })
+    .catch(() => {
+      document.getElementById('articlesGrid').innerHTML = '<p class="articles-empty">Could not load articles.</p>';
+    });
+})();
+
 </body>
 </html>
