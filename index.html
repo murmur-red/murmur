@@ -3,1575 +3,632 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lena Ry · Mobile UA & SaaS Growth</title>
+<title>Lena Ry · AI Customer Lifecycle</title>
+<meta name="description" content="AI Customer Lifecycle expert. 10+ years turning SaaS churn into growth.">
+<link rel="icon" href="favicon.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
 <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" media="print" onload="this.media='all'">
-<link rel="icon" href="favicon.png" type="image/png">
-<link rel="shortcut icon" href="favicon.png" type="image/png">
-<script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+<script src="https://assets.calendly.com/assets/external/widget.js" async></script>
 <style>
-  :root {
-    --cyan: #00f0ff;
-    --pink: #ff0f80;
-    --green: #00ff88;
-    --purple: #bf00ff;
-    --yellow: #ffee00;
-    --bg: #080c1e;
-    --bg2: #0b1028;
-    --bg3: #0e1430;
-    --text: #f0f0ff;
-    --muted: rgba(200,200,255,0.45);
-    --border: rgba(0,240,255,0.08);
-    --border-active: rgba(0,240,255,0.28);
-    --card: rgba(0,240,255,0.03);
-    --gap: clamp(14px, 2vw, 22px);
-    --py: clamp(36px, 5vw, 64px);
-  }
+/* ── Reset & Variables ─────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; overflow-x: clip; }
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; overflow-x: clip; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 16px;
-    line-height: 1.65;
-    min-width: 320px;
-  }
+:root {
+  --bg:   #050510;
+  --bg2:  #080820;
+  --text: #eeeeff;
+  --muted: rgba(180,180,255,.5);
+  --border: rgba(255,255,255,.06);
+  --c1: #38bdf8;
+  --c2: #a78bfa;
+  --c3: #ff2056;
+  --c4: #34d399;
+  --c5: #fb923c;
+}
 
-  /* Scanlines overlay */
-  body::before {
-    content: '';
-    position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
-  }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  min-width: 320px;
+}
 
-  /* Grid floor */
-  body::after {
-    content: '';
-    position: fixed; bottom: 0; left: 0; right: 0; height: 50vh;
-    z-index: 0; pointer-events: none;
-    background:
-      linear-gradient(to bottom, transparent 0%, rgba(0,240,255,0.04) 100%),
-      repeating-linear-gradient(90deg, rgba(0,240,255,0.04) 0 1px, transparent 1px 80px),
-      repeating-linear-gradient(0deg, rgba(0,240,255,0.04) 0 1px, transparent 1px 80px);
-    -webkit-mask-image: linear-gradient(to top, black 0%, transparent 100%);
-    mask-image: linear-gradient(to top, black 0%, transparent 100%);
-  }
+/* grain */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .018;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
 
-  /* Cursor */
-  .cursor, .cursor-ring { display: none; }
-  @media (pointer: fine) {
-    body { cursor: none; }
-    .cursor {
-      display: block; position: fixed; z-index: 9999; pointer-events: none;
-      width: 8px; height: 8px; background: var(--cyan); border-radius: 50%;
-      transform: translate(-50%,-50%);
-      transition: width .2s, height .2s, background .2s;
-      box-shadow: 0 0 10px var(--cyan), 0 0 20px var(--cyan);
-    }
-    .cursor-ring {
-      display: block; position: fixed; z-index: 9998; pointer-events: none;
-      width: 32px; height: 32px;
-      border: 1.5px solid rgba(0,240,255,0.5); border-radius: 50%;
-      transform: translate(-50%,-50%);
-      transition: width .25s, height .25s, border-color .25s;
-    }
-    body.hovering .cursor { width: 14px; height: 14px; background: var(--pink); box-shadow: 0 0 14px var(--pink), 0 0 28px var(--pink); }
-    body.hovering .cursor-ring { width: 48px; height: 48px; border-color: var(--pink); }
-  }
+/* ── Cursor ────────────────────────────────────────── */
+#cursorDot, #cursorRing { display:none; position:fixed; pointer-events:none; z-index:9999; border-radius:50%; transform:translate(-50%,-50%); }
+@media (pointer:fine) {
+  body { cursor:none; }
+  #cursorDot  { display:block; width:6px; height:6px; background:var(--c3); box-shadow:0 0 8px var(--c3),0 0 16px var(--c3); }
+  #cursorRing { display:block; width:30px; height:30px; border:1.5px solid rgba(255,32,86,.4); transition:width .2s,height .2s,border-color .2s; }
+  body.hovering #cursorDot  { background:#fff; box-shadow:0 0 10px #fff; }
+  body.hovering #cursorRing { width:44px; height:44px; border-color:rgba(255,255,255,.4); }
+}
 
-  /* Orbs */
-  .orb { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; filter: blur(70px); }
-  .orb-1 { width: clamp(260px,38vw,500px); height: clamp(260px,38vw,500px); background: radial-gradient(circle, rgba(191,0,255,0.15), transparent 70%); top:-8%; right:-6%; animation: orbFloat 14s ease-in-out infinite; }
-  .orb-2 { width: clamp(220px,32vw,420px); height: clamp(220px,32vw,420px); background: radial-gradient(circle, rgba(0,240,255,0.1), transparent 70%); bottom:8%; left:-6%; animation: orbFloat 18s ease-in-out infinite reverse; }
-  .orb-3 { width: clamp(160px,24vw,320px); height: clamp(160px,24vw,320px); background: radial-gradient(circle, rgba(255,15,128,0.08), transparent 70%); top:45%; right:6%; animation: orbFloat 11s ease-in-out infinite 2s; }
+/* ── Loader ────────────────────────────────────────── */
+#loader {
+  position:fixed; inset:0; z-index:9990;
+  background:var(--bg);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  transition:opacity .5s, visibility .5s;
+}
+#loader.hidden { opacity:0; visibility:hidden; }
+#loaderLogo { font-family:'Bebas Neue',sans-serif; font-size:3rem; letter-spacing:.2em; color:var(--c3); margin-bottom:2rem; }
+#loaderTrack { width:min(300px,80vw); height:2px; background:rgba(255,255,255,.08); border-radius:2px; overflow:hidden; }
+#loaderBar { height:100%; width:0; background:var(--c3); transition:width .1s linear; box-shadow:0 0 8px var(--c3); }
+#loaderStatus { margin-top:.75rem; font-size:.72rem; letter-spacing:.18em; color:var(--muted); }
 
-  @keyframes orbFloat {
-    0%,100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-24px) scale(1.04); }
-  }
+/* ── Canvas ────────────────────────────────────────── */
+#bgCanvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
 
-  /* Layout */
-  .container {
-    max-width: 1100px; margin: 0 auto;
-    padding: 0 clamp(20px,5vw,56px);
-    position: relative; z-index: 1; min-width: 0;
+/* ── Nav ───────────────────────────────────────────── */
+#mainNav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  padding:1.1rem clamp(20px,5vw,56px);
+  display:flex; align-items:center; justify-content:space-between;
+  transition:background .3s, border-color .3s;
+  border-bottom:1px solid transparent;
+}
+#mainNav.scrolled { background:rgba(5,5,16,.88); backdrop-filter:blur(14px); border-color:var(--border); }
+.nav-logo { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; letter-spacing:.15em; color:var(--c3); text-decoration:none; }
+.nav-links { display:flex; gap:2rem; list-style:none; }
+.nav-links a { font-size:.82rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); text-decoration:none; transition:color .2s; }
+.nav-links a:hover { color:var(--text); }
+.nav-cta { padding:.4rem 1.1rem; border:1px solid var(--c3); border-radius:4px; color:var(--c3)!important; transition:background .2s!important; }
+.nav-cta:hover { background:rgba(255,32,86,.12)!important; }
+#hamburger { display:none; cursor:pointer; flex-direction:column; gap:5px; }
+#hamburger span { display:block; width:22px; height:2px; background:var(--text); border-radius:2px; transition:.3s; }
+.mobile-nav { display:none; }
+@media(max-width:768px) {
+  .nav-links { display:none; }
+  #hamburger { display:flex; }
+  .mobile-nav {
+    display:block; position:fixed; top:0; right:0; bottom:0; width:min(280px,85vw);
+    background:rgba(5,5,22,.97); backdrop-filter:blur(20px);
+    padding:5rem 2rem 2rem; z-index:99; border-left:1px solid var(--border);
+    transform:translateX(100%); transition:transform .3s;
   }
+  .mobile-nav.open { transform:translateX(0); }
+  .mobile-nav a { display:block; padding:.9rem 0; font-size:1rem; letter-spacing:.08em; color:var(--muted); text-decoration:none; border-bottom:1px solid var(--border); }
+  .mobile-nav a:hover { color:var(--text); }
+  .mobile-overlay { display:none; position:fixed; inset:0; z-index:98; }
+  .mobile-overlay.open { display:block; }
+}
 
-  /* Nav */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    padding: clamp(14px,2vw,20px) 0;
-    transition: background .4s, border-bottom .4s;
-  }
-  nav.scrolled {
-    background: rgba(4,4,14,0.92);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(0,240,255,0.12);
-  }
-  .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-  .logo {
-    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
-    font-size: clamp(15px,1.8vw,18px); text-decoration: none; color: var(--text);
-    letter-spacing: 0.02em; flex-shrink: 0;
-  }
-  .logo .dot-red { color: var(--pink); text-shadow: 0 0 12px var(--pink); }
-  .nav-links { display: flex; align-items: center; gap: clamp(20px,3vw,36px); list-style: none; }
-  .nav-links a {
-    color: var(--muted); text-decoration: none; font-size: 13px;
-    font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
-    transition: color .25s; position: relative; white-space: nowrap;
-  }
-  .nav-links a::after {
-    content: ''; position: absolute; bottom: -3px; left: 0; right: 100%;
-    height: 1px; background: var(--cyan); box-shadow: 0 0 6px var(--cyan);
-    transition: right .3s cubic-bezier(.4,0,.2,1);
-  }
-  .nav-links a:hover { color: var(--cyan); }
-  .nav-links a:hover::after { right: 0; }
-  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; background: none; border: none; flex-shrink: 0; }
-  .hamburger span { display: block; width: 22px; height: 1.5px; background: var(--text); transition: all .3s; }
+/* ── Layout ────────────────────────────────────────── */
+.container { max-width:1100px; margin:0 auto; padding:0 clamp(20px,5vw,56px); position:relative; z-index:1; }
+section { position:relative; z-index:1; }
 
-  /* Hero */
-  .hero {
-    display: flex; align-items: center;
-    padding: clamp(100px,14vw,140px) 0 clamp(72px,9vw,100px);
-    position: relative; overflow: hidden;
-  }
-  .hero-grid {
-    display: grid;
-    grid-template-columns: minmax(0,1fr) minmax(0,min(420px,40%));
-    gap: clamp(28px,5vw,64px);
-    align-items: center; width: 100%;
-  }
-  .hero-name {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(38px,5vw,60px); letter-spacing: 0.06em;
-    color: var(--text); line-height: 1;
-    margin-bottom: 8px;
-    opacity: 0; animation: fadeUp .7s .05s cubic-bezier(.4,0,.2,1) forwards;
-  }
-  .hero-tag-line {
-    display: inline-flex; align-items: center; gap: 10px;
-    font-size: 11px; font-weight: 600; letter-spacing: 0.16em;
-    color: var(--cyan); text-transform: uppercase;
-    margin-bottom: clamp(18px,2.5vw,28px);
-    opacity: 0; animation: fadeUp .8s .2s cubic-bezier(.4,0,.2,1) forwards;
-  }
-  .hero-tag-line::before { content: ''; width: 28px; height: 1px; background: var(--cyan); box-shadow: 0 0 6px var(--cyan); flex-shrink: 0; }
-  .hero-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(52px,8vw,96px);
-    line-height: 0.95; letter-spacing: 0.02em;
-    margin-bottom: clamp(20px,2.5vw,32px);
-    opacity: 0; animation: fadeUp .9s .35s cubic-bezier(.4,0,.2,1) forwards;
-  }
-  .hero-title .line-accent {
-    display: block;
-    color: transparent;
-    -webkit-text-stroke: 2px var(--cyan);
-    text-shadow: 0 0 40px rgba(0,240,255,0.4);
-  }
-  .hero-title .line-solid { display: block; color: var(--text); }
-  .hero-title .line-pink {
-    display: block;
-    background: linear-gradient(90deg, var(--pink), var(--purple));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    filter: drop-shadow(0 0 20px rgba(255,15,128,0.5));
-  }
-  .hero-sub {
-    font-size: clamp(15px,2vw,18px); color: var(--muted); line-height: 1.7;
-    max-width: 460px; margin-bottom: clamp(28px,4vw,44px);
-    opacity: 0; animation: fadeUp .9s .5s cubic-bezier(.4,0,.2,1) forwards;
-  }
-  .hero-sub strong { color: var(--text); font-weight: 600; }
-  .hero-ctas {
-    display: flex; flex-direction: column; gap: 18px;
-    opacity: 0; animation: fadeUp .9s .65s cubic-bezier(.4,0,.2,1) forwards;
-  }
-  .cta-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+/* ── Hero ──────────────────────────────────────────── */
+#hero {
+  min-height:100dvh; display:flex; flex-direction:column; justify-content:center;
+  padding:8rem clamp(20px,5vw,56px) 5rem;
+  max-width:1100px; margin:0 auto;
+}
+.hero-eyebrow {
+  font-size:.75rem; letter-spacing:.25em; text-transform:uppercase;
+  color:var(--c3); margin-bottom:1.5rem;
+  display:flex; align-items:center; gap:.75rem;
+}
+.hero-eyebrow::before { content:''; display:block; width:2.5rem; height:1px; background:var(--c3); }
+.hero-name {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(4.5rem,13vw,12rem);
+  line-height:.88; letter-spacing:.03em; color:var(--text);
+  margin-bottom:1.75rem;
+}
+.hero-name span { color:var(--c3); }
+.hero-role { font-size:clamp(1rem,2.5vw,1.4rem); color:var(--muted); min-height:2.2rem; margin-bottom:2.75rem; }
+.hero-role #typewriter { color:var(--text); }
+#cursor-blink { display:inline-block; width:2px; height:1.1em; background:var(--c3); margin-left:2px; vertical-align:middle; animation:blink .8s step-end infinite; }
+@keyframes blink { 50% { opacity:0; } }
 
-  /* Buttons */
-  .btn-primary {
-    display: inline-flex; align-items: center; gap: 10px;
-    background: var(--cyan); color: #04040e;
-    font-family: 'Space Grotesk', sans-serif; font-size: clamp(13px,1.4vw,14px); font-weight: 700;
-    padding: clamp(13px,1.5vw,15px) clamp(22px,3vw,30px);
-    border-radius: 4px; border: none; cursor: pointer; text-decoration: none;
-    letter-spacing: 0.06em; text-transform: uppercase;
-    position: relative; overflow: hidden;
-    transition: transform .25s cubic-bezier(.4,0,.2,1), box-shadow .25s;
-    box-shadow: 0 0 20px rgba(0,240,255,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
-    white-space: nowrap; flex-shrink: 0;
-  }
-  .btn-primary::before {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
-    opacity: 0; transition: opacity .25s;
-  }
-  @media (hover: hover) {
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(0,240,255,0.6), 0 8px 24px rgba(0,240,255,0.3); }
-    .btn-primary:hover::before { opacity: 1; }
-    .btn-primary:hover svg { transform: translateX(3px); }
-  }
-  .btn-primary:active { transform: scale(.97); }
-  .btn-primary svg { transition: transform .25s; flex-shrink: 0; }
+.hero-stats { display:flex; gap:clamp(.75rem,3vw,2.5rem); flex-wrap:wrap; margin-bottom:3rem; align-items:stretch; }
+.hero-stat { display:flex; flex-direction:column; }
+.hero-stat-num { font-family:'Bebas Neue',sans-serif; font-size:clamp(2rem,5vw,3.5rem); line-height:1; color:var(--text); }
+.hero-stat-label { font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-top:.25rem; }
+.stat-sep { width:1px; background:var(--border); align-self:stretch; }
 
-  .btn-ghost {
-    display: inline-flex; align-items: center; gap: 10px;
-    background: transparent; color: var(--text);
-    font-family: 'Space Grotesk', sans-serif; font-size: clamp(13px,1.4vw,14px); font-weight: 700;
-    padding: clamp(12px,1.5vw,14px) clamp(20px,3vw,28px);
-    border-radius: 4px; border: 1.5px solid rgba(0,240,255,0.3);
-    cursor: pointer; text-decoration: none; letter-spacing: 0.06em; text-transform: uppercase;
-    transition: border-color .25s, background .25s, transform .25s, box-shadow .25s;
-    white-space: nowrap; flex-shrink: 0;
-  }
-  @media (hover: hover) {
-    .btn-ghost:hover { border-color: var(--cyan); background: rgba(0,240,255,0.06); transform: translateY(-2px); box-shadow: 0 0 20px rgba(0,240,255,0.15); }
-  }
-  .btn-ghost:active { transform: scale(.97); }
+.hero-ctas { display:flex; gap:1rem; flex-wrap:wrap; }
+.btn-primary {
+  padding:.8rem 2rem; background:var(--c3);
+  color:#fff; font-size:.82rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+  text-decoration:none; border-radius:4px; transition:background .2s, box-shadow .2s;
+}
+.btn-primary:hover { background:#d91545; box-shadow:0 0 24px rgba(255,32,86,.4); }
+.btn-outline {
+  padding:.8rem 2rem; border:1px solid var(--border);
+  color:var(--text); font-size:.82rem; letter-spacing:.1em; text-transform:uppercase;
+  text-decoration:none; border-radius:4px; transition:border-color .2s;
+}
+.btn-outline:hover { border-color:var(--muted); }
 
-  .micro-link {
-    display: inline-flex; align-items: center; gap: 8px;
-    color: var(--muted); font-size: 13px; letter-spacing: 0.04em;
-    cursor: pointer; border: none; background: none;
-    font-family: 'Space Grotesk', sans-serif; transition: color .25s; padding: 4px 0;
-  }
-  @media (hover: hover) {
-    .micro-link:hover { color: var(--pink); }
-    .micro-link:hover svg { transform: translateX(4px); }
-  }
-  .micro-link svg { transition: transform .25s; flex-shrink: 0; }
+.scroll-hint {
+  position:absolute; bottom:2rem; left:50%; transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:.4rem;
+  font-size:.68rem; letter-spacing:.2em; text-transform:uppercase; color:var(--muted);
+  animation:bounceDown 2.2s ease-in-out infinite;
+}
+@keyframes bounceDown { 0%,100% { transform:translateX(-50%) translateY(0); } 50% { transform:translateX(-50%) translateY(7px); } }
 
-  /* Hero image */
-  .hero-img-wrap {
-    position: relative; min-width: 0;
-    opacity: 0; animation: fadeIn 1.2s .4s cubic-bezier(.4,0,.2,1) forwards;
-  }
-  .hero-img-glow {
-    position: absolute; inset: -30px;
-    background: radial-gradient(ellipse at 50% 80%, rgba(255,15,128,0.18), transparent 65%);
-    pointer-events: none;
-    animation: glowPulse 4s ease-in-out infinite;
-  }
-  @keyframes glowPulse {
-    0%,100% { opacity: .7; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.04); }
-  }
-  .hero-img {
-    position: relative; width: 100%; border-radius: 8px; overflow: hidden;
-    border: 1px solid rgba(0,240,255,0.12);
-    aspect-ratio: 3/4;
-  }
-  .hero-img img {
-    width: 100%; height: 100%; object-fit: cover; object-position: center top;
-    display: block;
-    /* Fade edges so office background disappears into dark site */
-    -webkit-mask-image: radial-gradient(ellipse 88% 92% at 50% 40%, black 40%, transparent 100%);
-    mask-image: radial-gradient(ellipse 88% 92% at 50% 40%, black 40%, transparent 100%);
-    filter: contrast(1.05) brightness(0.88) saturate(0.9);
-  }
-  .hero-img::after {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(to bottom, transparent 55%, var(--bg) 100%);
-    pointer-events: none;
-  }
-  /* Cyan scanline accent on image */
-  .hero-img::before {
-    content: ''; position: absolute; inset: 0; z-index: 1;
-    background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,240,255,0.02) 3px, rgba(0,240,255,0.02) 4px);
-    pointer-events: none;
-  }
-  .hero-badge {
-    position: absolute; bottom: 18px; left: 18px; z-index: 2;
-    background: rgba(4,4,14,0.85); backdrop-filter: blur(12px);
-    border: 1px solid rgba(0,240,255,0.2); border-radius: 4px;
-    padding: 7px 14px; font-size: 12px; font-weight: 600; color: var(--cyan);
-    display: flex; align-items: center; gap: 8px; letter-spacing: 0.06em; text-transform: uppercase;
-    box-shadow: 0 0 12px rgba(0,240,255,0.1);
-  }
-  .live-dot {
-    width: 7px; height: 7px; background: var(--green); border-radius: 50%; flex-shrink: 0;
-    box-shadow: 0 0 8px var(--green);
-    animation: livePulse 2s ease-in-out infinite;
-  }
-  @keyframes livePulse {
-    0%,100% { box-shadow: 0 0 4px var(--green); }
-    50% { box-shadow: 0 0 14px var(--green), 0 0 28px rgba(0,255,136,0.3); }
-  }
+/* ── Section labels ────────────────────────────────── */
+.section-label { font-size:.72rem; letter-spacing:.25em; text-transform:uppercase; color:var(--muted); margin-bottom:.5rem; }
+.section-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(2rem,5vw,3.5rem); letter-spacing:.04em; }
 
-  /* Section common */
-  section { position: relative; z-index: 1; }
-  .section-eyebrow {
-    font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
-    color: var(--cyan); display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
-  }
-  .section-eyebrow::before { content: ''; width: 18px; height: 1px; background: var(--cyan); box-shadow: 0 0 6px var(--cyan); flex-shrink: 0; }
-  .section-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(32px,5vw,60px);
-    line-height: 1; letter-spacing: 0.03em; margin-bottom: 16px;
-  }
-  .section-title .accent {
-    color: transparent;
-    -webkit-text-stroke: 1.5px var(--pink);
-    filter: drop-shadow(0 0 12px rgba(255,15,128,0.5));
-  }
-  .divider {
-    height: 1px;
-    background: linear-gradient(to right, transparent, rgba(0,240,255,0.15), transparent);
-    margin: var(--py) 0;
-  }
+/* ── Story ─────────────────────────────────────────── */
+#story { padding:6rem 0 4rem; }
+.story-header { max-width:1100px; margin:0 auto 4rem; padding:0 clamp(20px,5vw,56px); }
 
-  /* Problem */
-  .problem-section { padding: var(--py) 0; }
-  .problem-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%,260px),1fr));
-    gap: clamp(36px,6vw,80px); align-items: start;
-  }
-  .problem-grid > * { min-width: 0; }
-  .pain-list { list-style: none; margin-top: 28px; }
-  .pain-item {
-    display: flex; align-items: flex-start; gap: 14px;
-    padding: 14px 0; border-bottom: 1px solid var(--border);
-    opacity: 0; transform: translateX(-18px); transition: opacity .6s, transform .6s;
-  }
-  .pain-item.visible { opacity: 1; transform: translateX(0); }
-  .pain-marker {
-    width: 20px; height: 20px; border-radius: 2px;
-    border: 1.5px solid rgba(0,240,255,0.3);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; margin-top: 2px; font-size: 10px; color: var(--cyan);
-    font-weight: 700;
-  }
-  .pain-item p { font-size: clamp(14px,1.8vw,16px); color: var(--muted); line-height: 1.5; }
-  .solution-box {
-    background: var(--card); border: 1px solid rgba(0,240,255,0.1);
-    border-radius: 8px; padding: clamp(24px,4vw,40px); position: relative; overflow: hidden;
-  }
-  .solution-box::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(to right, transparent, var(--cyan), var(--purple), transparent);
-    box-shadow: 0 0 12px rgba(0,240,255,0.5);
-  }
-  .solution-box p { font-size: clamp(15px,2vw,19px); line-height: 1.65; color: var(--text); }
-  .solution-box p .hl { color: var(--cyan); font-weight: 600; }
-  .solution-quote {
-    font-size: 13px; color: var(--muted); margin-top: 24px;
-    border-top: 1px solid var(--border); padding-top: 20px;
-    display: flex; align-items: center; gap: 12px; letter-spacing: 0.02em;
-  }
-  .solution-quote svg { flex-shrink: 0; opacity: .4; }
+.chapter {
+  max-width:1100px; margin:0 auto;
+  padding:3rem clamp(20px,5vw,56px);
+  border-left:3px solid transparent;
+  display:grid; grid-template-columns:32px 1fr; gap:clamp(1.5rem,3vw,3rem);
+  opacity:0; transform:translateY(28px);
+  transition:opacity .65s ease, transform .65s ease;
+  position:relative; overflow:hidden;
+}
+.chapter + .chapter { border-top:1px solid var(--border); }
+.chapter.visible { opacity:1; transform:translateY(0); }
 
-  /* Growth */
-  .growth-section { padding: var(--py) 0; }
-  .growth-track { display: none; margin-top: clamp(28px,4vw,44px); }
-  .growth-track.active { display: block; }
-  .growth-track-head {
-    display: flex; align-items: center; gap: 14px;
-    margin-bottom: clamp(18px,2.5vw,28px);
-  }
-  .growth-track-tag {
-    font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
-    padding: 5px 12px; border-radius: 3px; white-space: nowrap;
-  }
-  .growth-track-tag.mobile {
-    color: var(--pink); background: rgba(255,15,128,0.08); border: 1px solid rgba(255,15,128,0.2);
-  }
-  .growth-track-tag.saas {
-    color: var(--cyan); background: rgba(0,240,255,0.05); border: 1px solid rgba(0,240,255,0.15);
-  }
-  .growth-track-sub { font-size: 12px; color: var(--muted); letter-spacing: 0.03em; }
-  .growth-track-line { flex: 1; height: 1px; background: var(--border); }
-  /* Trajectory connector row */
-  .traj-flow {
-    display: flex; align-items: center;
-    margin-bottom: clamp(16px,2.5vw,24px);
-    overflow-x: auto; padding-bottom: 4px;
-    scrollbar-width: none;
-  }
-  .traj-flow::-webkit-scrollbar { display: none; }
-  .traj-step {
-    display: flex; align-items: center; gap: 8px;
-    white-space: nowrap; flex-shrink: 0;
-  }
-  .traj-dot {
-    width: 26px; height: 26px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 700;
-    border: 1.5px solid rgba(255,15,128,0.3);
-    color: var(--pink); background: rgba(255,15,128,0.06);
-    transition: all .25s;
-  }
-  .saas-track .traj-dot {
-    border-color: rgba(0,240,255,0.25); color: var(--cyan); background: rgba(0,240,255,0.05);
-  }
-  .traj-label {
-    font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--muted);
-  }
-  .traj-arrow {
-    flex: 1; min-width: 20px; max-width: 48px; height: 1px;
-    background: linear-gradient(to right, rgba(255,15,128,0.2), rgba(255,15,128,0.08));
-    position: relative; flex-shrink: 0;
-  }
-  .saas-track .traj-arrow {
-    background: linear-gradient(to right, rgba(0,240,255,0.15), rgba(0,240,255,0.05));
-  }
-  .traj-arrow::after {
-    content: ''; position: absolute; right: 0; top: -3px;
-    border: 4px solid transparent;
-    border-left: 6px solid rgba(255,15,128,0.3);
-  }
-  .saas-track .traj-arrow::after { border-left-color: rgba(0,240,255,0.2); }
-  .growth-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%,175px),1fr));
-    gap: var(--gap);
-  }
-  .growth-grid > * { min-width: 0; }
-  .growth-card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 8px; padding: clamp(18px,3vw,28px) clamp(16px,2.5vw,24px);
-    cursor: pointer; position: relative; overflow: hidden;
-    transition: border-color .3s, transform .3s, box-shadow .3s;
-    opacity: 0; transform: translateY(18px);
-  }
-  .growth-card.visible { opacity: 1; transform: translateY(0); }
-  .growth-card::after {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(to right, var(--cyan), var(--purple));
-    transform: scaleX(0); transition: transform .35s cubic-bezier(.4,0,.2,1);
-    transform-origin: left; box-shadow: 0 0 8px rgba(0,240,255,0.5);
-  }
-  @media (hover: hover) {
-    .growth-card:hover { border-color: var(--border-active); transform: translateY(-4px); box-shadow: 0 8px 32px rgba(0,240,255,0.08); }
-    .growth-card:hover::after { transform: scaleX(1); }
-  }
-  .growth-card.expanded { border-color: var(--border-active); }
-  .growth-card.expanded::after { transform: scaleX(1); }
-  .card-num { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: var(--pink); text-transform: uppercase; margin-bottom: 12px; }
-  .card-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(22px,2.5vw,28px); letter-spacing: 0.04em; margin-bottom: 10px; line-height: 1; }
-  .card-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
-  .card-expand { max-height: 0; overflow: hidden; transition: max-height .4s cubic-bezier(.4,0,.2,1); }
-  .growth-card.expanded .card-expand { max-height: 200px; }
-  .card-expand p { font-size: 13px; color: var(--muted); line-height: 1.7; padding-top: 14px; margin-top: 14px; border-top: 1px solid var(--border); }
-  .card-chevron { position: absolute; top: 18px; right: 16px; color: var(--muted); font-size: 16px; transition: transform .3s, color .3s; }
-  .growth-card.expanded .card-chevron { transform: rotate(180deg); color: var(--cyan); }
+/* big background number */
+.chapter::after {
+  content:attr(data-num);
+  position:absolute; right:clamp(10px,4vw,3rem); top:50%;
+  transform:translateY(-50%);
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(6rem,14vw,11rem);
+  line-height:1; color:var(--chapter-color,var(--c1));
+  opacity:.055; pointer-events:none; user-select:none;
+}
 
-  /* Why */
-  .why-section { padding: var(--py) 0; }
-  .why-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%,280px),1fr));
-    gap: clamp(32px,6vw,60px); align-items: center;
-    margin-top: clamp(32px,5vw,56px);
-  }
-  .why-grid > * { min-width: 0; }
-  .why-stats { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
-  .why-stats > * { min-width: 0; }
-  .stat-card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 8px; padding: clamp(18px,3vw,28px) clamp(14px,2.5vw,24px);
-    transition: border-color .3s, box-shadow .3s;
-    opacity: 0; transform: scale(.95);
-  }
-  .stat-card.visible { opacity: 1; transform: scale(1); }
-  @media (hover: hover) {
-    .stat-card:hover { border-color: var(--border-active); box-shadow: 0 0 20px rgba(0,240,255,0.06); }
-  }
-  .stat-num {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(36px,5vw,52px); letter-spacing: 0.02em;
-    color: var(--cyan); text-shadow: 0 0 20px rgba(0,240,255,0.5); line-height: 1;
-  }
-  .stat-label { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.4; letter-spacing: 0.02em; }
-  .why-points { list-style: none; }
-  .why-point {
-    display: flex; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--border);
-    opacity: 0; transform: translateX(18px); transition: opacity .6s, transform .6s;
-  }
-  .why-point.visible { opacity: 1; transform: translateX(0); }
-  .why-icon {
-    width: 36px; height: 36px; border-radius: 4px;
-    border: 1px solid rgba(0,240,255,0.2);
-    background: rgba(0,240,255,0.06);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; margin-top: 2px; font-size: 16px;
-  }
-  .why-txt { min-width: 0; }
-  .why-txt h4 { font-weight: 700; font-size: 15px; margin-bottom: 4px; letter-spacing: 0.02em; }
-  .why-txt p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.chapter[data-color="c1"] { border-color:var(--c1); --chapter-color:var(--c1); }
+.chapter[data-color="c2"] { border-color:var(--c2); --chapter-color:var(--c2); }
+.chapter[data-color="c3"] { border-color:var(--c3); --chapter-color:var(--c3); }
+.chapter[data-color="c4"] { border-color:var(--c4); --chapter-color:var(--c4); }
+.chapter[data-color="c5"] { border-color:var(--c5); --chapter-color:var(--c5); }
 
-  /* How */
-  .how-section { padding: var(--py) 0; }
-  .steps {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%,170px),1fr));
-    gap: var(--gap); margin-top: clamp(32px,5vw,56px);
-  }
-  .steps > * { min-width: 0; }
-  .step { opacity: 0; transform: translateY(18px); transition: opacity .7s, transform .7s; }
-  .step.visible { opacity: 1; transform: translateY(0); }
-  .step-num {
-    width: 32px; height: 32px; border-radius: 50%;
-    border: 1.5px solid rgba(0,240,255,0.3);
-    display: inline-flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 700; color: var(--cyan);
-    background: rgba(0,240,255,0.06);
-    margin-bottom: 12px; transition: all .3s;
-  }
-  .step-label { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: var(--pink); text-transform: uppercase; margin-bottom: 10px; }
-  @media (hover: hover) {
-    .step:hover .step-num { background: var(--cyan); border-color: var(--cyan); color: #04040e; box-shadow: 0 0 16px rgba(0,240,255,0.6); }
-  }
-  .step-body {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 8px; padding: clamp(18px,2.5vw,24px) clamp(16px,2vw,22px);
-    transition: border-color .3s, transform .3s;
-  }
-  @media (hover: hover) {
-    .step:hover .step-body { border-color: rgba(0,240,255,0.2); transform: translateY(-3px); }
-  }
-  .step-body h3 { font-weight: 700; font-size: 15px; margin-bottom: 8px; letter-spacing: 0.02em; }
-  .step-body p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+.ch-index {
+  font-family:'Bebas Neue',sans-serif; font-size:.9rem; letter-spacing:.2em;
+  color:var(--chapter-color); opacity:.6; writing-mode:vertical-lr; transform:rotate(180deg);
+  padding-top:.25rem; user-select:none;
+}
+.chapter-content { min-width:0; }
+.ch-years { font-size:.72rem; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); margin-bottom:.5rem; }
+.ch-company { font-family:'Bebas Neue',sans-serif; font-size:clamp(1.8rem,4vw,3rem); letter-spacing:.04em; line-height:1; margin-bottom:.3rem; }
+.ch-role { font-size:.92rem; font-weight:500; color:var(--muted); margin-bottom:1.4rem; }
+.ch-bullets { list-style:none; display:flex; flex-direction:column; gap:.55rem; margin-bottom:1.5rem; }
+.ch-bullets li { font-size:.88rem; color:var(--muted); padding-left:1.2rem; position:relative; }
+.ch-bullets li::before { content:'—'; position:absolute; left:0; color:var(--chapter-color); opacity:.55; }
 
-  /* Where I've worked */
-  .where-section { padding: var(--py) 0; }
-  .where-connect {
-    font-size: clamp(14px,1.6vw,16px); color: var(--muted);
-    font-style: italic; margin-top: 10px; letter-spacing: 0.02em;
-  }
-  .where-framing {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%,240px),1fr));
-    gap: 12px; margin-top: clamp(24px,3vw,36px);
-  }
-  .where-framing-item {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 8px; padding: 18px 22px;
-    display: flex; align-items: flex-start; gap: 14px;
-  }
-  .wf-num {
-    font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 0.02em;
-    line-height: 1; flex-shrink: 0; margin-top: 2px;
-  }
-  .wf-num.mobile { color: var(--pink); text-shadow: 0 0 16px rgba(255,15,128,0.4); }
-  .wf-num.saas { color: var(--cyan); text-shadow: 0 0 16px rgba(0,240,255,0.4); }
-  .wf-text strong { display: block; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
-  .wf-text span { font-size: 12px; color: var(--muted); letter-spacing: 0.03em; }
+.ch-badge {
+  display:inline-flex; align-items:baseline; gap:.45rem;
+  padding:.45rem 1.1rem;
+  border-radius:4px; border:1px solid;
+}
+.chapter[data-color="c1"] .ch-badge { border-color:var(--c1); background:rgba(56,189,248,.05); }
+.chapter[data-color="c2"] .ch-badge { border-color:var(--c2); background:rgba(167,139,250,.05); }
+.chapter[data-color="c3"] .ch-badge { border-color:var(--c3); background:rgba(255,32,86,.05); }
+.chapter[data-color="c4"] .ch-badge { border-color:var(--c4); background:rgba(52,211,153,.05); }
+.chapter[data-color="c5"] .ch-badge { border-color:var(--c5); background:rgba(251,146,60,.05); }
 
-  /* Toggle */
-  .where-toggle {
-    display: flex; align-items: center; gap: 4px;
-    margin-top: clamp(32px,5vw,52px);
-    background: rgba(255,255,255,0.03);
-    border: 1px solid var(--border);
-    border-radius: 6px; padding: 4px;
-    width: fit-content;
-  }
-  .toggle-btn {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 10px 22px; border-radius: 4px; border: none; cursor: pointer;
-    background: none; color: var(--muted);
-    transition: background .25s, color .25s, box-shadow .25s;
-    white-space: nowrap;
-  }
-  .toggle-btn.active.mobile-btn {
-    background: rgba(255,15,128,0.12); color: var(--pink);
-    box-shadow: 0 0 14px rgba(255,15,128,0.15);
-    border: 1px solid rgba(255,15,128,0.25);
-  }
-  .toggle-btn.active.saas-btn {
-    background: rgba(0,240,255,0.08); color: var(--cyan);
-    box-shadow: 0 0 14px rgba(0,240,255,0.12);
-    border: 1px solid rgba(0,240,255,0.2);
-  }
-  .toggle-btn:not(.active):hover { color: var(--text); }
+.ch-badge-num { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; line-height:1; color:var(--chapter-color); }
+.ch-badge-label { font-size:.74rem; letter-spacing:.08em; color:var(--muted); }
 
-  /* Panels */
-  .where-panel { display: none; }
-  .where-panel.active { display: block; }
+/* churn before/after */
+.churn-display { display:flex; align-items:center; gap:1.2rem; flex-wrap:wrap; }
+.churn-before { display:flex; flex-direction:column; align-items:center; }
+.churn-after  { display:flex; flex-direction:column; align-items:center; }
+.churn-val { font-family:'Bebas Neue',sans-serif; font-size:3rem; line-height:1; }
+.churn-lbl { font-size:.65rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-top:.15rem; }
+.churn-arrow { font-size:1.5rem; color:var(--muted); }
 
-  .where-panel-head {
-    display: flex; align-items: center; gap: 14px;
-    margin: clamp(28px,4vw,44px) 0 clamp(20px,3vw,32px);
-  }
-  .where-panel-tag {
-    font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
-    padding: 5px 12px; border-radius: 3px; white-space: nowrap;
-  }
-  .where-panel-tag.mobile {
-    color: var(--pink); background: rgba(255,15,128,0.08); border: 1px solid rgba(255,15,128,0.2);
-  }
-  .where-panel-tag.saas {
-    color: var(--cyan); background: rgba(0,240,255,0.05); border: 1px solid rgba(0,240,255,0.15);
-  }
-  .where-panel-sub {
-    font-size: 12px; color: var(--muted); letter-spacing: 0.04em;
-  }
-  .where-panel-line { flex: 1; height: 1px; background: var(--border); }
+@media(max-width:600px) {
+  .chapter { grid-template-columns:1fr; gap:1rem; }
+  .ch-index { writing-mode:horizontal-tb; transform:none; }
+}
 
-  /* Cards */
-  .where-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%,280px),1fr));
-    gap: var(--gap);
-  }
-  .where-grid > * { min-width: 0; }
-  .where-card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 8px; padding: clamp(22px,3vw,32px);
-    opacity: 0; transform: translateY(14px);
-    transition: opacity .6s, transform .6s, border-color .3s, box-shadow .3s;
-  }
-  .where-card.visible { opacity: 1; transform: translateY(0); }
-  @media (hover: hover) {
-    .mobile-panel .where-card:hover { border-color: rgba(255,15,128,0.2); box-shadow: 0 8px 28px rgba(255,15,128,0.06); }
-    .saas-panel .where-card:hover { border-color: rgba(0,240,255,0.18); box-shadow: 0 8px 28px rgba(0,240,255,0.05); }
-  }
-  .where-quote {
-    font-size: clamp(15px,1.8vw,17px); font-weight: 500; line-height: 1.5;
-    color: var(--text); margin-bottom: 16px;
-    quotes: 'C' 'D';
-  }
-  .where-what {
-    font-size: 13px; color: var(--muted); line-height: 1.7;
-    margin-bottom: 20px; padding-bottom: 20px;
-    border-bottom: 1px solid var(--border);
-  }
-  .where-metrics {
-    display: flex; gap: 8px; flex-wrap: wrap;
-  }
-  .wm {
-    font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-    padding: 5px 11px; border-radius: 3px;
-  }
-  .wm.mobile { color: var(--pink); background: rgba(255,15,128,0.08); border: 1px solid rgba(255,15,128,0.2); }
-  .wm.saas { color: var(--cyan); background: rgba(0,240,255,0.06); border: 1px solid rgba(0,240,255,0.15); }
+/* ── QBR Demo ──────────────────────────────────────── */
+#qbr {
+  padding:6rem 0;
+  background:linear-gradient(180deg, transparent 0%, rgba(255,32,86,.025) 50%, transparent 100%);
+}
+.qbr-inner { max-width:860px; margin:0 auto; padding:0 clamp(20px,5vw,56px); }
+.qbr-tag {
+  display:inline-block; padding:.22rem .85rem;
+  background:rgba(255,32,86,.1); border:1px solid rgba(255,32,86,.25);
+  border-radius:3px; font-size:.7rem; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--c3); margin-bottom:1rem;
+}
+.qbr-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(2rem,5vw,3.5rem); letter-spacing:.04em; margin-bottom:.75rem; }
+.qbr-subtitle { font-size:.92rem; color:var(--muted); max-width:520px; line-height:1.65; margin-bottom:2.5rem; }
 
-  /* Bottom CTA */
-  .cta-section { padding: clamp(72px,12vw,120px) 0; text-align: center; }
-  .cta-inner { max-width: 680px; margin: 0 auto; position: relative; }
-  .cta-glow {
-    position: absolute; inset: -80px;
-    background: radial-gradient(ellipse at center, rgba(0,240,255,0.07), transparent 70%);
-    pointer-events: none;
-  }
-  .cta-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(36px,7vw,72px);
-    line-height: 0.95; letter-spacing: 0.03em; margin-bottom: 20px; position: relative;
-  }
-  .cta-title .line-a { display: block; color: var(--text); }
-  .cta-title .line-b {
-    display: block;
-    color: transparent;
-    -webkit-text-stroke: 1.5px var(--cyan);
-    text-shadow: 0 0 30px rgba(0,240,255,0.4);
-  }
-  .cta-sub { font-size: clamp(15px,2vw,18px); color: var(--muted); margin-bottom: 40px; position: relative; }
-  .cta-actions { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; position: relative; }
-  .btn-primary-lg {
-    display: inline-flex; align-items: center; gap: 12px;
-    background: var(--cyan); color: #04040e;
-    font-family: 'Space Grotesk', sans-serif; font-size: clamp(14px,1.5vw,15px); font-weight: 700;
-    padding: clamp(14px,2vw,18px) clamp(28px,4vw,44px);
-    border-radius: 4px; border: none; cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase;
-    position: relative; overflow: hidden; white-space: nowrap;
-    transition: transform .3s cubic-bezier(.4,0,.2,1), box-shadow .3s;
-    box-shadow: 0 0 30px rgba(0,240,255,0.5), 0 4px 20px rgba(0,240,255,0.3);
-  }
-  .btn-primary-lg::before {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
-    opacity: 0; transition: opacity .25s;
-  }
-  @media (hover: hover) {
-    .btn-primary-lg:hover { transform: translateY(-3px); box-shadow: 0 0 60px rgba(0,240,255,0.6), 0 12px 40px rgba(0,240,255,0.3); }
-    .btn-primary-lg:hover::before { opacity: 1; }
-  }
-  .btn-primary-lg:active { transform: scale(.97); }
-  .btn-primary-lg svg { flex-shrink: 0; }
+.qbr-form {
+  display:grid; grid-template-columns:1fr 1fr; gap:.9rem; margin-bottom:1.25rem;
+}
+@media(max-width:560px) { .qbr-form { grid-template-columns:1fr; } }
+.qbr-field { display:flex; flex-direction:column; gap:.35rem; }
+.qbr-field label { font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+.qbr-field input {
+  background:rgba(255,255,255,.04); border:1px solid var(--border);
+  border-radius:4px; color:var(--text); font-family:inherit; font-size:.9rem;
+  padding:.65rem 1rem; width:100%; outline:none;
+  transition:border-color .2s, background .2s;
+}
+.qbr-field input:focus { border-color:rgba(255,32,86,.35); background:rgba(255,32,86,.025); }
 
-  /* Footer */
-  footer { border-top: 1px solid rgba(0,240,255,0.1); padding: clamp(28px,4vw,44px) 0; position: relative; z-index: 1; }
-  .footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
-  .footer-logo {
-    font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.08em; color: var(--text);
-  }
-  .footer-logo span { color: var(--cyan); text-shadow: 0 0 12px rgba(0,240,255,0.5); }
-  .footer-logo sub { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 400; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; vertical-align: baseline; margin-left: 8px; }
-  .footer-nav { display: flex; align-items: center; gap: 8px; list-style: none; flex-wrap: wrap; }
-  .footer-nav li { display: flex; align-items: center; gap: 8px; }
-  .footer-nav li::before { content: '/'; color: rgba(0,240,255,0.2); font-size: 12px; }
-  .footer-nav li:first-child::before { display: none; }
-  .footer-nav a, .footer-nav button {
-    color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
-    text-decoration: none; background: none; border: none; cursor: pointer;
-    font-family: 'Space Grotesk', sans-serif; transition: color .25s;
-  }
-  .footer-nav a:hover, .footer-nav button:hover { color: var(--cyan); }
-  .footer-extras { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .social-btn {
-    width: 36px; height: 36px; border: 1px solid rgba(0,240,255,0.2); border-radius: 4px;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--muted); text-decoration: none;
-    transition: border-color .25s, color .25s, box-shadow .25s; flex-shrink: 0;
-  }
-  @media (hover: hover) {
-    .social-btn:hover { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 12px rgba(0,240,255,0.2); }
-  }
-  .game-btn {
-    display: inline-flex; align-items: center; gap: 7px;
-    padding: 7px 14px; background: rgba(191,0,255,0.08);
-    border: 1px solid rgba(191,0,255,0.3); border-radius: 4px;
-    color: var(--purple); font-size: 11px; font-weight: 700;
-    letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;
-    transition: background .25s, border-color .25s, box-shadow .25s;
-    font-family: 'Space Grotesk', sans-serif; white-space: nowrap;
-    text-shadow: 0 0 8px rgba(191,0,255,0.5);
-  }
-  @media (hover: hover) {
-    .game-btn:hover { background: rgba(191,0,255,0.14); border-color: var(--purple); box-shadow: 0 0 20px rgba(191,0,255,0.25); }
-  }
-  .game-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--purple); flex-shrink: 0; box-shadow: 0 0 6px var(--purple); animation: livePulse 2s ease-in-out infinite; }
+.qbr-btn-row { display:flex; align-items:center; gap:1rem; margin-bottom:1.75rem; flex-wrap:wrap; }
+#qbrBtn {
+  padding:.75rem 2.2rem; background:var(--c3);
+  color:#fff; font-size:.82rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+  border:none; border-radius:4px; cursor:pointer;
+  display:flex; align-items:center; gap:.5rem;
+  transition:background .2s, box-shadow .2s;
+}
+#qbrBtn:hover { background:#d91545; box-shadow:0 0 20px rgba(255,32,86,.4); }
+#qbrBtn:disabled { opacity:.45; cursor:not-allowed; box-shadow:none; }
+#qbrStatus { font-size:.8rem; color:var(--muted); }
 
-  /* Modal */
-  .modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(4,4,14,0.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    z-index: 200; display: flex; align-items: center; justify-content: center;
-    padding: clamp(16px,3vw,24px);
-    opacity: 0; pointer-events: none; transition: opacity .3s;
-  }
-  .modal-overlay.open { opacity: 1; pointer-events: all; }
-  .modal {
-    background: var(--bg2); border: 1px solid rgba(0,240,255,0.15); border-radius: 8px;
-    width: 100%; max-width: 700px;
-    padding: clamp(20px,3vw,36px); position: relative;
-    transform: scale(.95) translateY(10px);
-    transition: transform .35s cubic-bezier(.4,0,.2,1);
-    max-height: calc(100vh - 40px); overflow-y: auto;
-  }
-  .modal-overlay.open .modal { transform: scale(1) translateY(0); }
-  .modal::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(to right, transparent, var(--cyan), var(--purple), transparent);
-    box-shadow: 0 0 10px rgba(0,240,255,0.4);
-  }
-  .modal-close {
-    position: absolute; top: 16px; right: 16px;
-    width: 36px; height: 36px; border: 1px solid rgba(0,240,255,0.2); border-radius: 4px;
-    background: none; cursor: pointer; color: var(--muted);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; transition: border-color .25s, color .25s, transform .25s;
-  }
-  .modal-close:hover { border-color: var(--cyan); color: var(--cyan); transform: rotate(90deg); }
-  .modal-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: var(--cyan); text-transform: uppercase; margin-bottom: 14px; }
-  .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(28px,5vw,40px); line-height: 1; letter-spacing: 0.03em; margin-bottom: 10px; }
-  .modal-sub { font-size: 14px; color: var(--muted); margin-bottom: 28px; line-height: 1.65; }
-  .calendly-placeholder {
-    background: rgba(0,240,255,0.02); border: 1px dashed rgba(0,240,255,0.15);
-    border-radius: 6px; padding: clamp(24px,4vw,36px); text-align: center;
-  }
-  .calendly-placeholder p { color: var(--muted); font-size: 13px; margin-bottom: 16px; line-height: 1.6; }
-  .calendly-cta {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: var(--cyan); color: #04040e;
-    padding: 11px 22px; border-radius: 4px;
-    font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700;
-    text-decoration: none; letter-spacing: 0.06em; text-transform: uppercase;
-    transition: box-shadow .25s, transform .25s;
-  }
-  .calendly-cta:hover { box-shadow: 0 0 24px rgba(0,240,255,0.5); transform: translateY(-1px); }
-  .modal-note { font-size: 11px; color: var(--muted); margin-top: 14px; text-align: center; letter-spacing: 0.04em; }
+#qbrOutput {
+  background:rgba(255,255,255,.02); border:1px solid var(--border);
+  border-radius:8px; padding:2rem; min-height:80px;
+  font-size:.88rem; line-height:1.8; display:none;
+}
+#qbrOutput.active { display:block; }
+#qbrOutput h2 { font-size:.85rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--c3); margin:1.5rem 0 .6rem; }
+#qbrOutput h2:first-child { margin-top:0; }
+#qbrOutput p { margin-bottom:.75rem; color:var(--muted); }
+#qbrOutput ul, #qbrOutput ol { padding-left:1.4rem; margin-bottom:.75rem; }
+#qbrOutput li { margin-bottom:.3rem; color:var(--muted); }
+#qbrOutput strong { color:var(--text); font-weight:600; }
+#qbrOutput table { width:100%; border-collapse:collapse; margin-bottom:1rem; font-size:.82rem; }
+#qbrOutput th { text-align:left; padding:.45rem .7rem; border-bottom:1px solid var(--border); font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+#qbrOutput td { padding:.45rem .7rem; border-bottom:1px solid rgba(255,255,255,.03); color:var(--muted); }
+#qbrOutput hr { border:none; border-top:1px solid var(--border); margin:1rem 0; }
+.stream-cursor { display:inline-block; width:2px; height:1em; background:var(--c3); margin-left:2px; vertical-align:middle; animation:blink .8s step-end infinite; }
+.qbr-note { font-size:.7rem; color:rgba(180,180,255,.25); text-align:center; margin-top:1rem; }
 
-  /* Mobile menu */
-  .mobile-menu {
-    position: fixed; inset: 0; background: var(--bg); z-index: 150;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: clamp(22px,5vw,36px);
-    opacity: 0; pointer-events: none; transition: opacity .3s;
-  }
-  .mobile-menu.open { opacity: 1; pointer-events: all; }
-  .mobile-menu a {
-    font-family: 'Bebas Neue', sans-serif; font-size: clamp(32px,10vw,52px);
-    color: var(--text); text-decoration: none; transition: color .25s; letter-spacing: 0.04em;
-  }
-  .mobile-menu a:hover { color: var(--cyan); text-shadow: 0 0 20px rgba(0,240,255,0.5); }
-  .mobile-close {
-    position: absolute; top: 24px; right: 24px;
-    background: none; border: none; color: var(--muted); font-size: 28px; cursor: pointer;
-  }
+/* ── Articles ──────────────────────────────────────── */
+#articles { padding:6rem 0; }
+.articles-header { margin-bottom:2.5rem; }
+.filter-tabs { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:1.4rem; }
+.filter-tab {
+  padding:.3rem .95rem; border:1px solid var(--border);
+  border-radius:20px; font-size:.74rem; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--muted); cursor:pointer; background:none;
+  transition:border-color .2s, color .2s, background .2s;
+}
+.filter-tab:hover { border-color:rgba(255,32,86,.3); color:var(--text); }
+.filter-tab.active { border-color:var(--c3); color:var(--c3); background:rgba(255,32,86,.06); }
 
-  /* Reveal */
-  .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s cubic-bezier(.4,0,.2,1), transform .7s cubic-bezier(.4,0,.2,1); }
-  .reveal.visible { opacity: 1; transform: translateY(0); }
+.articles-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(290px,1fr)); gap:1.1rem; }
+.article-card {
+  padding:1.4rem; border:1px solid var(--border); border-radius:8px;
+  background:rgba(255,255,255,.02); display:flex; flex-direction:column; gap:.7rem;
+  text-decoration:none; color:inherit;
+  transition:border-color .25s, transform .25s, background .25s;
+  opacity:0; animation:cardIn .4s ease forwards;
+}
+@keyframes cardIn { to { opacity:1; transform:translateY(0); } }
+.article-card { transform:translateY(12px); }
+.article-card:hover { border-color:rgba(255,32,86,.22); transform:translateY(-3px); background:rgba(255,32,86,.015); }
+.article-type { font-size:.66rem; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); display:flex; align-items:center; gap:.4rem; }
+.article-type::before { content:''; display:block; width:5px; height:5px; border-radius:50%; background:var(--c3); flex-shrink:0; }
+.article-title { font-size:.92rem; font-weight:500; line-height:1.45; color:var(--text); }
+.article-meta { font-size:.72rem; color:var(--muted); margin-top:auto; }
+.articles-empty { text-align:center; color:var(--muted); padding:3rem; font-size:.9rem; }
 
-  @keyframes fadeUp { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
-  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+/* ── Contact ───────────────────────────────────────── */
+#contact {
+  padding:6rem 0 4rem;
+  background:linear-gradient(0deg, rgba(255,32,86,.03) 0%, transparent 100%);
+}
+.contact-inner { max-width:680px; margin:0 auto; padding:0 clamp(20px,5vw,56px); text-align:center; }
+.contact-headline { font-family:'Bebas Neue',sans-serif; font-size:clamp(2.5rem,7vw,5.5rem); letter-spacing:.04em; line-height:.92; margin-bottom:1.2rem; }
+.contact-sub { font-size:.95rem; color:var(--muted); margin-bottom:3rem; line-height:1.7; }
+.contact-links { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
+.contact-link {
+  padding:.75rem 1.8rem; border:1px solid var(--border); border-radius:4px;
+  font-size:.82rem; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--text); text-decoration:none;
+  display:flex; align-items:center; gap:.5rem;
+  transition:border-color .2s, background .2s;
+}
+.contact-link:hover { border-color:rgba(255,32,86,.3); background:rgba(255,32,86,.04); }
+.contact-link.primary { background:var(--c3); border-color:var(--c3); color:#fff; }
+.contact-link.primary:hover { background:#d91545; border-color:#d91545; }
 
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.2); border-radius: 2px; }
+/* ── Footer ────────────────────────────────────────── */
+footer {
+  padding:2rem clamp(20px,5vw,56px);
+  border-top:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.75rem;
+  font-size:.72rem; letter-spacing:.06em; color:rgba(180,180,255,.28);
+  position:relative; z-index:1;
+}
+footer a { color:rgba(255,32,86,.55); text-decoration:none; }
+footer a:hover { color:var(--c3); }
 
-  /* ── Breakpoints (em = zoom-aware) ── */
-  @media (max-width: 64em) {
-    .hero-grid { grid-template-columns: minmax(0,1fr) minmax(0,min(360px,36%)); }
-  }
-  @media (max-width: 53.75em) {
-    .hero-grid { grid-template-columns: 1fr; }
-    .hero-content { order: 1; }
-    .hero-img-wrap { order: 2; max-width: min(300px,75vw); margin: 0 auto; }
-    .hero-sub { max-width: 100%; }
-    .nav-links { display: none; }
-    .hamburger { display: flex; }
-  }
-  @media (max-width: 40em) {
-    .cta-row { flex-direction: column; align-items: stretch; }
-    .btn-primary, .btn-ghost { width: 100%; justify-content: center; }
-    .footer-inner { flex-direction: column; align-items: flex-start; }
-    .cta-title .line-b br { display: none; }
-  }
-  @media (max-width: 26.25em) {
-    .btn-primary-lg { width: 100%; justify-content: center; }
-  }
-  /* Company strip */
-  .companies-strip {
-    padding: clamp(18px,2.5vw,28px) 0;
-    position: relative; z-index: 1;
-  }
-  .companies-strip .container {
-    display: flex; align-items: center; gap: clamp(16px,3vw,36px); flex-wrap: wrap;
-  }
-  .companies-label {
-    font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--muted); white-space: nowrap; flex-shrink: 0;
-  }
-  .companies-list {
-    display: flex; align-items: center; gap: clamp(20px,4vw,48px); flex-wrap: wrap;
-  }
-  .companies-list span {
-    font-family: 'Space Grotesk', sans-serif; font-size: clamp(13px,1.6vw,16px);
-    font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
-    color: rgba(200,200,255,0.25);
-    transition: color .25s;
-  }
-  .companies-list span:hover { color: rgba(200,200,255,0.55); }
-
-  /* Articles */
-  .articles-section { padding: var(--py) 0; }
-  .articles-sub { font-size: clamp(14px,1.8vw,16px); color: var(--muted); margin-bottom: 36px; max-width: 560px; }
-  .articles-filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 36px; }
-  .af-btn {
-    padding: 8px 20px; border-radius: 100px;
-    border: 1px solid var(--border); background: var(--card);
-    color: var(--muted); font-family: 'Space Grotesk', sans-serif;
-    font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s;
-  }
-  .af-btn:hover { border-color: rgba(0,240,255,0.3); color: var(--text); }
-  .af-btn.active { background: rgba(0,240,255,0.08); border-color: var(--cyan); color: var(--cyan); }
-  .articles-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%,320px), 1fr));
-    gap: clamp(14px,2vw,20px);
-  }
-  .article-card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 10px; padding: 24px;
-    display: flex; flex-direction: column; gap: 10px;
-    transition: border-color .25s, transform .25s;
-    cursor: default;
-  }
-  .article-card:hover { transform: translateY(-3px); }
-  .article-card[data-type="UA Digest"]:hover { border-color: rgba(255,15,128,0.4); }
-  .article-card[data-type="AI Agents Digest"]:hover { border-color: rgba(191,0,255,0.4); }
-  .article-card[data-type="Article"]:hover { border-color: rgba(0,240,255,0.4); }
-  .ac-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .ac-badge {
-    font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
-    text-transform: uppercase; padding: 3px 10px; border-radius: 3px;
-  }
-  .badge-ua { color: var(--pink); background: rgba(255,15,128,0.08); border: 1px solid rgba(255,15,128,0.2); }
-  .badge-ai { color: var(--purple); background: rgba(191,0,255,0.08); border: 1px solid rgba(191,0,255,0.2); }
-  .badge-article { color: var(--cyan); background: rgba(0,240,255,0.05); border: 1px solid rgba(0,240,255,0.15); }
-  .ac-date { font-size: 11px; color: var(--muted); font-family: 'Space Grotesk', monospace; }
-  .ac-title { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.35; }
-  .ac-topic { font-size: 12px; color: var(--muted); line-height: 1.5; }
-  .articles-loading { color: var(--muted); font-size: 14px; padding: 40px 0; }
-  .articles-empty { color: var(--muted); font-size: 14px; padding: 20px 0; }
+/* ── Scroll reveal ─────────────────────────────────── */
+.reveal { opacity:0; transform:translateY(22px); transition:opacity .65s ease, transform .65s ease; }
+.reveal.visible { opacity:1; transform:none; }
 </style>
 </head>
 <body>
 
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
+<div id="cursorDot"></div>
+<div id="cursorRing"></div>
+<canvas id="bgCanvas"></canvas>
 
-<div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
-<div class="orb orb-3"></div>
-
-<!-- Modal -->
-<div class="modal-overlay" id="calendlyModal" role="dialog" aria-modal="true">
-  <div class="modal">
-    <button class="modal-close" id="closeModal" aria-label="Close">✕</button>
-    <p class="modal-eyebrow">Book a call</p>
-    <h2 class="modal-title">Let's look at it together.</h2>
-    <p class="modal-sub">Pick a time. 30 minutes, no pitch, just a look at what's messy.</p>
-    <div class="calendly-inline-widget" data-url="https://calendly.com/murmur-red1/30min?hide_gdpr_banner=1&background_color=0b1028&text_color=ffffff&primary_color=00f0ff" style="min-width:280px;height:630px;"></div>
-  </div>
-</div>
-
-<!-- Mobile menu -->
-<div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true">
-  <button class="mobile-close" id="closeMobile" aria-label="Close">✕</button>
-  <a href="#what-i-do" onclick="closeMobileMenu()">What I Do</a>
-  <a href="#how-it-works" onclick="closeMobileMenu()">How It Works</a>
-  <a href="#case-studies" onclick="closeMobileMenu()">My Work</a>
-  <a href="#articles" onclick="closeMobileMenu()">Writing</a>
-  <button class="btn-primary" onclick="openCalendly(); closeMobileMenu();" style="margin-top:8px;">Let's meet</button>
+<!-- Loader -->
+<div id="loader">
+  <div id="loaderLogo">MURMUR.RED</div>
+  <div id="loaderTrack"><div id="loaderBar"></div></div>
+  <div id="loaderStatus">INITIALIZING...</div>
 </div>
 
 <!-- Nav -->
-<nav id="nav">
-  <div class="container">
-    <div class="nav-inner">
-      <a href="#" class="logo">murmur<span class="dot-red">.red</span></a>
-      <ul class="nav-links">
-        <li><a href="#what-i-do">What I Do</a></li>
-        <li><a href="#how-it-works">How It Works</a></li>
-        <li><a href="#case-studies">My Work</a></li>
-        <li><a href="#articles">Writing</a></li>
-      </ul>
-      <button class="hamburger" id="hamburger" onclick="openMobileMenu()" aria-label="Menu">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
+<nav id="mainNav">
+  <a href="#hero" class="nav-logo">murmur.red</a>
+  <ul class="nav-links">
+    <li><a href="#story">Story</a></li>
+    <li><a href="#qbr">QBR Agent</a></li>
+    <li><a href="#articles">Articles</a></li>
+    <li><a href="#contact" class="nav-cta">Let's talk</a></li>
+  </ul>
+  <div id="hamburger" onclick="toggleMobileNav()">
+    <span></span><span></span><span></span>
   </div>
 </nav>
+<div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileNav()"></div>
+<div class="mobile-nav" id="mobileNav">
+  <a href="#story"    onclick="closeMobileNav()">Story</a>
+  <a href="#qbr"      onclick="closeMobileNav()">QBR Agent</a>
+  <a href="#articles" onclick="closeMobileNav()">Articles</a>
+  <a href="#contact"  onclick="closeMobileNav()">Let's talk</a>
+</div>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="container">
-    <div class="hero-grid">
-      <div class="hero-content">
-        <p class="hero-name reveal-instant">Lena Ry</p>
-        <p class="hero-tag-line">Mobile UA & SaaS Growth Specialist</p>
-        <h1 class="hero-title">
-          <span class="line-solid">I come in</span>
-          <span class="line-accent">when growth</span>
-          <span class="line-pink">feels messy</span>
-          <span class="line-solid">and fix it.</span>
-        </h1>
-        <p class="hero-sub">
-          Most teams don't need more ideas.<br>
-          They need <strong>a system that actually works.</strong><br>
-          I build that. As part of your team or as an outside pair of hands.
-        </p>
-        <div class="hero-ctas">
-          <div class="cta-row">
-            <button class="btn-primary" onclick="openCalendly()">
-              Let's set up a meeting
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
-            <a href="#how-it-works" class="btn-ghost">See how I work</a>
-          </div>
-          <button class="micro-link" onclick="openCalendly()">
-            Pick a time that works for you
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </button>
-        </div>
-      </div>
-      <div class="hero-img-wrap">
-        <div class="hero-img-glow"></div>
-        <div class="hero-img">
-          <img src="public/images/image.png" loading="eager" decoding="async" width="480" height="720" alt="Lena Growth Systems Consultant">
-          <div class="hero-badge"><div class="live-dot"></div>Open to full-time & freelance</div>
-        </div>
-      </div>
+<!-- ══════════════════ HERO ══════════════════ -->
+<div id="hero">
+  <div class="hero-eyebrow">Amsterdam · Available for engagements</div>
+  <h1 class="hero-name">LENA<br><span>RY</span></h1>
+  <div class="hero-role">
+    <span id="typewriter"></span><span id="cursor-blink"></span>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <span class="hero-stat-num">10+</span>
+      <span class="hero-stat-label">Years in SaaS</span>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">5</span>
+      <span class="hero-stat-label">Startups</span>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">30→4%</span>
+      <span class="hero-stat-label">Churn reduction</span>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">$120M+</span>
+      <span class="hero-stat-label">ARR managed</span>
     </div>
   </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- COMPANY STRIP -->
-<div class="companies-strip">
-  <div class="container">
-    <p class="companies-label">Previously at</p>
-    <div class="companies-list">
-      <span>Chartboost</span>
-      <span>LunaLabs / IronSource</span>
-      <span>Replai</span>
-      <span>Merit Circle</span>
-      <span>Ygames</span>
-    </div>
+  <div class="hero-ctas">
+    <a href="#story" class="btn-primary">My Story</a>
+    <a href="#qbr"   class="btn-outline">Try QBR Agent →</a>
+  </div>
+  <div class="scroll-hint">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    scroll
   </div>
 </div>
 
-<div class="divider"></div>
-
-<!-- PROBLEM -->
-<section class="problem-section" id="what-i-do">
-  <div class="container">
-    <div class="problem-grid">
-      <div>
-        <p class="section-eyebrow">If this feels familiar</p>
-        <h2 class="section-title reveal">We should <span class="accent">talk.</span></h2>
-        <ul class="pain-list">
-          <li class="pain-item"><div class="pain-marker">↗</div><p>Campaigns running but nobody really knows what's working</p></li>
-          <li class="pain-item"><div class="pain-marker">↗</div><p>Tracking is set up… kind of… but the numbers don't add up</p></li>
-          <li class="pain-item"><div class="pain-marker">↗</div><p>Product, marketing, data all doing their own thing</p></li>
-          <li class="pain-item"><div class="pain-marker">↗</div><p>Every decision feels like a guess</p></li>
-          <li class="pain-item"><div class="pain-marker">↗</div><p>Everything takes longer than it should</p></li>
-        </ul>
-      </div>
-      <div>
-        <p class="section-eyebrow reveal">My approach</p>
-        <div class="solution-box reveal">
-          <p>The job is to <span class="hl">make sense of the mess.</span><br><br>Not with slides. Not with "frameworks for frameworks." I actually build the setup with you so it works in real life.</p>
-          <p class="solution-quote">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M12 8v4l3 3"/></svg>
-            More than a decade connecting growth, product, and data dots.
-          </p>
-        </div>
-      </div>
-    </div>
+<!-- ══════════════════ STORY ══════════════════ -->
+<section id="story">
+  <div class="story-header">
+    <div class="section-label">Career</div>
+    <h2 class="section-title">THE STORY</h2>
   </div>
-</section>
 
-<div class="divider"></div>
-
-<!-- GROWTH -->
-<section class="growth-section" id="growth-system">
-  <div class="container">
-    <p class="section-eyebrow reveal">Growth System</p>
-    <h2 class="section-title reveal">How I think about <span class="accent">growth</span></h2>
-
-    <div class="where-toggle reveal" style="margin-top:clamp(28px,4vw,44px)">
-      <button class="toggle-btn mobile-btn active" onclick="switchGrowthTrack('mobile', this)">Mobile Games</button>
-      <button class="toggle-btn saas-btn" onclick="switchGrowthTrack('saas', this)">SaaS &amp; CS</button>
-    </div>
-
-    <!-- MOBILE TRAJECTORY -->
-    <div class="growth-track mobile-track active" id="gtrack-mobile">
-      <div class="growth-track-head">
-        <span class="growth-track-tag mobile">Mobile Games / UA</span>
-        <span class="growth-track-sub">From first install to sustainable revenue</span>
-        <div class="growth-track-line"></div>
-      </div>
-      <div class="traj-flow">
-        <div class="traj-step"><div class="traj-dot">1</div><span class="traj-label">MMP</span></div>
-        <div class="traj-arrow"></div>
-        <div class="traj-step"><div class="traj-dot">2</div><span class="traj-label">Acquire</span></div>
-        <div class="traj-arrow"></div>
-        <div class="traj-step"><div class="traj-dot">3</div><span class="traj-label">Engage</span></div>
-        <div class="traj-arrow"></div>
-        <div class="traj-step"><div class="traj-dot">4</div><span class="traj-label">Retain</span></div>
-        <div class="traj-arrow"></div>
-        <div class="traj-step"><div class="traj-dot">5</div><span class="traj-label">Monetise</span></div>
-      </div>
-      <div class="growth-grid" id="growthGrid1">
-        <div class="growth-card" onclick="toggleCard(this)">
-          <span class="card-chevron">↓</span>
-          <p class="card-num">01 MMP</p>
-          <h3 class="card-title">Right MMP Setup</h3>
-          <p class="card-desc">Every number downstream depends on getting this right first.</p>
-          <div class="card-expand"><p>MMP evaluation and selection Adjust, AppsFlyer, Singular, Kochava based on your game type, team size, and network mix. Event taxonomy design, cost data integration, postback configuration, SKAdNetwork setup for iOS, fraud prevention rules. Get this wrong and your D7, ROAS, and LTV are fiction. Most studios skip this step or rush it. It's the one you can't fix retroactively.</p></div>
-        </div>
-        <div class="growth-card" onclick="toggleCard(this)">
-          <span class="card-chevron">↓</span>
-          <p class="card-num">02 Acquire</p>
-          <h3 class="card-title">UA & Attribution</h3>
-          <p class="card-desc">Are you buying the right users or just users?</p>
-          <div class="card-expand"><p>Channel attribution model, creative performance framework, click fraud detection, UA strategy across networks. Most UA problems start with bad data. I fix the measurement layer before touching spend because scaling bad attribution just costs more money.</p></div>
-        </div>
-        <div class="growth-card" onclick="toggleCard(this)">
-          <span class="card-chevron">↓</span>
-          <p class="card-num">03 Engage</p>
-          <h3 class="card-title">D1 Activation</h3>
-          <p class="card-desc">Do they get it on day one or do they leave?</p>
-          <div class="card-expand"><p>First-session funnel, tutorial drop analysis, aha-moment mapping, early behavioural signals that predict D7. D1 is where most games bleed users quietly. Fix the first session before optimising anything else.</p></div>
-        </div>
-        <div class="growth-card" onclick="toggleCard(this)">
-          <span class="card-chevron">↓</span>
-          <p class="card-num">04 Retain</p>
-          <h3 class="card-title">D7 / D30 Retention</h3>
-          <p class="card-desc">Are they forming a habit or just checking in once?</p>
-          <div class="card-expand"><p>Cohort analysis by install source, push notification strategy, re-engagement lifecycle, behavioural triggers for lapsing users. D7 and D30 benchmarks that mean something in your genre not industry averages from the wrong category.</p></div>
-        </div>
-        <div class="growth-card" onclick="toggleCard(this)">
-          <span class="card-chevron">↓</span>
-          <p class="card-num">05 Monetise</p>
-          <h3 class="card-title">Revenue & LTV</h3>
-          <p class="card-desc">Is the revenue model matching how users actually behave?</p>
-          <div class="card-expand"><p>IAP and subscription model review, paywall placement based on behavioural triggers not time gates, ad monetisation balance, LTV/CPI modelling by channel, payback period analysis. Revenue that grows with retention not despite it.</p></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SAAS TRAJECTORY -->
-    <div class="growth-track saas-track" id="gtrack-saas">
-      <div class="growth-track-head">
-        <span class="growth-track-tag saas">SaaS / Product / CS</span>
-        <span class="growth-track-sub">From first sign-up to expansion revenue</span>
-        <div class="growth-track-line"></div>
-      </div>
-      <div class="traj-flow">
-        <div class="traj-step"><div class="traj-dot">1</div><span class="traj-label">Demand</span></div>
-        <div class="traj-arrow"></div>
-        <div class="traj-step"><div class="traj-dot">2</div><span class="traj-label">Activate</span></div>
-        <div class="traj-arrow"></div>
-        <div class="traj-step"><div class="traj-dot">3</div><span class="traj-label">Adopt</span></div>
-        <div class="traj-arrow"></div>
-        <div class="traj-step"><div class="traj-dot">4</div><span class="traj-label">Expand</span></div>
-        <div class="traj-arrow"></div>
-        <div class="traj-step"><div class="traj-dot">5</div><span class="traj-label">Revenue</span></div>
-      </div>
-      <div class="growth-grid" id="growthGrid2">
-        <div class="growth-card" onclick="toggleCard(this)">
-          <span class="card-chevron">↓</span>
-          <p class="card-num">01 Demand</p>
-          <h3 class="card-title">SaaS Growth Motion</h3>
-          <p class="card-desc">How do the right companies find you and decide to try?</p>
-          <div class="card-expand"><p>PLG strategy, freemium-to-paid conversion, trial design, funnel instrumentation. Built around your actual motion sales-led, product-led, or hybrid. Most SaaS teams have a motion that doesn't match how their buyers actually decide.</p></div>
-        </div>
-        <div class="growth-card" onclick="toggleCard(this)">
-          <span class="card-chevron">↓</span>
-          <p class="card-num">02 Activate</p>
-          <h3 class="card-title">Time to Value</h3>
-          <p class="card-desc">Do they reach the aha moment before they close the tab?</p>
-          <div class="card-expand"><p>Onboarding flow design, time-to-value mapping, activation rate by cohort, first-session depth. Not installs adoption. The gap between sign-up and "this is actually useful" is where most SaaS trials die.</p></div>
-        </div>
-        <div class="growth-card" onclick="toggleCard(this)">
-          <span class="card-chevron">↓</span>
-          <p class="card-num">03 Adopt</p>
-          <h3 class="card-title">Product Stickiness</h3>
-          <p class="card-desc">Is it becoming part of how they work or just another tool they pay for?</p>
-          <div class="card-expand"><p>Feature adoption tracking, habit loop analysis, engagement depth by user type, retention cohorts. Adoption means the product is woven into a workflow. Stickiness is the only thing that makes expansion revenue possible.</p></div>
-        </div>
-        <div class="growth-card" onclick="toggleCard(this)">
-          <span class="card-chevron">↓</span>
-          <p class="card-num">04 Expand</p>
-          <h3 class="card-title">Customer Success</h3>
-          <p class="card-desc">Are you growing the accounts you already have?</p>
-          <div class="card-expand"><p>Health score frameworks, churn prediction signals, expansion playbooks, QBR design, AI-assisted CS tooling. CS is the growth engine most SaaS teams treat as a cost centre. NRR is the number and it lives here.</p></div>
-        </div>
-        <div class="growth-card" onclick="toggleCard(this)">
-          <span class="card-chevron">↓</span>
-          <p class="card-num">05 Revenue</p>
-          <h3 class="card-title">ARR & Pricing</h3>
-          <p class="card-desc">Does the business model actually work at scale?</p>
-          <div class="card-expand"><p>ARR/MRR instrumentation, pricing strategy, CAC payback by segment, expansion vs new ARR mix, LTV modelling. Revenue clarity is a data problem. I make the numbers tell the truth so you can make decisions with confidence.</p></div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- WHY ME -->
-<section class="why-section">
-  <div class="container">
-    <div class="why-grid">
-      <div>
-        <p class="section-eyebrow">Why me</p>
-        <h2 class="section-title reveal">Here's what you <span class="accent">actually get.</span></h2>
-        <ul class="why-points">
-          <li class="why-point">
-            <div class="why-icon">🎯</div>
-            <div class="why-txt"><h4>I focus on results</h4><p>Not clinging to what sounds good. I'm here to make things actually work.</p></div>
-          </li>
-          <li class="why-point">
-            <div class="why-icon">🔗</div>
-            <div class="why-txt"><h4>I connect the dots</h4><p>Growth, product, and data talking to each other. When aligned, everything moves faster.</p></div>
-          </li>
-          <li class="why-point">
-            <div class="why-icon">⚡</div>
-            <div class="why-txt"><h4>I work fast</h4><p>More than a decade in startups means I know how to move at your pace with precision.</p></div>
-          </li>
-        </ul>
-      </div>
-      <div class="why-stats">
-        <div class="stat-card"><div class="stat-num">10+</div><div class="stat-label">Years in startup growth</div></div>
-        <div class="stat-card" style="transition-delay:.1s"><div class="stat-num">5</div><div class="stat-label">Companies scaled from the inside</div></div>
-        <div class="stat-card" style="transition-delay:.2s"><div class="stat-num">0</div><div class="stat-label">Useless frameworks delivered</div></div>
-        <div class="stat-card" style="transition-delay:.3s"><div class="stat-num">∞</div><div class="stat-label">Messes cleaned up</div></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- HOW IT WORKS -->
-<section class="how-section" id="how-it-works">
-  <div class="container">
-    <p class="section-eyebrow reveal">Process</p>
-    <h2 class="section-title reveal">How we <span class="accent">work</span></h2>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-label">Diagnose</div>
-        <div class="step-body"><h3>The Audit</h3><p>We look at what you have. Data, stack, processes, team. No judgment just clarity on what's actually happening.</p></div>
-      </div>
-      <div class="step" style="transition-delay:.1s">
-        <div class="step-num">2</div>
-        <div class="step-label">Map</div>
-        <div class="step-body"><h3>The System</h3><p>I design the growth system that fits your stage and goals. Specific, buildable, not theoretical.</p></div>
-      </div>
-      <div class="step" style="transition-delay:.2s">
-        <div class="step-num">3</div>
-        <div class="step-label">Build</div>
-        <div class="step-body"><h3>The Build</h3><p>We build it together. Hands-on. Whether I'm embedded in your team or working alongside it, I'm in the tools. Not writing a report.</p></div>
-      </div>
-      <div class="step" style="transition-delay:.3s">
-        <div class="step-num">4</div>
-        <div class="step-label">Ship</div>
-        <div class="step-body"><h3>The Handoff</h3><p>The team owns it. Documented, working, and built to run on its own. That's the point.</p></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- WHERE I'VE WORKED -->
-<section class="where-section" id="case-studies">
-  <div class="container">
-    <p class="section-eyebrow reveal">Case Studies</p>
-    <h2 class="section-title reveal">Two types of problems.<br><span class="accent">One kind of fix.</span></h2>
-    <p class="where-connect reveal">I don't mix them. I connect them.</p>
-
-    <div class="where-framing reveal">
-      <div class="where-framing-item">
-        <div class="wf-num mobile">1</div>
-        <div class="wf-text">
-          <strong>Growth that brings users in</strong>
-          <span>Mobile games · UA · monetisation · attribution</span>
-        </div>
-      </div>
-      <div class="where-framing-item">
-        <div class="wf-num saas">2</div>
-        <div class="wf-text">
-          <strong>Systems that make those users matter</strong>
-          <span>SaaS · product · customer success · data</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="where-toggle reveal">
-      <button class="toggle-btn mobile-btn active" onclick="switchPanel('mobile', this)">Mobile Growth</button>
-      <button class="toggle-btn saas-btn" onclick="switchPanel('saas', this)">Product &amp; Systems</button>
-    </div>
-
-    <!-- MOBILE PANEL -->
-    <div class="where-panel mobile-panel active" id="panel-mobile">
-      <div class="where-panel-head">
-        <span class="where-panel-tag mobile">Mobile Games / UA</span>
-        <span class="where-panel-sub">Growth · UA · monetisation · attribution</span>
-        <div class="where-panel-line"></div>
-      </div>
-      <div class="where-grid">
-
-        <div class="where-card">
-          <p class="where-quote">We were buying users but had no idea which channels were actually working</p>
-          <p class="where-what">UA spend at €80k/month across three networks. MMP misconfigured since launch. One network flooding clicks. Campaigns optimised on installs instead of revenue events. Two channels looked profitable but were not.</p>
-          <div class="where-metrics">
-            <span class="wm mobile">↓ 40% CPI</span>
-          </div>
-        </div>
-
-        <div class="where-card" style="transition-delay:.08s">
-          <p class="where-quote">D7 retention plateaued at 18% for five months. We kept changing the creative. It wasn't the creative</p>
-          <p class="where-what">Casual mobile game. D1 retention was stable but D7 retention was flat. The assumption was weak content. The actual issue was a tutorial drop at step 4. Users never reached the core loop.</p>
-          <div class="where-metrics">
-            <span class="wm mobile">D7 retention +34%</span>
-            <span class="wm mobile">0 additional UA spend</span>
-          </div>
-        </div>
-
-        <div class="where-card" style="transition-delay:.16s">
-          <p class="where-quote">Revenue was growing but we had no idea if we could sustain the spend</p>
-          <p class="where-what">Hybrid monetisation with IAP and ads. Strong top line but no LTV to CPI model by channel. Paywall triggered at session 3 for every user regardless of behaviour. No visibility on revenue payback.</p>
-          <div class="where-metrics">
-            <span class="wm mobile">LTV model built by channel</span>
-            <span class="wm mobile">Paywall redesigned on behaviour</span>
-            <span class="wm mobile">Revenue payback visibility: week 1</span>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- SAAS PANEL -->
-    <div class="where-panel saas-panel" id="panel-saas">
-      <div class="where-panel-head">
-        <span class="where-panel-tag saas">SaaS / Product / CS</span>
-        <span class="where-panel-sub">Adoption · data trust · value proof · decision making</span>
-        <div class="where-panel-line"></div>
-      </div>
-      <div class="where-grid">
-
-        <div class="where-card">
-          <p class="where-quote">Everyone was looking at different numbers. Every meeting started with a fight about the data</p>
-          <p class="where-what">B2B SaaS. Product, marketing, and CS each ran separate reports. No shared definition of a key metric. Decisions stalled because nobody trusted the source. The product was working the problem was visibility.</p>
-          <div class="where-metrics">
-            <span class="wm saas">3 dashboards → 1</span>
-            <span class="wm saas">Decision time −60%</span>
-            <span class="wm saas">Single source of truth</span>
-          </div>
-        </div>
-
-        <div class="where-card" style="transition-delay:.08s">
-          <p class="where-quote">The product was live across the whole organisation. Almost nobody was actually using it</p>
-          <p class="where-what">Enterprise rollout. Licences deployed, onboarding done, training delivered. But teams were still running their workflows outside the system in spreadsheets, in email, in old habits. Adoption had stalled at 30% of active users.</p>
-          <div class="where-metrics">
-            <span class="wm saas">Active usage +58%</span>
-            <span class="wm saas">Workflows moved into product</span>
-            <span class="wm saas">Time to impact: 6 weeks</span>
-          </div>
-        </div>
-
-        <div class="where-card" style="transition-delay:.16s">
-          <p class="where-quote">The client couldn't explain what the product was doing for their business. Neither could we</p>
-          <p class="where-what">Enterprise account. CS team managing the relationship but no framework for proving value. Renewal conversations were uncomfortable because the impact wasn't visible. The product was embedded but the business case wasn't documented.</p>
-          <div class="where-metrics">
-            <span class="wm saas">Value framework built</span>
-            <span class="wm saas">Impact tied to business outcomes</span>
-            <span class="wm saas">Renewal conversation changed</span>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-  </div>
-</section>
-
-
-<div class="divider"></div>
-
-<!-- ARTICLES -->
-<section class="articles-section reveal" id="articles">
-  <div class="container">
-    <p class="section-eyebrow">Writing</p>
-    <h2 class="section-title reveal">Weekly <span class="accent">insights.</span></h2>
-    <p class="articles-sub reveal">UA strategy, AI agents, and what's actually moving the needle — published every week.</p>
-    <div class="articles-filters reveal" id="articlesFilters">
-      <button class="af-btn active" data-filter="all">All</button>
-      <button class="af-btn" data-filter="UA Digest">UA Digest</button>
-      <button class="af-btn" data-filter="AI Agents Digest">AI Agents</button>
-      <button class="af-btn" data-filter="Article">Articles</button>
-    </div>
-    <div class="articles-grid reveal" id="articlesGrid">
-      <p class="articles-loading">Loading articles…</p>
-    </div>
-  </div>
-</section>
-
-<!-- BOTTOM CTA -->
-<section class="cta-section">
-  <div class="container">
-    <div class="cta-inner">
-      <div class="cta-glow"></div>
-      <p class="section-eyebrow reveal" style="justify-content:center;">Let's talk</p>
-      <h2 class="cta-title reveal">
-        <span class="line-a">Let's build something</span>
-        <span class="line-b">that actually works.</span>
-      </h2>
-      <p class="cta-sub reveal">Full-time, freelance, or a quick audit. I'm open. Let's talk.</p>
-      <div class="cta-actions reveal">
-        <button class="btn-primary-lg" onclick="openCalendly()">
-          Let's set up a meeting
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </button>
-      </div>
-      <div style="margin-top:18px;text-align:center;">
-        <button class="micro-link" onclick="openCalendly()" style="justify-content:center;">
-          Pick a time that works for you
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div class="container">
-    <div class="footer-inner">
-      <div class="footer-logo">LENA <span>RY</span><sub>Growth Systems</sub></div>
-      <ul class="footer-nav">
-        <li><a href="#what-i-do">What I Do</a></li>
-        <li><a href="#case-studies">My Work</a></li>
-        <li><button onclick="openCalendly()">Contact</button></li>
+  <!-- 01 Chartboost -->
+  <div class="chapter" data-color="c1" data-num="01">
+    <div class="ch-index">01</div>
+    <div class="chapter-content">
+      <div class="ch-years">2015 — 2019</div>
+      <div class="ch-company">CHARTBOOST</div>
+      <div class="ch-role">Head of Growth &amp; Analytics · Mobile Gaming</div>
+      <ul class="ch-bullets">
+        <li>Led growth and analytics for one of the world's largest mobile gaming ad networks, serving 300,000+ game developers globally.</li>
+        <li>Built data-driven UA frameworks scaling acquisition campaigns across iOS and Android, optimizing for LTV from day one.</li>
+        <li>Established attribution and analytics standards that became industry reference points for mobile gaming studios.</li>
       </ul>
-      <div class="footer-extras">
-        <a href="https://www.linkedin.com/in/lena-ry-8baa8716/" target="_blank" rel="noopener" class="social-btn" title="LinkedIn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
-        </a>
-        <a href="https://murmura.netlify.app/" target="_blank" rel="noopener" class="game-btn">
-          <div class="game-dot"></div>My Game
-        </a>
+      <div class="ch-badge">
+        <span class="ch-badge-num">300K+</span>
+        <span class="ch-badge-label">game developers on platform</span>
       </div>
     </div>
   </div>
+
+  <!-- 02 LunaLabs → Unity -->
+  <div class="chapter" data-color="c2" data-num="02">
+    <div class="ch-index">02</div>
+    <div class="chapter-content">
+      <div class="ch-years">2019 — 2021</div>
+      <div class="ch-company">LUNALABS → UNITY</div>
+      <div class="ch-role">Head of Product Adoption · SaaS for Gaming Studios</div>
+      <ul class="ch-bullets">
+        <li>Joined LunaLabs pre-acquisition; built the product adoption function that became the template for Unity's CS org post-merger.</li>
+        <li>Designed onboarding journeys and health-scoring models that reduced time-to-value by 40% for gaming studio clients.</li>
+        <li>Navigated a high-stakes acquisition while maintaining customer trust and zero churn through the full transition period.</li>
+      </ul>
+      <div class="ch-badge">
+        <span class="ch-badge-num">–40%</span>
+        <span class="ch-badge-label">time-to-value</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 Replai — animated churn counter -->
+  <div class="chapter" data-color="c3" data-num="03" id="chapterReplai">
+    <div class="ch-index">03</div>
+    <div class="chapter-content">
+      <div class="ch-years">2021 — 2022</div>
+      <div class="ch-company">REPLAI</div>
+      <div class="ch-role">Head of Customer Success · Computer Vision AI</div>
+      <ul class="ch-bullets">
+        <li>Inherited a struggling CS function at a Series A computer vision startup with 30% annual churn eating the company's growth.</li>
+        <li>Rebuilt the entire customer lifecycle: health scoring, EBRs, escalation playbooks, and a dedicated CSM-to-account model.</li>
+        <li>Churn dropped from 30% to 4% in 18 months — the single data point that unlocked the company's next funding round.</li>
+      </ul>
+      <div class="churn-display">
+        <div class="churn-before">
+          <span class="churn-val" style="color:var(--muted)">30<span style="font-size:1.8rem">%</span></span>
+          <span class="churn-lbl">was</span>
+        </div>
+        <span class="churn-arrow">→</span>
+        <div class="churn-after">
+          <span class="churn-val" style="color:var(--c4)"><span id="churnVal">30</span><span style="font-size:1.8rem">%</span></span>
+          <span class="churn-lbl">annual churn</span>
+        </div>
+        <span style="font-size:.75rem;color:var(--muted);align-self:center;padding-left:.5rem">in 18 months</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 Merit Circle -->
+  <div class="chapter" data-color="c4" data-num="04">
+    <div class="ch-index">04</div>
+    <div class="chapter-content">
+      <div class="ch-years">2022 — 2023</div>
+      <div class="ch-company">MERIT CIRCLE</div>
+      <div class="ch-role">Head of Support &amp; Customer Operations · Web3 Gaming DAO</div>
+      <ul class="ch-bullets">
+        <li>Built customer operations from zero at a fast-moving Web3 gaming DAO with a global community of 50,000+ players.</li>
+        <li>Defined support SLAs, tooling, and escalation workflows for 24/7 decentralized operations and crypto-native users.</li>
+        <li>Bridged Web2 CS best practices with Web3 community dynamics — a playbook the organization still runs today.</li>
+      </ul>
+      <div class="ch-badge">
+        <span class="ch-badge-num">0→1</span>
+        <span class="ch-badge-label">CS org built from scratch</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 murmur.red -->
+  <div class="chapter" data-color="c5" data-num="05">
+    <div class="ch-index">05</div>
+    <div class="chapter-content">
+      <div class="ch-years">2023 — Present</div>
+      <div class="ch-company">MURMUR.RED</div>
+      <div class="ch-role">AI Customer Lifecycle Consultant · Co-Founder YGames</div>
+      <ul class="ch-bullets">
+        <li>Founded murmur.red to bring AI-native customer lifecycle design to SaaS and gaming companies — strategy, tooling, and execution.</li>
+        <li>Co-founded YGames, building AI-powered casual gaming experiences for the next generation of mobile players.</li>
+        <li>Advising Series A–C SaaS companies on CSM-to-AI transitions, churn modeling, and automated QBR workflows.</li>
+      </ul>
+      <div class="ch-badge">
+        <span class="ch-badge-num">AI-first</span>
+        <span class="ch-badge-label">customer lifecycle design</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ QBR AGENT ══════════════════ -->
+<section id="qbr">
+  <div class="qbr-inner">
+    <div class="reveal">
+      <div class="qbr-tag">Live Demo</div>
+      <h2 class="qbr-title">AI QBR AGENT</h2>
+      <p class="qbr-subtitle">Enter an account's basics and watch AI build an executive-quality QBR in real time — the same system I use with clients.</p>
+    </div>
+
+    <div class="reveal">
+      <div class="qbr-form">
+        <div class="qbr-field">
+          <label>Account Name</label>
+          <input id="qbrAccount" type="text" placeholder="Acme Corp">
+        </div>
+        <div class="qbr-field">
+          <label>ARR (USD)</label>
+          <input id="qbrARR" type="number" placeholder="120000">
+        </div>
+        <div class="qbr-field">
+          <label>Health Score (0–100)</label>
+          <input id="qbrHealth" type="number" placeholder="72" min="0" max="100">
+        </div>
+        <div class="qbr-field">
+          <label>Key Challenge</label>
+          <input id="qbrChallenge" type="text" placeholder="Low product adoption in Q2">
+        </div>
+      </div>
+
+      <div class="qbr-btn-row">
+        <button id="qbrBtn" onclick="runQBR()">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1.5 6.5h10M6.5 1.5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Generate QBR
+        </button>
+        <span id="qbrStatus"></span>
+      </div>
+
+      <div id="qbrOutput"></div>
+      <p class="qbr-note">Powered by Claude · murmur.red QBR Agent · No data stored</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ ARTICLES ══════════════════ -->
+<section id="articles">
+  <div class="container">
+    <div class="articles-header reveal">
+      <div class="section-label">Writing</div>
+      <h2 class="section-title">ARTICLES</h2>
+      <div class="filter-tabs" id="filterTabs">
+        <button class="filter-tab active" onclick="filterArticles('all',this)">All</button>
+      </div>
+    </div>
+    <div class="articles-grid" id="articlesGrid">
+      <div class="articles-empty">Loading articles…</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ CONTACT ══════════════════ -->
+<section id="contact">
+  <div class="contact-inner reveal">
+    <h2 class="contact-headline">LET'S BUILD<br>SOMETHING</h2>
+    <p class="contact-sub">I work with SaaS founders and CS leaders who want to turn customer success into a growth engine — not just a support cost.</p>
+    <div class="contact-links">
+      <a href="#" class="contact-link primary"
+         onclick="Calendly.initPopupWidget({url:'https://calendly.com/murmur-red1/30min'});return false;">
+        Book a Call
+      </a>
+      <a href="mailto:murmur.red1@gmail.com" class="contact-link">Email</a>
+      <a href="https://linkedin.com/in/lenary" target="_blank" rel="noopener" class="contact-link">LinkedIn</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 Lena Ry / murmur.red</span>
+  <span>Amsterdam · <a href="mailto:murmur.red1@gmail.com">murmur.red1@gmail.com</a></span>
 </footer>
 
-<script>
-if (window.matchMedia('(pointer: fine)').matches) {
-  const cursor = document.getElementById('cursor');
-  const ring = document.getElementById('cursorRing');
-  let mx=0, my=0, rx=0, ry=0;
-  document.addEventListener('mousemove', e => {
-    mx=e.clientX; my=e.clientY;
-    cursor.style.left=mx+'px'; cursor.style.top=my+'px';
-  });
-  (function animRing() {
-    rx+=(mx-rx)*.12; ry+=(my-ry)*.12;
-    ring.style.left=rx+'px'; ring.style.top=ry+'px';
-    requestAnimationFrame(animRing);
-  })();
-  document.querySelectorAll('a,button,.growth-card,.case-card,.stat-card').forEach(el => {
-    el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
-    el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
-  });
-}
-
-window.addEventListener('scroll', () => {
-  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40);
-}, {passive: true});
-
-function openCalendly() {
-  document.getElementById('calendlyModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeCalendly() {
-  document.getElementById('calendlyModal').classList.remove('open');
-  document.body.style.overflow = '';
-}
-document.getElementById('closeModal').addEventListener('click', closeCalendly);
-document.getElementById('calendlyModal').addEventListener('click', e => { if (e.target===e.currentTarget) closeCalendly(); });
-
-function openMobileMenu() { document.getElementById('mobileMenu').classList.add('open'); document.body.style.overflow='hidden'; }
-function closeMobileMenu() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow=''; }
-document.getElementById('closeMobile').addEventListener('click', closeMobileMenu);
-
-document.addEventListener('keydown', e => { if (e.key==='Escape') { closeCalendly(); closeMobileMenu(); } });
-
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); }
-  });
-}, { threshold: 0.06, rootMargin: '0px 0px -28px 0px' });
-
-document.querySelectorAll('.reveal,.pain-item,.why-point,.stat-card,.step,.growth-card,.where-card').forEach((el,i) => {
-  // skip cards in hidden growth tracks, they animate when track is switched
-  if (el.classList.contains('growth-card') && !el.closest('.growth-track.active')) return;
-  if (el.classList.contains('where-card') && !el.closest('.where-panel.active')) return;
-  if (!el.classList.contains('reveal')) el.style.transitionDelay = (i%4)*.07+'s';
-  observer.observe(el);
-});
-document.querySelectorAll('#growthGrid1 .growth-card, #growthGrid2 .growth-card').forEach((c,i) => { c.style.transitionDelay = (i%4)*.07+'s'; });
-
-function switchPanel(id, btn) {
-  document.querySelectorAll('.where-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.where-toggle .toggle-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('panel-' + id).classList.add('active');
-  btn.classList.add('active');
-  document.querySelectorAll('#panel-' + id + ' .where-card').forEach(c => {
-    if (!c.classList.contains('visible')) setTimeout(() => c.classList.add('visible'), 60);
-  });
-}
-
-function switchGrowthTrack(id, btn) {
-  document.querySelectorAll('.growth-track').forEach(t => t.classList.remove('active'));
-  btn.closest('.where-toggle').querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('gtrack-' + id).classList.add('active');
-  btn.classList.add('active');
-  document.querySelectorAll('#gtrack-' + id + ' .growth-card').forEach((c,i) => {
-    if (!c.classList.contains('visible')) setTimeout(() => c.classList.add('visible'), 60 + i * 70);
-  });
-}
-
-function toggleCard(card) {
-  const was = card.classList.contains('expanded');
-  document.querySelectorAll('.growth-card').forEach(c => c.classList.remove('expanded'));
-  if (!was) card.classList.add('expanded');
-}
-</script>
-
-<script>
-// Articles
-(function() {
-  const ARTICLES_URL = 'https://raw.githubusercontent.com/murmur-red/murmur/main/articles.json';
-  let allArticles = [];
-
-  function badgeClass(type) {
-    if (type === 'UA Digest') return 'badge-ua';
-    if (type === 'AI Agents Digest') return 'badge-ai';
-    return 'badge-article';
-  }
-
-  function formatDate(dateStr) {
-    const d = new Date(dateStr + 'T00:00:00');
-    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  }
-
-  function renderArticles(articles) {
-    const grid = document.getElementById('articlesGrid');
-    if (!articles.length) {
-      grid.innerHTML = '<p class="articles-empty">No articles found.</p>';
-      return;
-    }
-    grid.innerHTML = articles.map(a => `
-      <div class="article-card" data-type="${a.type}">
-        <div class="ac-top">
-          <span class="ac-badge ${badgeClass(a.type)}">${a.type}</span>
-          <span class="ac-date">${formatDate(a.date)}</span>
-        </div>
-        <div class="ac-title">${a.title}</div>
-        ${a.topic ? `<div class="ac-topic">${a.topic}</div>` : ''}
-      </div>
-    `).join('');
-  }
-
-  function filterArticles(type) {
-    const filtered = type === 'all' ? allArticles : allArticles.filter(a => a.type === type);
-    renderArticles(filtered);
-  }
-
-  // Filter buttons
-  document.getElementById('articlesFilters').addEventListener('click', function(e) {
-    const btn = e.target.closest('.af-btn');
-    if (!btn) return;
-    document.querySelectorAll('.af-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    filterArticles(btn.dataset.filter);
-  });
-
-  // Fetch articles
-  fetch(ARTICLES_URL)
-    .then(r => r.json())
-    .then(data => {
-      allArticles = data.articles || [];
-      renderArticles(allArticles);
-    })
-    .catch(() => {
-      document.getElementById('articlesGrid').innerHTML = '<p class="articles-empty">Could not load articles.</p>';
-    });
-})();
-
-</script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
