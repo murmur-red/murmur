@@ -251,49 +251,19 @@ body::before {
 
 /* ── STORY ────────────────────────────────────────── */
 #story{padding:7rem 0 3rem;position:relative;z-index:1;}
-.story-hd{max-width:1100px;margin:0 auto 4.5rem;padding:0 clamp(20px,5vw,60px);}
+.story-hd{max-width:1200px;margin:0 auto 4.5rem;padding:0 clamp(24px,5vw,80px);}
 
-/* vertical timeline line */
-#story .timeline-line{
-  position:absolute;
-  left:clamp(20px,5vw,60px);
-  top:14rem;bottom:4rem;
-  width:1px;
-  background:linear-gradient(to bottom,transparent,var(--border) 15%,var(--border) 85%,transparent);
-  pointer-events:none;
-}
-
+/* Chapter = full-width row, left border is the accent line */
 .chapter{
-  max-width:1100px;margin:0 auto;
-  padding:3.5rem clamp(48px,6vw,80px);
-  position:relative;
-  opacity:0;transform:translateX(-24px);
-  transition:opacity .6s ease,transform .6s ease;
+  width:100%;
+  border-top:1px solid var(--border);
+  border-left:3px solid var(--chapter-color,transparent);
+  box-shadow:-3px 0 20px -4px var(--chapter-color,transparent);
+  position:relative;overflow:hidden;
+  opacity:0;transform:translateY(20px);
+  transition:opacity .65s ease,transform .65s ease;
 }
 .chapter.visible{opacity:1;transform:none;}
-
-/* timeline dot */
-.chapter::before{
-  content:'';
-  position:absolute;
-  left:calc(clamp(20px,5vw,60px) - 4px);
-  top:3.8rem;
-  width:8px;height:8px;border-radius:50%;
-  background:var(--chapter-color,#fff);
-  box-shadow:0 0 14px var(--chapter-color,#fff);
-}
-
-/* big background numeral */
-.chapter::after{
-  content:attr(data-num);
-  position:absolute;right:clamp(16px,4vw,3rem);top:50%;
-  transform:translateY(-50%);
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(7rem,16vw,14rem);
-  line-height:1;letter-spacing:.04em;
-  color:var(--chapter-color,#fff);
-  opacity:.045;pointer-events:none;user-select:none;
-}
 
 .chapter[data-color="c1"]{--chapter-color:var(--c1);}
 .chapter[data-color="c2"]{--chapter-color:var(--c2);}
@@ -301,23 +271,43 @@ body::before {
 .chapter[data-color="c4"]{--chapter-color:var(--c4);}
 .chapter[data-color="c5"]{--chapter-color:var(--c5);}
 
-/* chapter header row */
+/* big background numeral — inside .ch-inner so it's positioned correctly */
+.ch-bg-num{
+  position:absolute;right:-0.04em;top:50%;
+  transform:translateY(-50%);
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(10rem,22vw,22rem);
+  line-height:1;color:var(--chapter-color);
+  opacity:.04;pointer-events:none;user-select:none;
+  z-index:0;
+}
+
+/* inner container — same max-width as hero content */
+.ch-inner{
+  max-width:1200px;margin:0 auto;
+  padding:3.5rem clamp(24px,5vw,80px);
+  position:relative;z-index:1;
+}
+
+/* header row: label + year flush to edges */
 .ch-head{
-  display:flex;align-items:baseline;justify-content:space-between;gap:1rem;
-  padding-bottom:1rem;margin-bottom:1.5rem;
-  border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;
+  margin-bottom:.6rem;
 }
 .ch-company{
   font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(2.2rem,5.5vw,5rem);
-  letter-spacing:.03em;line-height:1;
+  font-size:clamp(3rem,8vw,8.5rem);
+  letter-spacing:.02em;line-height:.88;
+  margin-bottom:.9rem;
+  border-bottom:1px solid var(--border);
+  padding-bottom:.9rem;
 }
-.ch-year{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);flex-shrink:0;}
+.ch-year{font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);flex-shrink:0;white-space:nowrap;}
 
 /* chapter body: bullets left, stat right */
-.ch-meta{font-size:.82rem;font-weight:500;color:var(--muted);margin-bottom:1.4rem;}
-.ch-body{display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:start;}
-@media(max-width:640px){.ch-body{grid-template-columns:1fr;} .ch-head{flex-direction:column;gap:.3rem;}}
+.ch-meta{font-size:.82rem;font-weight:500;color:var(--muted);margin-bottom:1.6rem;}
+.ch-body{display:grid;grid-template-columns:1fr auto;gap:3rem;align-items:start;}
+@media(max-width:680px){.ch-body{grid-template-columns:1fr;gap:1.5rem;} .ch-head{flex-direction:column;gap:.25rem;}}
 
 .ch-bullets{list-style:none;display:flex;flex-direction:column;gap:.55rem;}
 .ch-bullets li{
@@ -567,134 +557,137 @@ footer a:hover{color:var(--c3);}
 
 <!-- ═══════════════════ STORY ═══════════════════ -->
 <section id="story">
-  <div class="timeline-line"></div>
   <div class="story-hd">
     <div class="s-label">Career</div>
     <h2 class="s-title">THE STORY</h2>
   </div>
 
   <!-- 01 Chartboost -->
-  <div class="chapter" data-color="c1" data-num="01">
-    <div class="ch-head">
-      <div>
-        <div class="s-label" style="color:var(--c1)">01 / Chartboost</div>
-        <div class="ch-company">CHARTBOOST</div>
+  <div class="chapter" data-color="c1">
+    <span class="ch-bg-num">01</span>
+    <div class="ch-inner">
+      <div class="ch-head">
+        <span class="s-label" style="color:var(--c1)">01 / Chartboost</span>
+        <span class="ch-year">2015 — 2019</span>
       </div>
-      <div class="ch-year">2015 — 2019</div>
-    </div>
-    <div class="ch-meta">Head of Growth &amp; Analytics · Mobile Gaming Ad Network</div>
-    <div class="ch-body">
-      <ul class="ch-bullets">
-        <li>Led growth and analytics for one of the world's largest mobile gaming ad networks, serving 300,000+ game developers globally.</li>
-        <li>Built data-driven UA frameworks scaling acquisition campaigns across iOS and Android, optimizing for LTV from day one.</li>
-        <li>Established attribution and analytics standards that became industry benchmarks for mobile gaming studios.</li>
-      </ul>
-      <div class="ch-stat">
-        <span class="ch-stat-num">300K+</span>
-        <span class="ch-stat-lbl">game<br>developers</span>
+      <div class="ch-company">CHARTBOOST</div>
+      <div class="ch-meta">Head of Growth &amp; Analytics · Mobile Gaming Ad Network</div>
+      <div class="ch-body">
+        <ul class="ch-bullets">
+          <li>Led growth and analytics for one of the world's largest mobile gaming ad networks, serving 300,000+ game developers globally.</li>
+          <li>Built data-driven UA frameworks scaling acquisition campaigns across iOS and Android, optimizing for LTV from day one.</li>
+          <li>Established attribution and analytics standards that became industry benchmarks for mobile gaming studios.</li>
+        </ul>
+        <div class="ch-stat">
+          <span class="ch-stat-num">300K+</span>
+          <span class="ch-stat-lbl">game<br>developers</span>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- 02 LunaLabs → Unity -->
-  <div class="chapter" data-color="c2" data-num="02">
-    <div class="ch-head">
-      <div>
-        <div class="s-label" style="color:var(--c2)">02 / LunaLabs → Unity</div>
-        <div class="ch-company">LUNALABS → UNITY</div>
+  <div class="chapter" data-color="c2">
+    <span class="ch-bg-num">02</span>
+    <div class="ch-inner">
+      <div class="ch-head">
+        <span class="s-label" style="color:var(--c2)">02 / LunaLabs → Unity</span>
+        <span class="ch-year">2019 — 2021</span>
       </div>
-      <div class="ch-year">2019 — 2021</div>
-    </div>
-    <div class="ch-meta">Head of Product Adoption · SaaS for Gaming Studios</div>
-    <div class="ch-body">
-      <ul class="ch-bullets">
-        <li>Joined LunaLabs pre-acquisition; built the product adoption function that became the template for Unity's CS org post-merger.</li>
-        <li>Designed onboarding journeys and health-scoring models that cut time-to-value by 40% for gaming studio clients.</li>
-        <li>Maintained customer trust and zero churn through a high-stakes acquisition and full transition period.</li>
-      </ul>
-      <div class="ch-stat">
-        <span class="ch-stat-num">–40%</span>
-        <span class="ch-stat-lbl">time-to-<br>value</span>
+      <div class="ch-company">LUNALABS → UNITY</div>
+      <div class="ch-meta">Head of Product Adoption · SaaS for Gaming Studios</div>
+      <div class="ch-body">
+        <ul class="ch-bullets">
+          <li>Joined LunaLabs pre-acquisition; built the product adoption function that became the template for Unity's CS org post-merger.</li>
+          <li>Designed onboarding journeys and health-scoring models that cut time-to-value by 40% for gaming studio clients.</li>
+          <li>Maintained customer trust and zero churn through a high-stakes acquisition and full transition period.</li>
+        </ul>
+        <div class="ch-stat">
+          <span class="ch-stat-num">–40%</span>
+          <span class="ch-stat-lbl">time-to-<br>value</span>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- 03 Replai — churn counter -->
-  <div class="chapter" data-color="c3" data-num="03" id="chapterReplai">
-    <div class="ch-head">
-      <div>
-        <div class="s-label" style="color:var(--c3)">03 / Replai</div>
-        <div class="ch-company">REPLAI</div>
+  <div class="chapter" data-color="c3" id="chapterReplai">
+    <span class="ch-bg-num">03</span>
+    <div class="ch-inner">
+      <div class="ch-head">
+        <span class="s-label" style="color:var(--c3)">03 / Replai</span>
+        <span class="ch-year">2021 — 2022</span>
       </div>
-      <div class="ch-year">2021 — 2022</div>
-    </div>
-    <div class="ch-meta">Head of Customer Success · Series A Computer Vision AI</div>
-    <div class="ch-body">
-      <ul class="ch-bullets">
-        <li>Inherited a struggling CS org with 30% annual churn actively undermining the company's growth trajectory.</li>
-        <li>Rebuilt the entire customer lifecycle from scratch: health scoring, EBRs, escalation playbooks, dedicated CSM model.</li>
-        <li>The result unlocked the next funding round — investors cited the turnaround as the defining proof of product-market fit.</li>
-      </ul>
-      <!-- animated churn badge -->
-      <div class="ch-stat" style="min-width:130px;">
-        <div class="churn-pair">
-          <div>
-            <div class="churn-num" style="color:var(--muted)">30<span style="font-size:1.3rem">%</span></div>
-            <div class="churn-sub">was</div>
+      <div class="ch-company">REPLAI</div>
+      <div class="ch-meta">Head of Customer Success · Series A Computer Vision AI</div>
+      <div class="ch-body">
+        <ul class="ch-bullets">
+          <li>Inherited a struggling CS org with 30% annual churn actively undermining the company's growth trajectory.</li>
+          <li>Rebuilt the entire customer lifecycle from scratch: health scoring, EBRs, escalation playbooks, dedicated CSM model.</li>
+          <li>The result unlocked the next funding round — investors cited the turnaround as the defining proof of product-market fit.</li>
+        </ul>
+        <div class="ch-stat" style="min-width:120px;">
+          <div class="churn-pair">
+            <div>
+              <div class="churn-num" style="color:var(--muted)">30<span style="font-size:1.1rem">%</span></div>
+              <div class="churn-sub">was</div>
+            </div>
+            <div style="color:var(--muted);font-size:1rem;padding:0 .2rem">→</div>
+            <div>
+              <div class="churn-num" style="color:var(--c4)"><span id="churnVal">30</span><span style="font-size:1.1rem">%</span></div>
+              <div class="churn-sub" style="color:var(--c4)">now</div>
+            </div>
           </div>
-          <div style="color:var(--muted);font-size:1.2rem">→</div>
-          <div>
-            <div class="churn-num" style="color:var(--c4)"><span id="churnVal">30</span><span style="font-size:1.3rem">%</span></div>
-            <div class="churn-sub" style="color:var(--c4)">now</div>
-          </div>
+          <span class="ch-stat-lbl" style="margin-top:.5rem">annual churn<br>18 months</span>
         </div>
-        <span class="ch-stat-lbl" style="margin-top:.5rem">annual churn<br>18 months</span>
       </div>
     </div>
   </div>
 
   <!-- 04 Merit Circle -->
-  <div class="chapter" data-color="c4" data-num="04">
-    <div class="ch-head">
-      <div>
-        <div class="s-label" style="color:var(--c4)">04 / Merit Circle</div>
-        <div class="ch-company">MERIT CIRCLE</div>
+  <div class="chapter" data-color="c4">
+    <span class="ch-bg-num">04</span>
+    <div class="ch-inner">
+      <div class="ch-head">
+        <span class="s-label" style="color:var(--c4)">04 / Merit Circle</span>
+        <span class="ch-year">2022 — 2023</span>
       </div>
-      <div class="ch-year">2022 — 2023</div>
-    </div>
-    <div class="ch-meta">Head of Support &amp; Customer Operations · Web3 Gaming DAO</div>
-    <div class="ch-body">
-      <ul class="ch-bullets">
-        <li>Built customer operations from zero at a fast-moving Web3 gaming DAO with a global community of 50,000+ players.</li>
-        <li>Defined support SLAs, tooling, and escalation workflows for 24/7 decentralized operations serving crypto-native users.</li>
-        <li>Bridged Web2 CS best practices with Web3 community dynamics — the playbook is still running today.</li>
-      </ul>
-      <div class="ch-stat">
-        <span class="ch-stat-num">0→1</span>
-        <span class="ch-stat-lbl">CS org<br>built</span>
+      <div class="ch-company">MERIT CIRCLE</div>
+      <div class="ch-meta">Head of Support &amp; Customer Operations · Web3 Gaming DAO</div>
+      <div class="ch-body">
+        <ul class="ch-bullets">
+          <li>Built customer operations from zero at a fast-moving Web3 gaming DAO with a global community of 50,000+ players.</li>
+          <li>Defined support SLAs, tooling, and escalation workflows for 24/7 decentralized operations serving crypto-native users.</li>
+          <li>Bridged Web2 CS best practices with Web3 community dynamics — the playbook is still running today.</li>
+        </ul>
+        <div class="ch-stat">
+          <span class="ch-stat-num">0→1</span>
+          <span class="ch-stat-lbl">CS org<br>built</span>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- 05 murmur.red -->
-  <div class="chapter" data-color="c5" data-num="05">
-    <div class="ch-head">
-      <div>
-        <div class="s-label" style="color:var(--c5)">05 / Now</div>
-        <div class="ch-company">MURMUR.RED</div>
+  <div class="chapter" data-color="c5">
+    <span class="ch-bg-num">05</span>
+    <div class="ch-inner">
+      <div class="ch-head">
+        <span class="s-label" style="color:var(--c5)">05 / Now</span>
+        <span class="ch-year">2023 — Present</span>
       </div>
-      <div class="ch-year">2023 — Present</div>
-    </div>
-    <div class="ch-meta">AI Customer Lifecycle Consultant · Co-Founder YGames</div>
-    <div class="ch-body">
-      <ul class="ch-bullets">
-        <li>Founded murmur.red to bring AI-native customer lifecycle design to SaaS and gaming companies — strategy, tooling, execution.</li>
-        <li>Co-founded YGames, building AI-powered casual gaming experiences for the next generation of mobile players.</li>
-        <li>Advising Series A–C SaaS companies on CSM-to-AI transitions, churn modeling, and automated QBR workflows.</li>
-      </ul>
-      <div class="ch-stat">
-        <span class="ch-stat-num" style="font-size:1.6rem">AI-first</span>
-        <span class="ch-stat-lbl">lifecycle<br>design</span>
+      <div class="ch-company">MURMUR.RED</div>
+      <div class="ch-meta">AI Customer Lifecycle Consultant · Co-Founder YGames</div>
+      <div class="ch-body">
+        <ul class="ch-bullets">
+          <li>Founded murmur.red to bring AI-native customer lifecycle design to SaaS and gaming companies — strategy, tooling, execution.</li>
+          <li>Co-founded YGames, building AI-powered casual gaming experiences for the next generation of mobile players.</li>
+          <li>Advising Series A–C SaaS companies on CSM-to-AI transitions, churn modeling, and automated QBR workflows.</li>
+        </ul>
+        <div class="ch-stat">
+          <span class="ch-stat-num" style="font-size:1.5rem">AI-first</span>
+          <span class="ch-stat-lbl">lifecycle<br>design</span>
+        </div>
       </div>
     </div>
   </div>
