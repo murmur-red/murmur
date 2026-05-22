@@ -1,53 +1,44 @@
-/* ═══════════════════════════════════════════════════
-   MURMUR.RED — script.js
-   ═══════════════════════════════════════════════════ */
+/* murmur.red — script.js */
 
-const WORKER_URL   = 'https://murmur-qbr.YOUR_SUBDOMAIN.workers.dev'; // TODO: set after Cloudflare deploy
+const WORKER_URL   = 'https://murmur-qbr.YOUR_SUBDOMAIN.workers.dev';
 const ARTICLES_URL = 'https://raw.githubusercontent.com/murmur-red/murmur/main/articles.json';
 
-// ── Scramble text effect ─────────────────────────────
-function scramble(el, finalText, duration) {
-  const pool = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%·';
-  const len  = finalText.length;
-  const start = performance.now();
-
-  const frame = (now) => {
-    const t = Math.min((now - start) / duration, 1);
-    // how many chars have "resolved" (from left)
-    const resolved = Math.floor(t * len);
-
-    el.textContent = finalText.split('').map((ch, i) => {
-      if (ch === ' ') return ' ';
-      if (i < resolved) return ch;
-      return pool[Math.floor(Math.random() * pool.length)];
+// ── Scramble utility ────────────────────────────────────
+function scramble(el, final, ms) {
+  const pool = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789·!';
+  const n = final.length;
+  const t0 = performance.now();
+  const run = now => {
+    const p = Math.min((now - t0) / ms, 1);
+    const done = Math.floor(p * n);
+    el.textContent = final.split('').map((c,i) => {
+      if (c === ' ' || c === '.') return c;
+      return i < done ? c : pool[Math.floor(Math.random() * pool.length)];
     }).join('');
-
-    if (t < 1) requestAnimationFrame(frame);
-    else el.textContent = finalText;
+    if (p < 1) requestAnimationFrame(run);
+    else el.textContent = final;
   };
-  requestAnimationFrame(frame);
+  requestAnimationFrame(run);
 }
 
-// ── Loader ───────────────────────────────────────────
+// ── Loader ──────────────────────────────────────────────
 window.addEventListener('load', () => {
-  const loader  = document.getElementById('loader');
-  const bar     = document.getElementById('loaderBar');
-  const pct     = document.getElementById('loaderPct');
-  const logoEl  = document.getElementById('loaderLogo');
+  const loader = document.getElementById('loader');
+  const bar    = document.getElementById('lBar');
+  const pct    = document.getElementById('lPct');
+  const logo   = document.getElementById('lLogo');
 
-  // Start scramble immediately
-  logoEl.textContent = '';
-  scramble(logoEl, 'MURMUR.RED', 1400);
+  logo.textContent = '';
+  scramble(logo, 'MURMUR.RED', 1500);
 
   let p = 0;
   const tick = setInterval(() => {
-    p += Math.random() * 18 + 8;
+    p += Math.random() * 20 + 8;
     if (p > 100) p = 100;
-    bar.style.width  = p + '%';
-    pct.textContent  = Math.round(p) + '%';
+    bar.style.width = p + '%';
+    pct.textContent = Math.round(p) + '%';
     if (p >= 100) {
       clearInterval(tick);
-      // flash red → reveal
       setTimeout(() => {
         loader.style.transition = 'background .07s';
         loader.style.background = '#ff2056';
@@ -56,273 +47,154 @@ window.addEventListener('load', () => {
           loader.classList.add('out');
           setTimeout(() => {
             loader.style.display = 'none';
-            initTypewriter();
-            initScrollReveal();
+            initTW();
+            initReveal();
             initChapters();
             loadArticles();
-          }, 380);
+          }, 400);
         }, 90);
-      }, 420);
+      }, 440);
     }
-  }, 65);
+  }, 60);
 });
 
-// ── Custom cursor ─────────────────────────────────────
-const cursorDot  = document.getElementById('cursorDot');
-const cursorRing = document.getElementById('cursorRing');
-let mx = 0, my = 0, rx = 0, ry = 0;
-
+// ── Cursor ──────────────────────────────────────────────
+const cd = document.getElementById('cd');
+const cr = document.getElementById('cr');
+let mx=0,my=0,rx=0,ry=0;
 document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  cursorDot.style.left = mx + 'px';
-  cursorDot.style.top  = my + 'px';
+  mx=e.clientX; my=e.clientY;
+  cd.style.left=mx+'px'; cd.style.top=my+'px';
 });
-(function loop() {
-  rx += (mx - rx) * .12;
-  ry += (my - ry) * .12;
-  cursorRing.style.left = rx + 'px';
-  cursorRing.style.top  = ry + 'px';
+(function loop(){
+  rx+=(mx-rx)*.12; ry+=(my-ry)*.12;
+  cr.style.left=rx+'px'; cr.style.top=ry+'px';
   requestAnimationFrame(loop);
 })();
-document.querySelectorAll('a,button,input,[onclick]').forEach(el => {
-  el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
-  el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+document.querySelectorAll('a,button,input,[onclick]').forEach(el=>{
+  el.addEventListener('mouseenter',()=>document.body.classList.add('hov'));
+  el.addEventListener('mouseleave',()=>document.body.classList.remove('hov'));
 });
 
-// ── Particle canvas ───────────────────────────────────
-const canvas = document.getElementById('bgCanvas');
-const ctx    = canvas.getContext('2d');
-let W, H, pts = [];
-
-function resize() {
-  W = canvas.width  = window.innerWidth;
-  H = canvas.height = window.innerHeight;
+// ── Particles ───────────────────────────────────────────
+const cv = document.getElementById('bgc');
+const cx = cv.getContext('2d');
+let W,H,pts=[];
+function rsz(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight}
+rsz();
+window.addEventListener('resize',()=>{rsz();build();},{passive:true});
+class P{
+  reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-.5)*.22;this.vy=(Math.random()-.5)*.22;this.r=Math.random()*.9+.2;this.a=Math.random()*.28+.04;const r=Math.random();this.c=r<.1?'#ff2056':r<.22?'#38bdf8':'#ffffff'}
+  step(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset()}
+  draw(){cx.beginPath();cx.arc(this.x,this.y,this.r,0,Math.PI*2);cx.fillStyle=this.c+Math.floor(this.a*255).toString(16).padStart(2,'0');cx.fill()}
 }
-resize();
-window.addEventListener('resize', () => { resize(); buildPts(); }, { passive:true });
+function build(){pts=Array.from({length:Math.min(Math.floor(W*H/22000),80)},()=>{const p=new P;p.reset();return p})}
+build();
+(function render(){cx.clearRect(0,0,W,H);pts.forEach(p=>{p.step();p.draw()});requestAnimationFrame(render)})();
 
-class Pt {
-  constructor() { this.reset(); }
-  reset() {
-    this.x  = Math.random() * W;
-    this.y  = Math.random() * H;
-    this.vx = (Math.random() - .5) * .25;
-    this.vy = (Math.random() - .5) * .25;
-    this.r  = Math.random() * 1.0 + .25;
-    this.a  = Math.random() * .3 + .05;
-    const r = Math.random();
-    this.c  = r < .1 ? '#ff2056' : r < .22 ? '#38bdf8' : '#ffffff';
-  }
-  step() {
-    this.x += this.vx; this.y += this.vy;
-    if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
-  }
-  draw() {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-    ctx.fillStyle = this.c + Math.floor(this.a * 255).toString(16).padStart(2, '0');
-    ctx.fill();
-  }
-}
-function buildPts() {
-  const n = Math.min(Math.floor(W * H / 20000), 80);
-  pts = Array.from({length: n}, () => new Pt());
-}
-buildPts();
-(function render() {
-  ctx.clearRect(0, 0, W, H);
-  pts.forEach(p => { p.step(); p.draw(); });
-  requestAnimationFrame(render);
-})();
+// ── Nav ─────────────────────────────────────────────────
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>nav.classList.toggle('on',window.scrollY>50),{passive:true});
+function toggleNav(){document.getElementById('mnav').classList.toggle('on');document.getElementById('mov').classList.toggle('on')}
+function closeNav(){document.getElementById('mnav').classList.remove('on');document.getElementById('mov').classList.remove('on')}
 
-// ── Nav ───────────────────────────────────────────────
-const mainNav = document.getElementById('mainNav');
-window.addEventListener('scroll', () => {
-  mainNav.classList.toggle('scrolled', window.scrollY > 60);
-}, { passive:true });
-
-// ── Mobile nav ────────────────────────────────────────
-function toggleMobileNav() {
-  document.getElementById('mobileNav').classList.toggle('open');
-  document.getElementById('mobileOverlay').classList.toggle('open');
-}
-function closeMobileNav() {
-  document.getElementById('mobileNav').classList.remove('open');
-  document.getElementById('mobileOverlay').classList.remove('open');
-}
-
-// ── Typewriter ────────────────────────────────────────
-function initTypewriter() {
-  const phrases = [
-    'AI Customer Lifecycle Expert',
-    'Head of Customer Success',
-    'Co-Founder @ YGames',
-    'SaaS Churn Slayer',
-  ];
-  const el = document.getElementById('typewriter');
-  let pi = 0, ci = 0, del = false, wait = 0;
-
-  (function tick() {
-    if (wait-- > 0) { setTimeout(tick, 80); return; }
-    const p = phrases[pi];
-    if (!del) {
-      el.textContent = p.slice(0, ++ci);
-      if (ci === p.length) { del = true; wait = 24; }
-    } else {
-      el.textContent = p.slice(0, --ci);
-      if (ci === 0) { del = false; pi = (pi + 1) % phrases.length; wait = 5; }
-    }
-    setTimeout(tick, del ? 40 : 80);
+// ── Typewriter ──────────────────────────────────────────
+function initTW(){
+  const phrases=['AI Customer Lifecycle Expert','Head of Customer Success','Co-Founder @ YGames','SaaS Churn Slayer'];
+  const el=document.getElementById('tw');
+  let pi=0,ci=0,del=false,w=0;
+  (function tick(){
+    if(w-->0){setTimeout(tick,80);return}
+    const p=phrases[pi];
+    if(!del){el.textContent=p.slice(0,++ci);if(ci===p.length){del=true;w=22}}
+    else{el.textContent=p.slice(0,--ci);if(ci===0){del=false;pi=(pi+1)%phrases.length;w=4}}
+    setTimeout(tick,del?40:78);
   })();
 }
 
-// ── Scroll reveal (.reveal) ───────────────────────────
-function initScrollReveal() {
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+// ── Scroll reveal ────────────────────────────────────────
+function initReveal(){
+  const ob=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');ob.unobserve(e.target)}})},{threshold:.14});
+  document.querySelectorAll('.rev').forEach(el=>ob.observe(el));
+}
+
+// ── Chapters ─────────────────────────────────────────────
+let churnDone=false;
+function initChapters(){
+  const ob=new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(!e.isIntersecting)return;
+      e.target.classList.add('vis');
+      if(e.target.id==='chreplai'&&!churnDone){churnDone=true;setTimeout(animChurn,500)}
+      ob.unobserve(e.target);
     });
-  }, { threshold: .14 });
-  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  },{threshold:.18});
+  document.querySelectorAll('.ch').forEach(el=>ob.observe(el));
 }
 
-// ── Chapter reveal ────────────────────────────────────
-let churnDone = false;
-
-function initChapters() {
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (!e.isIntersecting) return;
-      e.target.classList.add('visible');
-      if (e.target.id === 'chapterReplai' && !churnDone) {
-        churnDone = true;
-        setTimeout(animateChurn, 480);
-      }
-      obs.unobserve(e.target);
-    });
-  }, { threshold: .2 });
-  document.querySelectorAll('.chapter').forEach(el => obs.observe(el));
+// ── Churn counter ────────────────────────────────────────
+function animChurn(){
+  const el=document.getElementById('cv');
+  let v=30,i=0;const steps=55,dec=26/steps;
+  const t=setInterval(()=>{v-=dec;i++;if(i>=steps){v=4;clearInterval(t)}el.textContent=Math.round(v)},26);
 }
 
-// ── Churn counter ─────────────────────────────────────
-function animateChurn() {
-  const el  = document.getElementById('churnVal');
-  const end = 4;
-  let val   = 30;
-  const steps = 52;
-  const dec   = (val - end) / steps;
-  let i = 0;
+// ── QBR ──────────────────────────────────────────────────
+async function runQBR(){
+  const acct=document.getElementById('qa').value.trim()||'Demo Company';
+  const arr =document.getElementById('qr').value||120000;
+  const hlth=document.getElementById('qh').value||72;
+  const chlg=document.getElementById('qc').value.trim()||'Improving product adoption';
+  const btn=document.getElementById('qbtn'),st=document.getElementById('qst'),out=document.getElementById('qout');
 
-  const t = setInterval(() => {
-    val -= dec; i++;
-    if (i >= steps) { val = end; clearInterval(t); }
-    el.textContent = Math.round(val);
-  }, 28);
-}
-
-// ── QBR streaming ─────────────────────────────────────
-async function runQBR() {
-  const account   = document.getElementById('qbrAccount').value.trim()   || 'Demo Company';
-  const arr       = document.getElementById('qbrARR').value              || 120000;
-  const health    = document.getElementById('qbrHealth').value           || 72;
-  const challenge = document.getElementById('qbrChallenge').value.trim() || 'Improving product adoption';
-
-  const btn    = document.getElementById('qbrBtn');
-  const status = document.getElementById('qbrStatus');
-  const output = document.getElementById('qbrOutput');
-
-  if (WORKER_URL.includes('YOUR_SUBDOMAIN')) {
-    output.classList.add('active');
-    output.innerHTML = '<p style="color:var(--c3)">Worker not deployed yet.</p><p style="color:var(--muted);font-size:.82rem;margin-top:.4rem">Deploy worker.js to Cloudflare and update WORKER_URL in script.js to enable live generation.</p>';
+  if(WORKER_URL.includes('YOUR_SUBDOMAIN')){
+    out.classList.add('on');
+    out.innerHTML='<p style="color:var(--red)">Worker not deployed yet.</p><p style="color:var(--dim);font-size:.8rem;margin-top:.4rem">Deploy worker.js to Cloudflare and update WORKER_URL in script.js.</p>';
     return;
   }
-
-  btn.disabled = true;
-  btn.textContent = 'Generating…';
-  status.textContent = '';
-  output.classList.add('active');
-  output.innerHTML = '<span class="stream-cursor"></span>';
-
-  let raw = '';
-  const md = typeof marked.parse === 'function' ? marked.parse : marked;
-
-  try {
-    const res = await fetch(WORKER_URL, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({account_name:account, arr, health_score:health, challenge})
-    });
-    if (!res.ok) throw new Error(`Worker ${res.status}: ${await res.text()}`);
-
-    const reader = res.body.getReader();
-    const dec    = new TextDecoder();
-
-    while (true) {
-      const {done, value} = await reader.read();
-      if (done) break;
-      for (const line of dec.decode(value, {stream:true}).split('\n')) {
-        if (!line.startsWith('data: ')) continue;
-        const payload = line.slice(6).trim();
-        if (payload === '[DONE]') break;
-        try {
-          const j     = JSON.parse(payload);
-          const delta = j?.delta?.text ?? '';
-          if (delta) {
-            raw += delta;
-            output.innerHTML = md(raw) + '<span class="stream-cursor"></span>';
-          }
-        } catch { /* skip bad chunks */ }
+  btn.disabled=true;btn.textContent='Generating…';st.textContent='';
+  out.classList.add('on');out.innerHTML='<span class="scur"></span>';
+  let raw='';
+  const md=typeof marked.parse==='function'?marked.parse:marked;
+  try{
+    const res=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({account_name:acct,arr,health_score:hlth,challenge:chlg})});
+    if(!res.ok)throw new Error(`${res.status}`);
+    const reader=res.body.getReader(),dec=new TextDecoder();
+    while(true){
+      const{done,value}=await reader.read();if(done)break;
+      for(const line of dec.decode(value,{stream:true}).split('\n')){
+        if(!line.startsWith('data: '))continue;
+        const pl=line.slice(6).trim();if(pl==='[DONE]')break;
+        try{const j=JSON.parse(pl);const d=j?.delta?.text??'';if(d){raw+=d;out.innerHTML=md(raw)+'<span class="scur"></span>'}}catch{}
       }
     }
-    output.innerHTML = md(raw);
-    status.textContent = '✓ Done';
-  } catch (err) {
-    output.innerHTML = `<p style="color:var(--c3)">Error: ${err.message}</p>`;
-    status.textContent = 'Failed';
-  }
-
-  btn.disabled = false;
-  btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6h10M6 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Generate QBR';
+    out.innerHTML=md(raw);st.textContent='✓ Done';
+  }catch(err){out.innerHTML=`<p style="color:var(--red)">Error: ${err.message}</p>`;st.textContent='Failed'}
+  btn.disabled=false;btn.innerHTML='<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 5.5h9M5.5 1l4.5 4.5L5.5 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Generate QBR';
 }
 
-// ── Articles ──────────────────────────────────────────
-let allArticles = [];
-
-async function loadArticles() {
-  const grid = document.getElementById('articlesGrid');
-  try {
-    const res  = await fetch(ARTICLES_URL + '?t=' + Date.now());
-    const data = await res.json();
-    allArticles = data.articles || [];
-
-    const types = ['All', ...new Set(allArticles.map(a => a.type).filter(Boolean))];
-    document.getElementById('filterTabs').innerHTML = types.map((t, i) =>
-      `<button class="filter-tab${i===0?' active':''}" onclick="filterArticles('${t==='All'?'all':t}',this)">${t}</button>`
-    ).join('');
-
-    renderArticles(allArticles);
-  } catch {
-    grid.innerHTML = '<div class="art-empty">Could not load articles.</div>';
-  }
+// ── Articles ─────────────────────────────────────────────
+let arts=[];
+async function loadArticles(){
+  const g=document.getElementById('agrid');
+  try{
+    const d=(await(await fetch(ARTICLES_URL+'?t='+Date.now())).json());
+    arts=d.articles||[];
+    const types=['All',...new Set(arts.map(a=>a.type).filter(Boolean))];
+    document.getElementById('ftabs').innerHTML=types.map((t,i)=>`<button class="ftab${i===0?' on':''}" onclick="filterA('${t==='All'?'all':t}',this)">${t}</button>`).join('');
+    renderA(arts);
+  }catch{g.innerHTML='<div class="aempty">Could not load articles.</div>'}
 }
-
-function filterArticles(type, btn) {
-  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  renderArticles(type === 'all' ? allArticles : allArticles.filter(a => a.type === type));
+function filterA(type,btn){
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');
+  renderA(type==='all'?arts:arts.filter(a=>a.type===type));
 }
-
-function renderArticles(list) {
-  const grid = document.getElementById('articlesGrid');
-  if (!list.length) { grid.innerHTML = '<div class="art-empty">No articles found.</div>'; return; }
-  grid.innerHTML = list.map((a, i) => {
-    const d    = a.date ? new Date(a.date).toLocaleDateString('en-GB',{year:'numeric',month:'short',day:'numeric'}) : '';
-    const href = (a.url && a.url !== '#') ? a.url : '#';
-    const tgt  = href !== '#' ? 'target="_blank" rel="noopener"' : '';
-    return `<a class="art-card" href="${href}" ${tgt} style="animation-delay:${i*32}ms">
-      <div class="art-type">${a.type||'Article'}</div>
-      <div class="art-title">${a.title}</div>
-      <div class="art-meta">${d}${a.topic?' · '+a.topic:''}</div>
-    </a>`;
+function renderA(list){
+  const g=document.getElementById('agrid');
+  if(!list.length){g.innerHTML='<div class="aempty">No articles found.</div>';return}
+  g.innerHTML=list.map((a,i)=>{
+    const d=a.date?new Date(a.date).toLocaleDateString('en-GB',{year:'numeric',month:'short',day:'numeric'}):'';
+    const h=(a.url&&a.url!=='#')?a.url:'#';
+    return`<a class="acard" href="${h}"${h!=='#'?' target="_blank" rel="noopener"':''} style="animation-delay:${i*30}ms"><div class="atype">${a.type||'Article'}</div><div class="atitle">${a.title}</div><div class="ameta">${d}${a.topic?' · '+a.topic:''}</div></a>`;
   }).join('');
 }
