@@ -1,39 +1,73 @@
-/* ═══════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════
    MURMUR.RED — script.js
-   ═══════════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════ */
 
-// ─── CONFIG ──────────────────────────────────────
-// TODO: Replace with your Cloudflare Worker URL after deployment
-const WORKER_URL   = 'https://murmur-qbr.YOUR_SUBDOMAIN.workers.dev';
+const WORKER_URL   = 'https://murmur-qbr.YOUR_SUBDOMAIN.workers.dev'; // TODO: set after Cloudflare deploy
 const ARTICLES_URL = 'https://raw.githubusercontent.com/murmur-red/murmur/main/articles.json';
 
-// ─── LOADER ──────────────────────────────────────
-window.addEventListener('load', () => {
-  const loader = document.getElementById('loader');
-  const bar    = document.getElementById('loaderBar');
-  const status = document.getElementById('loaderStatus');
-  const msgs   = ['INITIALIZING...', 'LOADING ASSETS...', 'READY.'];
-  let p = 0;
+// ── Scramble text effect ─────────────────────────────
+function scramble(el, finalText, duration) {
+  const pool = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%·';
+  const len  = finalText.length;
+  const start = performance.now();
 
+  const frame = (now) => {
+    const t = Math.min((now - start) / duration, 1);
+    // how many chars have "resolved" (from left)
+    const resolved = Math.floor(t * len);
+
+    el.textContent = finalText.split('').map((ch, i) => {
+      if (ch === ' ') return ' ';
+      if (i < resolved) return ch;
+      return pool[Math.floor(Math.random() * pool.length)];
+    }).join('');
+
+    if (t < 1) requestAnimationFrame(frame);
+    else el.textContent = finalText;
+  };
+  requestAnimationFrame(frame);
+}
+
+// ── Loader ───────────────────────────────────────────
+window.addEventListener('load', () => {
+  const loader  = document.getElementById('loader');
+  const bar     = document.getElementById('loaderBar');
+  const pct     = document.getElementById('loaderPct');
+  const logoEl  = document.getElementById('loaderLogo');
+
+  // Start scramble immediately
+  logoEl.textContent = '';
+  scramble(logoEl, 'MURMUR.RED', 1400);
+
+  let p = 0;
   const tick = setInterval(() => {
-    p += Math.random() * 22 + 10;
+    p += Math.random() * 18 + 8;
     if (p > 100) p = 100;
-    bar.style.width = p + '%';
-    status.textContent = msgs[Math.min(Math.floor(p / 40), msgs.length - 1)];
+    bar.style.width  = p + '%';
+    pct.textContent  = Math.round(p) + '%';
     if (p >= 100) {
       clearInterval(tick);
+      // flash red → reveal
       setTimeout(() => {
-        loader.classList.add('hidden');
-        initTypewriter();
-        initScrollReveal();
-        initChapterReveal();
-        loadArticles();
-      }, 380);
+        loader.style.transition = 'background .07s';
+        loader.style.background = '#ff2056';
+        setTimeout(() => {
+          loader.style.background = '';
+          loader.classList.add('out');
+          setTimeout(() => {
+            loader.style.display = 'none';
+            initTypewriter();
+            initScrollReveal();
+            initChapters();
+            loadArticles();
+          }, 380);
+        }, 90);
+      }, 420);
     }
-  }, 60);
+  }, 65);
 });
 
-// ─── CUSTOM CURSOR ────────────────────────────────
+// ── Custom cursor ─────────────────────────────────────
 const cursorDot  = document.getElementById('cursorDot');
 const cursorRing = document.getElementById('cursorRing');
 let mx = 0, my = 0, rx = 0, ry = 0;
@@ -43,45 +77,43 @@ document.addEventListener('mousemove', e => {
   cursorDot.style.left = mx + 'px';
   cursorDot.style.top  = my + 'px';
 });
-
-(function animRing() {
+(function loop() {
   rx += (mx - rx) * .12;
   ry += (my - ry) * .12;
   cursorRing.style.left = rx + 'px';
   cursorRing.style.top  = ry + 'px';
-  requestAnimationFrame(animRing);
+  requestAnimationFrame(loop);
 })();
-
-document.querySelectorAll('a, button, input, [onclick]').forEach(el => {
+document.querySelectorAll('a,button,input,[onclick]').forEach(el => {
   el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
   el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
 });
 
-// ─── PARTICLE CANVAS ─────────────────────────────
+// ── Particle canvas ───────────────────────────────────
 const canvas = document.getElementById('bgCanvas');
 const ctx    = canvas.getContext('2d');
-let W, H, particles = [];
+let W, H, pts = [];
 
-function resizeCanvas() {
+function resize() {
   W = canvas.width  = window.innerWidth;
   H = canvas.height = window.innerHeight;
 }
-resizeCanvas();
-window.addEventListener('resize', () => { resizeCanvas(); buildParticles(); });
+resize();
+window.addEventListener('resize', () => { resize(); buildPts(); }, { passive:true });
 
-class Particle {
+class Pt {
   constructor() { this.reset(); }
   reset() {
     this.x  = Math.random() * W;
     this.y  = Math.random() * H;
-    this.vx = (Math.random() - .5) * .28;
-    this.vy = (Math.random() - .5) * .28;
-    this.r  = Math.random() * 1.1 + .3;
-    this.a  = Math.random() * .35 + .05;
+    this.vx = (Math.random() - .5) * .25;
+    this.vy = (Math.random() - .5) * .25;
+    this.r  = Math.random() * 1.0 + .25;
+    this.a  = Math.random() * .3 + .05;
     const r = Math.random();
-    this.c  = r < .12 ? '#ff2056' : r < .26 ? '#38bdf8' : '#ffffff';
+    this.c  = r < .1 ? '#ff2056' : r < .22 ? '#38bdf8' : '#ffffff';
   }
-  update() {
+  step() {
     this.x += this.vx; this.y += this.vy;
     if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
   }
@@ -92,26 +124,24 @@ class Particle {
     ctx.fill();
   }
 }
-
-function buildParticles() {
-  const n = Math.min(Math.floor(W * H / 18000), 90);
-  particles = Array.from({length: n}, () => new Particle());
+function buildPts() {
+  const n = Math.min(Math.floor(W * H / 20000), 80);
+  pts = Array.from({length: n}, () => new Pt());
 }
-buildParticles();
-
-(function renderCanvas() {
+buildPts();
+(function render() {
   ctx.clearRect(0, 0, W, H);
-  particles.forEach(p => { p.update(); p.draw(); });
-  requestAnimationFrame(renderCanvas);
+  pts.forEach(p => { p.step(); p.draw(); });
+  requestAnimationFrame(render);
 })();
 
-// ─── NAVBAR SCROLL ───────────────────────────────
+// ── Nav ───────────────────────────────────────────────
 const mainNav = document.getElementById('mainNav');
 window.addEventListener('scroll', () => {
   mainNav.classList.toggle('scrolled', window.scrollY > 60);
-}, { passive: true });
+}, { passive:true });
 
-// ─── MOBILE NAV ──────────────────────────────────
+// ── Mobile nav ────────────────────────────────────────
 function toggleMobileNav() {
   document.getElementById('mobileNav').classList.toggle('open');
   document.getElementById('mobileOverlay').classList.toggle('open');
@@ -121,7 +151,7 @@ function closeMobileNav() {
   document.getElementById('mobileOverlay').classList.remove('open');
 }
 
-// ─── TYPEWRITER ──────────────────────────────────
+// ── Typewriter ────────────────────────────────────────
 function initTypewriter() {
   const phrases = [
     'AI Customer Lifecycle Expert',
@@ -130,72 +160,67 @@ function initTypewriter() {
     'SaaS Churn Slayer',
   ];
   const el = document.getElementById('typewriter');
-  let pi = 0, ci = 0, deleting = false, waitCycles = 0;
+  let pi = 0, ci = 0, del = false, wait = 0;
 
-  function tick() {
-    if (waitCycles > 0) { waitCycles--; setTimeout(tick, 80); return; }
-    const phrase = phrases[pi];
-    if (!deleting) {
-      el.textContent = phrase.slice(0, ++ci);
-      if (ci === phrase.length) { deleting = true; waitCycles = 24; }
+  (function tick() {
+    if (wait-- > 0) { setTimeout(tick, 80); return; }
+    const p = phrases[pi];
+    if (!del) {
+      el.textContent = p.slice(0, ++ci);
+      if (ci === p.length) { del = true; wait = 24; }
     } else {
-      el.textContent = phrase.slice(0, --ci);
-      if (ci === 0) { deleting = false; pi = (pi + 1) % phrases.length; waitCycles = 5; }
+      el.textContent = p.slice(0, --ci);
+      if (ci === 0) { del = false; pi = (pi + 1) % phrases.length; wait = 5; }
     }
-    setTimeout(tick, deleting ? 42 : 82);
-  }
-  tick();
+    setTimeout(tick, del ? 40 : 80);
+  })();
 }
 
-// ─── SCROLL REVEAL (.reveal elements) ────────────
+// ── Scroll reveal (.reveal) ───────────────────────────
 function initScrollReveal() {
   const obs = new IntersectionObserver(entries => {
     entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-        obs.unobserve(e.target);
-      }
+      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
     });
-  }, { threshold: .15 });
+  }, { threshold: .14 });
   document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 }
 
-// ─── CHAPTER REVEAL ──────────────────────────────
-let churnAnimated = false;
+// ── Chapter reveal ────────────────────────────────────
+let churnDone = false;
 
-function initChapterReveal() {
+function initChapters() {
   const obs = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (!e.isIntersecting) return;
       e.target.classList.add('visible');
-      if (e.target.id === 'chapterReplai' && !churnAnimated) {
-        churnAnimated = true;
-        setTimeout(animateChurn, 500);
+      if (e.target.id === 'chapterReplai' && !churnDone) {
+        churnDone = true;
+        setTimeout(animateChurn, 480);
       }
       obs.unobserve(e.target);
     });
-  }, { threshold: .18 });
+  }, { threshold: .2 });
   document.querySelectorAll('.chapter').forEach(el => obs.observe(el));
 }
 
-// ─── CHURN COUNTER ───────────────────────────────
+// ── Churn counter ─────────────────────────────────────
 function animateChurn() {
-  const el = document.getElementById('churnVal');
-  let val = 30;
-  const target = 4;
-  const steps  = 55;
-  const dec    = (val - target) / steps;
+  const el  = document.getElementById('churnVal');
+  const end = 4;
+  let val   = 30;
+  const steps = 52;
+  const dec   = (val - end) / steps;
   let i = 0;
 
-  const tick = setInterval(() => {
-    val -= dec;
-    i++;
-    if (i >= steps) { val = target; clearInterval(tick); }
+  const t = setInterval(() => {
+    val -= dec; i++;
+    if (i >= steps) { val = end; clearInterval(t); }
     el.textContent = Math.round(val);
   }, 28);
 }
 
-// ─── QBR STREAMING ───────────────────────────────
+// ── QBR streaming ─────────────────────────────────────
 async function runQBR() {
   const account   = document.getElementById('qbrAccount').value.trim()   || 'Demo Company';
   const arr       = document.getElementById('qbrARR').value              || 120000;
@@ -206,67 +231,61 @@ async function runQBR() {
   const status = document.getElementById('qbrStatus');
   const output = document.getElementById('qbrOutput');
 
-  // Check worker is configured
   if (WORKER_URL.includes('YOUR_SUBDOMAIN')) {
     output.classList.add('active');
-    output.innerHTML = '<p style="color:var(--c3)">Worker not configured yet.</p><p style="color:var(--muted);font-size:.82rem;margin-top:.4rem">Deploy worker.js to Cloudflare and update WORKER_URL in script.js to enable live generation.</p>';
+    output.innerHTML = '<p style="color:var(--c3)">Worker not deployed yet.</p><p style="color:var(--muted);font-size:.82rem;margin-top:.4rem">Deploy worker.js to Cloudflare and update WORKER_URL in script.js to enable live generation.</p>';
     return;
   }
 
   btn.disabled = true;
-  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v2M6.5 10v2M1 6.5h2M10 6.5h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Generating…';
+  btn.textContent = 'Generating…';
   status.textContent = '';
   output.classList.add('active');
   output.innerHTML = '<span class="stream-cursor"></span>';
 
   let raw = '';
+  const md = typeof marked.parse === 'function' ? marked.parse : marked;
 
   try {
     const res = await fetch(WORKER_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ account_name: account, arr, health_score: health, challenge })
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({account_name:account, arr, health_score:health, challenge})
     });
-
-    if (!res.ok) throw new Error(`Worker returned ${res.status}: ${await res.text()}`);
+    if (!res.ok) throw new Error(`Worker ${res.status}: ${await res.text()}`);
 
     const reader = res.body.getReader();
     const dec    = new TextDecoder();
-    const md     = typeof marked.parse === 'function' ? marked.parse : marked;
 
     while (true) {
-      const { done, value } = await reader.read();
+      const {done, value} = await reader.read();
       if (done) break;
-
-      const chunk = dec.decode(value, { stream: true });
-      for (const line of chunk.split('\n')) {
+      for (const line of dec.decode(value, {stream:true}).split('\n')) {
         if (!line.startsWith('data: ')) continue;
         const payload = line.slice(6).trim();
         if (payload === '[DONE]') break;
         try {
-          const json  = JSON.parse(payload);
-          const delta = json?.delta?.text ?? (json?.type === 'content_block_delta' ? json?.delta?.text : '');
+          const j     = JSON.parse(payload);
+          const delta = j?.delta?.text ?? '';
           if (delta) {
             raw += delta;
             output.innerHTML = md(raw) + '<span class="stream-cursor"></span>';
           }
-        } catch { /* skip malformed chunks */ }
+        } catch { /* skip bad chunks */ }
       }
     }
-
-    output.innerHTML = (typeof marked.parse === 'function' ? marked.parse : marked)(raw);
+    output.innerHTML = md(raw);
     status.textContent = '✓ Done';
-
   } catch (err) {
     output.innerHTML = `<p style="color:var(--c3)">Error: ${err.message}</p>`;
     status.textContent = 'Failed';
   }
 
   btn.disabled = false;
-  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1.5 6.5h10M6.5 1.5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Generate QBR';
+  btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6h10M6 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Generate QBR';
 }
 
-// ─── ARTICLES ────────────────────────────────────
+// ── Articles ──────────────────────────────────────────
 let allArticles = [];
 
 async function loadArticles() {
@@ -277,14 +296,13 @@ async function loadArticles() {
     allArticles = data.articles || [];
 
     const types = ['All', ...new Set(allArticles.map(a => a.type).filter(Boolean))];
-    const tabs  = document.getElementById('filterTabs');
-    tabs.innerHTML = types.map((t, i) =>
-      `<button class="filter-tab${i === 0 ? ' active' : ''}" onclick="filterArticles('${t === 'All' ? 'all' : t}',this)">${t}</button>`
+    document.getElementById('filterTabs').innerHTML = types.map((t, i) =>
+      `<button class="filter-tab${i===0?' active':''}" onclick="filterArticles('${t==='All'?'all':t}',this)">${t}</button>`
     ).join('');
 
     renderArticles(allArticles);
   } catch {
-    grid.innerHTML = '<div class="articles-empty">Could not load articles.</div>';
+    grid.innerHTML = '<div class="art-empty">Could not load articles.</div>';
   }
 }
 
@@ -296,20 +314,15 @@ function filterArticles(type, btn) {
 
 function renderArticles(list) {
   const grid = document.getElementById('articlesGrid');
-  if (!list.length) {
-    grid.innerHTML = '<div class="articles-empty">No articles found.</div>';
-    return;
-  }
+  if (!list.length) { grid.innerHTML = '<div class="art-empty">No articles found.</div>'; return; }
   grid.innerHTML = list.map((a, i) => {
-    const date = a.date
-      ? new Date(a.date).toLocaleDateString('en-GB', { year:'numeric', month:'short', day:'numeric' })
-      : '';
-    const href = a.url && a.url !== '#' ? a.url : '#';
-    const target = href !== '#' ? 'target="_blank" rel="noopener"' : '';
-    return `<a class="article-card" href="${href}" ${target} style="animation-delay:${i * 35}ms">
-      <div class="article-type">${a.type || 'Article'}</div>
-      <div class="article-title">${a.title}</div>
-      <div class="article-meta">${date}${a.topic ? ' · ' + a.topic : ''}</div>
+    const d    = a.date ? new Date(a.date).toLocaleDateString('en-GB',{year:'numeric',month:'short',day:'numeric'}) : '';
+    const href = (a.url && a.url !== '#') ? a.url : '#';
+    const tgt  = href !== '#' ? 'target="_blank" rel="noopener"' : '';
+    return `<a class="art-card" href="${href}" ${tgt} style="animation-delay:${i*32}ms">
+      <div class="art-type">${a.type||'Article'}</div>
+      <div class="art-title">${a.title}</div>
+      <div class="art-meta">${d}${a.topic?' · '+a.topic:''}</div>
     </a>`;
   }).join('');
 }
