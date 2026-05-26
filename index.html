@@ -88,9 +88,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opa
 /* ═══════════ HERO ═══════════ */
 #hero{
   display:grid;
-  grid-template-columns:1fr min(44vw,560px);
+  grid-template-columns:1fr min(38vw,480px);
   min-height:100dvh;
   position:relative;overflow:hidden;
+  align-items:center;
 }
 
 .htext{
@@ -128,7 +129,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opa
 .bghost{padding:.6rem 1.6rem;border:1px solid var(--line);color:var(--text);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;border-radius:2px;transition:border-color .2s}
 .bghost:hover{border-color:rgba(255,255,255,.3)}
 
-.hphoto{position:relative;align-self:stretch;overflow:hidden}
+.hphoto{position:relative;align-self:stretch;overflow:hidden;max-height:680px}
 .hphoto img{width:100%;height:100%;object-fit:cover;object-position:top center;
   filter:grayscale(18%) contrast(1.08) brightness(.85);display:block}
 .hphoto::after{content:'';position:absolute;inset:0;
@@ -388,9 +389,9 @@ footer a:hover{color:var(--red)}
 
   <!-- LEFT: text -->
   <div class="htext">
-    <div class="hbrow">Amsterdam · AI Customer Lifecycle</div>
+    <div class="hbrow">Amsterdam · AI Customer Lifecycle · Growth &amp; Ops</div>
 
-    <h1 class="hname">LENA<br>RY</h1>
+    <h1 class="hname">LENA RY</h1>
 
     <div class="hrole">
       <span id="tw"></span><span id="cb"></span>
