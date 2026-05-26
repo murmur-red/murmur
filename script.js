@@ -1,6 +1,6 @@
 /* murmur.red — script.js */
 
-const WORKER_URL   = 'https://murmur-qbr.YOUR_SUBDOMAIN.workers.dev';
+const WORKER_URL   = 'https://murmur-qbr.murmur-red1.workers.dev';
 const ARTICLES_URL = 'https://raw.githubusercontent.com/murmur-red/murmur/main/articles.json';
 
 // ── Scramble utility ────────────────────────────────────

@@ -1,6 +1,8 @@
 name = "murmur-qbr"
 main = "worker.js"
 compatibility_date = "2024-01-01"
+account_id = "1d849fd649a986588e46f162c5d4322c"
+workers_dev = true
 
 [vars]
 # ANTHROPIC_KEY is stored as a secret — run:
