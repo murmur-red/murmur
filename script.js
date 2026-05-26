@@ -50,6 +50,7 @@ window.addEventListener('load', () => {
             initTW();
             initReveal();
             initChapters();
+            initStacks();
             loadArticles();
           }, 400);
         }, 90);
@@ -171,6 +172,121 @@ async function runQBR(){
     out.innerHTML=md(raw);st.textContent='✓ Done';
   }catch(err){out.innerHTML=`<p style="color:var(--red)">Error: ${err.message}</p>`;st.textContent='Failed'}
   btn.disabled=false;btn.innerHTML='<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 5.5h9M5.5 1l4.5 4.5L5.5 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Generate QBR';
+}
+
+// ── AI Stacks ────────────────────────────────────────────
+const STACKS={
+  cs:{label:'CS Teams',color:'#38bdf8',
+    recipe:{name:'Churn Early Warning',steps:[
+      {tool:'Mixpanel',action:'usage drop detected'},
+      {tool:'Gainsight',action:'health score updated'},
+      {tool:'Claude',action:'risk email drafted'},
+      {tool:'Salesforce',action:'activity logged'},
+      {tool:'Slack',action:'CSM alerted'}
+    ]},
+    tools:[
+      {name:'Gainsight',cat:'CS Platform',desc:'The gold standard for health scoring, lifecycle automation, and renewal forecasting at scale.',connects:['Salesforce','Slack','Mixpanel','Zendesk']},
+      {name:'ChurnZero',cat:'CS Platform',desc:'Real-time CS automation with in-app messaging, health scores, and playbook triggers.',connects:['HubSpot','Intercom','Segment','Zapier']},
+      {name:'Gong',cat:'Revenue Intel',desc:'Records every customer call. AI surfaces risks, objections, and next steps automatically.',connects:['Salesforce','HubSpot','Slack','Zoom']},
+      {name:'Intercom',cat:'Messaging',desc:'In-app chat, onboarding flows, and AI support in one. Best for PLG and mid-market SaaS.',connects:['Salesforce','Mixpanel','Stripe','Zapier']},
+      {name:'Mixpanel',cat:'Analytics',desc:'Event-based product analytics. Track feature adoption, activation funnels, and leading churn indicators.',connects:['Segment','Salesforce','Gainsight','Slack']},
+      {name:'Claude',cat:'AI',desc:'Write QBRs, EBR decks, risk emails, and success plans in seconds. Best output for long-form CS content.',connects:['Zapier','Make','Notion','Gmail']},
+      {name:'Notion AI',cat:'Knowledge',desc:'CS playbooks, runbooks, and wikis with AI-generated summaries and auto-fill templates.',connects:['Slack','Zapier','Google Drive','Linear']},
+      {name:'Zapier',cat:'Automation',desc:'The connective tissue. Trigger CS workflows across any tool without writing code.',connects:['Gainsight','Mixpanel','Salesforce','Slack']},
+      {name:'Loom',cat:'Async Video',desc:'Record walkthroughs and QBR summaries. AI generates transcripts and shareable chapters.',connects:['Notion','Intercom','Gmail','Slack']},
+      {name:'Salesforce',cat:'CRM',desc:'System of record for accounts, contacts, and renewals. Everything flows in and out of Salesforce.',connects:['Gainsight','Gong','Intercom','Mixpanel']},
+    ]
+  },
+  ops:{label:'Ops & Growth',color:'#a78bfa',
+    recipe:{name:'Outbound Pipeline',steps:[
+      {tool:'Apollo',action:'prospect list built'},
+      {tool:'Clay',action:'data enriched'},
+      {tool:'Claude',action:'emails personalized'},
+      {tool:'Instantly',action:'sequence launched'},
+      {tool:'HubSpot',action:'replies tracked'}
+    ]},
+    tools:[
+      {name:'Clay',cat:'Enrichment',desc:'The most powerful enrichment tool built. Pulls from 75+ sources and runs AI research on every lead.',connects:['Apollo','HubSpot','Salesforce','Instantly']},
+      {name:'Apollo',cat:'Prospecting',desc:'275M+ contacts with email and mobile. Build precise ICP lists and launch sequences directly.',connects:['Clay','HubSpot','Salesforce','LinkedIn']},
+      {name:'Make',cat:'Automation',desc:'Visual automation builder more powerful than Zapier. Handles complex multi-step ops workflows.',connects:['Clay','HubSpot','Slack','Airtable']},
+      {name:'HubSpot',cat:'CRM',desc:'Best-in-class for inbound and mid-market. Marketing, sales, and ops all in one platform.',connects:['Clay','Apollo','Segment','Intercom']},
+      {name:'Segment',cat:'CDP',desc:'Routes customer data from every source to every destination. The data backbone of modern SaaS.',connects:['Mixpanel','Amplitude','Salesforce','Intercom']},
+      {name:'Amplitude',cat:'Analytics',desc:'Product analytics with powerful behavioral cohorts and predictive analytics for retention.',connects:['Segment','Braze','Salesforce','Slack']},
+      {name:'n8n',cat:'Automation',desc:'Self-hosted automation for teams wanting full control. No per-task pricing. Runs complex AI workflows.',connects:['Webhooks','Postgres','Claude','Slack']},
+      {name:'Instantly',cat:'Outreach',desc:'Cold email at scale with AI personalization and inbox rotation. Used by top GTM teams.',connects:['Clay','Apollo','HubSpot','Slack']},
+      {name:'Clearbit',cat:'Enrichment',desc:'Real-time B2B data enrichment on website visitors and form fills. Now part of HubSpot.',connects:['HubSpot','Salesforce','Segment','Marketo']},
+      {name:'Hotjar',cat:'Analytics',desc:'Session recordings, heatmaps, and feedback widgets. Understand exactly why users drop off.',connects:['Google Analytics','Segment','Slack','Jira']},
+    ]
+  },
+  creative:{label:'Creative',color:'#ff2056',
+    recipe:{name:'Ad Creative Pipeline',steps:[
+      {tool:'Midjourney',action:'concepts generated'},
+      {tool:'Runway',action:'video animated'},
+      {tool:'ElevenLabs',action:'voiceover added'},
+      {tool:'CapCut',action:'final edit'},
+      {tool:'Meta Ads',action:'A/B launched'}
+    ]},
+    tools:[
+      {name:'Midjourney',cat:'Image AI',desc:'Best aesthetic quality for ad creatives, game art, and brand visuals. Prompt → stunning image in seconds.',connects:['Runway','Figma','Canva','Adobe']},
+      {name:'Runway',cat:'Video AI',desc:'Gen-3 Alpha turns images or text into cinematic video clips. Used by real studios and ad agencies.',connects:['Midjourney','ElevenLabs','CapCut','Adobe Premiere']},
+      {name:'ElevenLabs',cat:'Audio AI',desc:'Hyper-realistic AI voices in 30+ languages. Clone your own voice or pick from 1000+ presets.',connects:['Runway','CapCut','Descript','Pika']},
+      {name:'Pika',cat:'Video AI',desc:'Fast video generation for mobile-first content, game trailers, and social ads.',connects:['ElevenLabs','CapCut','Midjourney','Canva']},
+      {name:'Spline',cat:'3D Design',desc:'Browser-based 3D design and animation. Build interactive 3D elements for web — no Three.js needed.',connects:['Webflow','Framer','React','Figma']},
+      {name:'Adobe Firefly',cat:'Image AI',desc:'Commercially safe AI image generation inside Photoshop and Illustrator. IP-indemnified.',connects:['Adobe Premiere','Figma','Frame.io','Midjourney']},
+      {name:'CapCut',cat:'Video Edit',desc:'AI-powered editing with auto-captions, background removal, beat sync, and viral templates.',connects:['Runway','ElevenLabs','Pika','TikTok']},
+      {name:'Krea',cat:'Image AI',desc:'Real-time AI image generation and enhancement. Flux-based, excellent for brand consistency.',connects:['Midjourney','Figma','Canva','Webflow']},
+      {name:'Figma AI',cat:'Design',desc:'The design standard. AI auto-fills layouts, generates copy, and turns designs into code.',connects:['Webflow','Framer','GitHub','Zeplin']},
+      {name:'Canva AI',cat:'Design',desc:'Fastest path from idea to polished creative. Magic Studio handles resizing, translation, and remixing.',connects:['Midjourney','Meta Ads','HubSpot','Slack']},
+    ]
+  },
+  web:{label:'Build a Website',color:'#34d399',
+    recipe:{name:'Ship a Landing Page',steps:[
+      {tool:'Figma',action:'design mocked'},
+      {tool:'v0',action:'code generated'},
+      {tool:'Cursor',action:'refined with AI'},
+      {tool:'Cloudflare',action:'worker deployed'},
+      {tool:'GitHub',action:'live on push'}
+    ]},
+    tools:[
+      {name:'Cursor',cat:'AI Coding',desc:'The best AI code editor. Knows your entire codebase context. Tab-complete entire features, not just lines.',connects:['GitHub','Vercel','Supabase','Cloudflare']},
+      {name:'v0',cat:'UI Gen',desc:"Vercel's UI generator. Describe a component → get production React/Tailwind code instantly.",connects:['Cursor','GitHub','Vercel','Figma']},
+      {name:'Framer',cat:'No-Code',desc:'The best no-code tool for beautiful marketing sites. CMS, animations, and AI layout built in.',connects:['Figma','HubSpot','Calendly','Lottie']},
+      {name:'Figma',cat:'Design',desc:'Design your site here first. Dev Mode exports exact CSS. Plugins generate real code from frames.',connects:['Cursor','Framer','Webflow','v0']},
+      {name:'Cloudflare',cat:'Infrastructure',desc:'Workers for serverless functions, Pages for hosting, R2 for storage. Fast, cheap, global edge.',connects:['GitHub','Supabase','Stripe','Resend']},
+      {name:'Vercel',cat:'Hosting',desc:'Deploy any frontend in seconds. Git push → live URL. Best DX in the industry, free tier is generous.',connects:['GitHub','Supabase','Cloudflare','Next.js']},
+      {name:'Supabase',cat:'Database',desc:'Postgres + auth + storage + realtime — all with a great dashboard. Open source Firebase alternative.',connects:['Vercel','Cloudflare','Next.js','Cursor']},
+      {name:'Webflow',cat:'No-Code',desc:'Most powerful no-code builder. Full CSS control, CMS, and ecommerce. High ceiling, steep learning curve.',connects:['Figma','Zapier','HubSpot','Lottie']},
+      {name:'Resend',cat:'Email',desc:'Modern email API. Send transactional emails from your domain with React templates.',connects:['Vercel','Supabase','Cloudflare','GitHub']},
+      {name:'GitHub',cat:'Version Control',desc:'Every project lives here. Actions for CI/CD, Pages for free hosting, Copilot for AI code completion.',connects:['Vercel','Cloudflare','Cursor','Linear']},
+    ]
+  }
+};
+
+let activeStack='cs';
+function initStacks(){switchStack('cs',document.querySelector('.stab'))}
+function switchStack(key,btn){
+  activeStack=key;
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+  const s=STACKS[key];
+  document.getElementById('stacks').style.setProperty('--scolor',s.color);
+  document.getElementById('srlabel').textContent=s.recipe.name;
+  const rc=document.getElementById('srecipe');
+  rc.innerHTML=s.recipe.steps.map((step,i)=>`
+    <div class="sritem"><div class="srtool">${step.tool}</div><div class="sraction">${step.action}</div></div>
+    ${i<s.recipe.steps.length-1?'<span class="srarr">→</span>':''}
+  `).join('');
+  const g=document.getElementById('sgrid');
+  g.innerHTML=s.tools.map((t,i)=>`
+    <div class="stcard" style="animation-delay:${i*20}ms">
+      <div class="stcard-top">
+        <div class="stcard-name">${t.name}</div>
+        <div class="stcard-cat">${t.cat}</div>
+      </div>
+      <div class="stcard-desc">${t.desc}</div>
+      <div class="stcard-conn">${t.connects.map(c=>`<span class="stconn">${c}</span>`).join('')}</div>
+    </div>
+  `).join('');
 }
 
 // ── Articles ─────────────────────────────────────────────
