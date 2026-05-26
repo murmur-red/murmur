@@ -87,32 +87,39 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opa
 
 /* ═══════════ HERO ═══════════ */
 #hero{
-  display:grid;
-  grid-template-columns:1fr min(38vw,480px);
-  min-height:100dvh;
-  position:relative;overflow:hidden;
-  align-items:center;
+  position:relative;min-height:100dvh;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:flex-end;
 }
 
+.hphoto{position:absolute;inset:0;z-index:0}
+.hphoto img{width:100%;height:100%;object-fit:cover;object-position:center 15%;
+  filter:grayscale(22%) contrast(1.06) brightness(.6);display:block}
+.hphoto::after{content:'';position:absolute;inset:0;
+  background:
+    linear-gradient(to right,var(--bg) 0%,rgba(5,5,9,.92) 28%,rgba(5,5,9,.55) 58%,rgba(5,5,9,.08) 100%),
+    linear-gradient(to top,var(--bg) 0%,rgba(5,5,9,.8) 22%,transparent 55%),
+    linear-gradient(to bottom,rgba(5,5,9,.55) 0%,transparent 18%)}
+.hphoto::before{content:'';position:absolute;inset:0;background:rgba(255,32,86,.04);z-index:1}
+
 .htext{
-  display:flex;flex-direction:column;justify-content:center;
-  padding:6rem var(--pad) 4rem;
   position:relative;z-index:1;
+  max-width:var(--max);margin:0 auto;width:100%;
+  padding:0 var(--pad) 5rem;
+  display:flex;flex-direction:column;
 }
 .hbrow{font-size:.62rem;letter-spacing:.26em;text-transform:uppercase;
-  color:var(--red);margin-bottom:1.2rem;
+  color:var(--red);margin-bottom:1.4rem;
   display:flex;align-items:center;gap:.55rem}
 .hbrow::before{content:'';display:block;width:1.4rem;height:1px;background:var(--red)}
 
-/* THE ONE big thing on the page */
 .hname{
   font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(3.5rem,7vw,6rem);
-  line-height:.9;letter-spacing:.02em;
-  margin-bottom:1.2rem;
+  font-size:clamp(4rem,8vw,7.5rem);
+  line-height:.88;letter-spacing:.02em;
+  margin-bottom:1rem;
 }
 
-.hrole{font-size:.92rem;color:var(--dim);min-height:1.5rem;margin-bottom:2rem}
+.hrole{font-size:.92rem;color:var(--dim);min-height:1.5rem;margin-bottom:2.2rem}
 .hrole #tw{color:var(--text)}
 #cb{display:inline-block;width:2px;height:.85em;background:var(--red);margin-left:2px;vertical-align:middle;animation:blink .9s step-end infinite}
 @keyframes blink{50%{opacity:0}}
@@ -129,26 +136,13 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opa
 .bghost{padding:.6rem 1.6rem;border:1px solid var(--line);color:var(--text);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;border-radius:2px;transition:border-color .2s}
 .bghost:hover{border-color:rgba(255,255,255,.3)}
 
-.hphoto{position:relative;align-self:stretch;overflow:hidden;max-height:680px}
-.hphoto img{width:100%;height:100%;object-fit:cover;object-position:top center;
-  filter:grayscale(18%) contrast(1.08) brightness(.85);display:block}
-.hphoto::after{content:'';position:absolute;inset:0;
-  background:
-    linear-gradient(to right,var(--bg) 0%,rgba(5,5,9,.75) 22%,rgba(5,5,9,.15) 55%,transparent 100%),
-    linear-gradient(to top,var(--bg) 0%,rgba(5,5,9,.5) 16%,transparent 40%),
-    linear-gradient(to bottom,rgba(5,5,9,.3) 0%,transparent 14%)}
-.hphoto::before{content:'';position:absolute;inset:0;background:rgba(255,32,86,.06);z-index:1}
-
 .scrl{position:absolute;bottom:2rem;left:var(--pad);display:flex;align-items:center;gap:.5rem;
   font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);
   animation:bob 2.5s ease-in-out infinite;z-index:2}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
 
 @media(max-width:740px){
-  #hero{grid-template-columns:1fr;grid-template-rows:auto 1fr}
-  .hphoto{grid-row:1;height:50vw;min-height:200px;max-height:380px;align-self:auto}
-  .hphoto::after{background:linear-gradient(to bottom,transparent 30%,var(--bg) 100%),linear-gradient(to right,var(--bg) 0%,transparent 35%)}
-  .htext{grid-row:2;padding:2rem var(--pad) 4rem}
+  .hname{font-size:clamp(3.2rem,12vw,5rem)}
   .hstats{width:100%}
   .hstat{flex:1;padding:.5rem .7rem}
 }
