@@ -49,7 +49,6 @@ window.addEventListener('load', () => {
             loader.style.display = 'none';
             initTW();
             initReveal();
-            initChapters();
             initStacks();
             loadArticles();
           }, 400);
@@ -100,6 +99,18 @@ function toggleNav(){document.getElementById('mnav').classList.toggle('on');docu
 function closeNav(){document.getElementById('mnav').classList.remove('on');document.getElementById('mov').classList.remove('on')}
 
 // ── Typewriter ──────────────────────────────────────────
+function triggerUnicorn(){
+  const u=document.getElementById('unicorn');
+  const tw=document.getElementById('tw');
+  const rect=tw.getBoundingClientRect();
+  u.style.top=(rect.top+rect.height/2-37)+'px';
+  u.style.left='-120px';
+  u.classList.remove('run');
+  void u.offsetWidth;
+  u.classList.add('run');
+  u.addEventListener('animationend',()=>u.classList.remove('run'),{once:true});
+}
+
 function initTW(){
   const phrases=['AI Customer Lifecycle Expert','Growth & Operations Expert','Head of Customer Success','Co-Founder @ YGames','SaaS Churn Slayer','Unicorn'];
   const el=document.getElementById('tw');
@@ -107,7 +118,10 @@ function initTW(){
   (function tick(){
     if(w-->0){setTimeout(tick,80);return}
     const p=phrases[pi];
-    if(!del){el.textContent=p.slice(0,++ci);if(ci===p.length){del=true;w=22}}
+    if(!del){
+      el.textContent=p.slice(0,++ci);
+      if(ci===p.length){del=true;w=22;if(p==='Unicorn')triggerUnicorn()}
+    }
     else{el.textContent=p.slice(0,--ci);if(ci===0){del=false;pi=(pi+1)%phrases.length;w=4}}
     setTimeout(tick,del?40:78);
   })();
@@ -119,26 +133,6 @@ function initReveal(){
   document.querySelectorAll('.rev').forEach(el=>ob.observe(el));
 }
 
-// ── Chapters ─────────────────────────────────────────────
-let churnDone=false;
-function initChapters(){
-  const ob=new IntersectionObserver(es=>{
-    es.forEach(e=>{
-      if(!e.isIntersecting)return;
-      e.target.classList.add('vis');
-      if(e.target.id==='chreplai'&&!churnDone){churnDone=true;setTimeout(animChurn,500)}
-      ob.unobserve(e.target);
-    });
-  },{threshold:.18});
-  document.querySelectorAll('.ch').forEach(el=>ob.observe(el));
-}
-
-// ── Churn counter ────────────────────────────────────────
-function animChurn(){
-  const el=document.getElementById('cv');
-  let v=30,i=0;const steps=55,dec=26/steps;
-  const t=setInterval(()=>{v-=dec;i++;if(i>=steps){v=4;clearInterval(t)}el.textContent=Math.round(v)},26);
-}
 
 // ── QBR ──────────────────────────────────────────────────
 async function runQBR(){

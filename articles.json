@@ -2,24 +2,6 @@
   "updated": "2026-05-19",
   "articles": [
     {
-      "id": "36487c28-6213-81bc-9b10-c28acd970ede",
-      "title": "UA Digest \u2014 Week of 2026-05-11",
-      "type": "UA Digest",
-      "topic": "AI in mobile gaming user acquisition and ad tech",
-      "date": "2026-05-18",
-      "status": "Published",
-      "url": "https://www.notion.so/UA-Digest-Week-of-2026-05-11-36487c28621381bc9b10c28acd970ede"
-    },
-    {
-      "id": "36487c28-6213-8124-b58b-d370242bd97b",
-      "title": "AI Agents Digest \u2014 Week of 2026-05-11",
-      "type": "AI Agents Digest",
-      "topic": "AI agents, agentic workflows, and prompt engineering",
-      "date": "2026-05-18",
-      "status": "Published",
-      "url": "https://www.notion.so/AI-Agents-Digest-Week-of-2026-05-11-36487c2862138124b58bd370242bd97b"
-    },
-    {
       "id": "35f87c28-6213-815a-999d-cbde90ff2369",
       "title": "The $20 Subscription That's Disrupting the $200K Enterprise Deal",
       "type": "Article",
@@ -27,78 +9,6 @@
       "date": "2026-05-13",
       "status": "Published",
       "url": "https://www.notion.so/The-20-Subscription-That-s-Disrupting-the-200K-Enterprise-Deal-35f87c286213815a999dcbde90ff2369"
-    },
-    {
-      "id": "35d87c28-6213-81cc-babf-ceb6cdb97ecd",
-      "title": "AI Agents Digest \u2014 Week of 2026-05-04",
-      "type": "AI Agents Digest",
-      "topic": "AI agents, agentic workflows, and prompt engineering",
-      "date": "2026-05-11",
-      "status": "Published",
-      "url": "https://www.notion.so/AI-Agents-Digest-Week-of-2026-05-04-35d87c28621381ccbabfceb6cdb97ecd"
-    },
-    {
-      "id": "35d87c28-6213-81b4-b6bf-f3a3f88c32fe",
-      "title": "UA Digest \u2014 Week of 2026-05-04",
-      "type": "UA Digest",
-      "topic": "AI in mobile gaming user acquisition and ad tech",
-      "date": "2026-05-11",
-      "status": "Published",
-      "url": "https://www.notion.so/UA-Digest-Week-of-2026-05-04-35d87c28621381b4b6bff3a3f88c32fe"
-    },
-    {
-      "id": "35d87c28-6213-8180-b0a4-cad01c0690f8",
-      "title": "AI Agents Digest \u2014 Week of 2026-05-08",
-      "type": "AI Agents Digest",
-      "topic": "AI agents, agentic workflows, and prompt engineering",
-      "date": "2026-05-08",
-      "status": "LinkedIn Posted",
-      "url": "https://www.notion.so/AI-Agents-Digest-Week-of-2026-05-08-35d87c2862138180b0a4cad01c0690f8"
-    },
-    {
-      "id": "35d87c28-6213-81ef-8965-c52078bed64b",
-      "title": "UA Digest \u2014 Week of 2026-05-08",
-      "type": "UA Digest",
-      "topic": "AI in mobile gaming user acquisition and ad tech",
-      "date": "2026-05-08",
-      "status": "LinkedIn Posted",
-      "url": "https://www.notion.so/UA-Digest-Week-of-2026-05-08-35d87c28621381ef8965c52078bed64b"
-    },
-    {
-      "id": "35a87c28-6213-8155-881f-fedbb31b4b65",
-      "title": "AI Agents Digest \u2014 Week of 2026-05-01",
-      "type": "AI Agents Digest",
-      "topic": "AI agents, agentic workflows, and prompt engineering",
-      "date": "2026-05-08",
-      "status": "Published",
-      "url": "https://www.notion.so/AI-Agents-Digest-Week-of-2026-05-01-35a87c2862138155881ffedbb31b4b65"
-    },
-    {
-      "id": "35a87c28-6213-81c4-a79c-fb2119b6b547",
-      "title": "UA Digest \u2014 Week of 2026-05-01",
-      "type": "UA Digest",
-      "topic": "AI in mobile gaming user acquisition and ad tech",
-      "date": "2026-05-08",
-      "status": "Published",
-      "url": "https://www.notion.so/UA-Digest-Week-of-2026-05-01-35a87c28621381c4a79cfb2119b6b547"
-    },
-    {
-      "id": "35087c28-6213-815a-b727-db15bcf735a5",
-      "title": "UA Digest \u2014 Week of 2026-04-21",
-      "type": "UA Digest",
-      "topic": "AI in mobile gaming user acquisition and ad tech",
-      "date": "2026-04-28",
-      "status": "Published",
-      "url": "https://www.notion.so/UA-Digest-Week-of-2026-04-21-35087c286213815ab727db15bcf735a5"
-    },
-    {
-      "id": "34987c28-6213-8138-a330-d83623345316",
-      "title": "UA Digest \u2014 Week of 2026-04-14",
-      "type": "UA Digest",
-      "topic": "AI in mobile gaming user acquisition and ad tech",
-      "date": "2026-04-21",
-      "status": "Published",
-      "url": "https://www.notion.so/UA-Digest-Week-of-2026-04-14-34987c2862138138a330d83623345316"
     }
   ]
 }
