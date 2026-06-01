@@ -51,6 +51,7 @@ window.addEventListener('load', () => {
             initReveal();
             initStacks();
             loadArticles();
+            loadAccountsQBR();
           }, 400);
         }, 90);
       }, 440);
@@ -135,37 +136,157 @@ function initReveal(){
 
 
 // ── QBR ──────────────────────────────────────────────────
-async function runQBR(){
-  const acct=document.getElementById('qa').value.trim()||'Demo Company';
-  const arr =document.getElementById('qr').value||120000;
-  const hlth=document.getElementById('qh').value||72;
-  const chlg=document.getElementById('qc').value.trim()||'Improving product adoption';
-  const btn=document.getElementById('qbtn'),st=document.getElementById('qst'),out=document.getElementById('qout');
+let _accounts = [];
+let _qbrMarkdown = '';
 
-  if(WORKER_URL.includes('YOUR_SUBDOMAIN')){
-    out.classList.add('on');
-    out.innerHTML='<p style="color:var(--red)">Worker not deployed yet.</p><p style="color:var(--dim);font-size:.8rem;margin-top:.4rem">Deploy worker.js to Cloudflare and update WORKER_URL in script.js.</p>';
+async function loadAccountsQBR() {
+  const sel = document.getElementById('qacc');
+  const st  = document.getElementById('qsrc-status');
+  if (!sel) return;
+  try {
+    if (st) st.textContent = 'Loading…';
+    const res = await fetch(WORKER_URL);
+    if (!res.ok) throw new Error();
+    _accounts = await res.json();
+    sel.innerHTML = '<option value="">— select account or fill manually —</option>' +
+      _accounts.map((a, i) =>
+        `<option value="${i}">${a.account_name} · ${a.industry} · $${Number(a.arr||0).toLocaleString()} · Health ${a.health_score}</option>`
+      ).join('');
+    if (st) { st.textContent = `${_accounts.length} accounts loaded`; setTimeout(() => { st.textContent = ''; }, 3000); }
+  } catch {
+    if (st) st.textContent = 'Could not load accounts';
+  }
+}
+
+async function syncAccounts() { await loadAccountsQBR(); }
+
+function selectAccount(idx) {
+  if (idx === '') return;
+  const a = _accounts[parseInt(idx)];
+  if (!a) return;
+  document.getElementById('qa').value         = a.account_name   || '';
+  document.getElementById('qindustry').value  = a.industry       || '';
+  document.getElementById('qr').value         = a.arr            || '';
+  document.getElementById('qh').value         = a.health_score   || '';
+  document.getElementById('qrenew').value     = a.renewal_date   || '';
+  document.getElementById('qcsm').value       = a.csm            || '';
+  document.getElementById('qseats_lic').value = a.seats_licensed || '';
+  document.getElementById('qseats_act').value = a.seats_active   || '';
+  document.getElementById('qnps').value       = a.nps            || '';
+  document.getElementById('qtickets').value   = a.open_tickets   || '';
+  document.getElementById('qc').value         = a.key_challenge  || '';
+  document.getElementById('qnotes').value     = a.notes          || '';
+}
+
+function toggleTranscript() {
+  const body = document.getElementById('qtrans-body');
+  const icon = document.querySelector('.qtrans-icon');
+  const open = body.style.display === 'block';
+  body.style.display = open ? 'none' : 'block';
+  if (icon) icon.textContent = open ? '+' : '−';
+}
+
+async function runQBR() {
+  const btn     = document.getElementById('qbtn');
+  const st      = document.getElementById('qst');
+  const outWrap = document.getElementById('qout-wrap');
+  const out     = document.getElementById('qout');
+  const tabBar  = document.getElementById('qtabs');
+
+  if (WORKER_URL.includes('YOUR_SUBDOMAIN')) {
+    outWrap.style.display = 'block';
+    out.innerHTML = '<div class="qloading" style="color:var(--red)">Worker not deployed yet.</div>';
     return;
   }
-  btn.disabled=true;btn.textContent='Generating…';st.textContent='';
-  out.classList.add('on');out.innerHTML='<span class="scur"></span>';
-  let raw='';
-  const md=typeof marked.parse==='function'?marked.parse:marked;
-  try{
-    const res=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({account_name:acct,arr,health_score:hlth,challenge:chlg})});
-    if(!res.ok)throw new Error(`${res.status}`);
-    const reader=res.body.getReader(),dec=new TextDecoder();
-    while(true){
-      const{done,value}=await reader.read();if(done)break;
-      for(const line of dec.decode(value,{stream:true}).split('\n')){
-        if(!line.startsWith('data: '))continue;
-        const pl=line.slice(6).trim();if(pl==='[DONE]')break;
-        try{const j=JSON.parse(pl);const d=j?.delta?.text??'';if(d){raw+=d;out.innerHTML=md(raw)+'<span class="scur"></span>'}}catch{}
+
+  btn.disabled = true; btn.textContent = 'Generating…'; st.textContent = '';
+  outWrap.style.display = 'block';
+  tabBar.innerHTML = '';
+  out.innerHTML = '<div class="qloading">Generating QBR<span class="scur"></span></div>';
+  _qbrMarkdown = '';
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        account_name:   document.getElementById('qa').value.trim()          || 'Demo Company',
+        industry:       document.getElementById('qindustry').value.trim()   || 'SaaS',
+        arr:            document.getElementById('qr').value                 || 120000,
+        health_score:   document.getElementById('qh').value                 || 72,
+        renewal_date:   document.getElementById('qrenew').value             || '',
+        csm:            document.getElementById('qcsm').value.trim()        || 'CSM',
+        seats_licensed: document.getElementById('qseats_lic').value         || 100,
+        seats_active:   document.getElementById('qseats_act').value         || 70,
+        nps:            document.getElementById('qnps').value               || 45,
+        open_tickets:   document.getElementById('qtickets').value           || 3,
+        challenge:      document.getElementById('qc').value.trim()          || 'Improving product adoption',
+        notes:          document.getElementById('qnotes').value.trim()      || '',
+        transcript:     document.getElementById('qtranscript').value.trim() || '',
+      })
+    });
+    if (!res.ok) throw new Error(`${res.status}`);
+    const reader = res.body.getReader(), dec = new TextDecoder();
+    while (true) {
+      const { done, value } = await reader.read(); if (done) break;
+      for (const line of dec.decode(value, { stream: true }).split('\n')) {
+        if (!line.startsWith('data: ')) continue;
+        const pl = line.slice(6).trim(); if (pl === '[DONE]') break;
+        try { const j = JSON.parse(pl); const d = j?.delta?.text ?? ''; if (d) _qbrMarkdown += d; } catch {}
       }
     }
-    out.innerHTML=md(raw);st.textContent='✓ Done';
-  }catch(err){out.innerHTML=`<p style="color:var(--red)">Error: ${err.message}</p>`;st.textContent='Failed'}
-  btn.disabled=false;btn.innerHTML='<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 5.5h9M5.5 1l4.5 4.5L5.5 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Generate QBR';
+    renderQBRTabs(_qbrMarkdown);
+    st.textContent = '✓ Done';
+  } catch (err) {
+    out.innerHTML = `<div class="qloading" style="color:var(--red)">Error: ${err.message}</div>`;
+    st.textContent = 'Failed';
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 5.5h9M5.5 1l4.5 4.5L5.5 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Generate QBR';
+}
+
+function renderQBRTabs(markdown) {
+  const md    = typeof marked.parse === 'function' ? marked.parse : marked;
+  const parts = markdown.split(/\n(?=## )/);
+  const sections = parts.map(p => {
+    const m = p.match(/^## (.+)\n([\s\S]*)/);
+    return m ? { title: m[1].trim(), content: m[2].trim() } : null;
+  }).filter(Boolean);
+
+  const tabBar = document.getElementById('qtabs');
+  const out    = document.getElementById('qout');
+
+  if (!sections.length) { out.innerHTML = `<div class="qtab-panel on">${md(markdown)}</div>`; return; }
+
+  tabBar.innerHTML = sections.map((s, i) =>
+    `<button class="qtab${i === 0 ? ' on' : ''}" onclick="showQBRTab(${i})">${s.title}</button>`
+  ).join('');
+  out.innerHTML = sections.map((s, i) =>
+    `<div class="qtab-panel${i === 0 ? ' on' : ''}" data-tab="${i}">${md(s.content)}</div>`
+  ).join('');
+}
+
+function showQBRTab(idx) {
+  document.querySelectorAll('.qtab').forEach((t, i)       => t.classList.toggle('on', i === idx));
+  document.querySelectorAll('.qtab-panel').forEach((p, i) => p.classList.toggle('on', i === idx));
+}
+
+function copyQBR() {
+  navigator.clipboard.writeText(_qbrMarkdown).then(() => {
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 1800);
+  });
+}
+
+function downloadQBR() {
+  const name = document.getElementById('qa').value.trim() || 'QBR';
+  const blob = new Blob([_qbrMarkdown], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${name.replace(/\s+/g, '-')}-QBR.txt`;
+  a.click();
 }
 
 // ── AI Stacks ────────────────────────────────────────────
