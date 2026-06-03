@@ -1,6 +1,15 @@
 {
-  "updated": "2026-05-19",
+  "updated": "2026-06-03",
   "articles": [
+    {
+      "id": "4aa2c9bf-4f5c-4258-8e39-03a49f4a3221",
+      "title": "The Internet Forgets Everything, Including Yesterday",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-06-03",
+      "status": "Published",
+      "url": "https://murmur-red.github.io/blog/tech/2026/06/03/the-internet-forgets-everything-including-yesterda.html"
+    },
     {
       "id": "35f87c28-6213-815a-999d-cbde90ff2369",
       "title": "The $20 Subscription That's Disrupting the $200K Enterprise Deal",
