@@ -1,6 +1,15 @@
 {
-  "updated": "2026-06-03",
+  "updated": "2026-06-05",
   "articles": [
+    {
+      "id": "db381641-b1f9-470a-99a8-00cd414f3cbc",
+      "title": "Down Syndrome Trended for 23 Hours and Nobody Can Tell You Why",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-06-05",
+      "status": "Published",
+      "url": "https://murmur-red.github.io/blog/tech/2026/06/05/down-syndrome-trended-for-23-hours-and-nobody-can.html"
+    },
     {
       "id": "4aa2c9bf-4f5c-4258-8e39-03a49f4a3221",
       "title": "The Internet Forgets Everything, Including Yesterday",
