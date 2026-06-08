@@ -24,6 +24,64 @@ function parseCSV(csv) {
   });
 }
 
+async function fetchPerplexity(company, apiKey) {
+  const res = await fetch('https://api.perplexity.ai/chat/completions', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'sonar',
+      messages: [{
+        role: 'user',
+        content: `Research "${company}" and return a JSON object with these fields:
+- funding: latest funding round or investment news (string, or null)
+- acquisitions: any recent acquisitions or mergers (string, or null)
+- new_hires: notable senior hires or leadership changes in the past 6 months (string, or null)
+- news: 2-3 most important recent company news items (string)
+- strategy: current strategic priorities or product direction (string)
+- headcount: approximate company size or recent headcount change (string, or null)
+Return ONLY valid JSON. No markdown, no explanation.`
+      }],
+      max_tokens: 600,
+    })
+  });
+  if (!res.ok) throw new Error('Perplexity error: ' + res.status);
+  const data = await res.json();
+  const raw = data.choices?.[0]?.message?.content?.trim() || '{}';
+  try {
+    return JSON.parse(raw.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,''));
+  } catch {
+    return { news: raw.slice(0, 400) };
+  }
+}
+
+async function fetchGrok(company, apiKey) {
+  const res = await fetch('https://api.x.ai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'grok-3',
+      messages: [{
+        role: 'user',
+        content: `Search X/Twitter for recent posts about "${company}". Return a JSON object with:
+- sentiment: overall sentiment on X right now (positive/neutral/negative + 1 sentence)
+- trending_topics: what people are talking about regarding this company (string)
+- complaints: any recurring complaints or concerns being discussed (string, or null)
+- praise: what the market is praising about them (string, or null)
+Return ONLY valid JSON. No markdown, no explanation.`
+      }],
+      max_tokens: 400,
+    })
+  });
+  if (!res.ok) throw new Error('Grok error: ' + res.status);
+  const data = await res.json();
+  const raw = data.choices?.[0]?.message?.content?.trim() || '{}';
+  try {
+    return JSON.parse(raw.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,''));
+  } catch {
+    return { sentiment: raw.slice(0, 300) };
+  }
+}
+
 export default {
   async fetch(request, env) {
     const cors = {
@@ -34,7 +92,9 @@ export default {
 
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
 
-    // GET → return accounts (from Google Sheets if SHEET_ID set, else embedded)
+    const url = new URL(request.url);
+
+    // GET → return accounts
     if (request.method === 'GET') {
       let accounts = ACCOUNTS;
       if (env.SHEET_ID) {
@@ -57,20 +117,61 @@ export default {
     try { body = await request.json(); }
     catch { return new Response('Invalid JSON', { status: 400, headers: cors }); }
 
+    // POST /research → parallel Perplexity + Grok lookup
+    if (url.pathname === '/research') {
+      const company = (body.company || '').trim();
+      if (!company) return new Response(JSON.stringify({ error: 'No company name' }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } });
+
+      const [perplexity, grok] = await Promise.allSettled([
+        env.PERPLEXITY_KEY ? fetchPerplexity(company, env.PERPLEXITY_KEY) : Promise.resolve(null),
+        env.GROK_API_KEY   ? fetchGrok(company, env.GROK_API_KEY)         : Promise.resolve(null),
+      ]);
+
+      return new Response(JSON.stringify({
+        company,
+        perplexity: perplexity.status === 'fulfilled' ? perplexity.value : null,
+        grok:       grok.status === 'fulfilled'       ? grok.value       : null,
+      }), { headers: { ...cors, 'Content-Type': 'application/json' } });
+    }
+
+    // POST / → generate QBR with optional research context
     const {
       account_name = 'Demo Company', industry = 'SaaS',
       arr = 120000, health_score = 72,
       renewal_date = '', seats_licensed = 100, seats_active = 70,
       nps = 45, open_tickets = 3, csm = 'CSM',
       challenge = 'Improving product adoption',
-      transcript = '', notes = ''
+      transcript = '', notes = '',
+      research = null,
     } = body;
 
     const usage = seats_licensed > 0 ? Math.round(seats_active / seats_licensed * 100) : 0;
     const days = renewal_date ? Math.round((new Date(renewal_date) - new Date()) / 86400000) : null;
     const renewalStr = renewal_date ? `${renewal_date} (${days} days away)` : 'Not set';
 
-    const prompt = `You are a senior Customer Success analyst preparing a board-ready QBR.
+    let researchBlock = '';
+    if (research) {
+      const p = research.perplexity || {};
+      const g = research.grok || {};
+      researchBlock = `
+
+LIVE COMPANY INTELLIGENCE (sourced from Perplexity + X/Twitter — treat as context, not verified fact):
+Company researched: ${research.company || account_name}
+${p.funding        ? `• Funding/Investment: ${p.funding}` : ''}
+${p.acquisitions   ? `• Acquisitions/M&A: ${p.acquisitions}` : ''}
+${p.new_hires      ? `• Leadership/Hiring: ${p.new_hires}` : ''}
+${p.headcount      ? `• Team Size: ${p.headcount}` : ''}
+${p.news           ? `• Recent News: ${p.news}` : ''}
+${p.strategy       ? `• Strategic Direction: ${p.strategy}` : ''}
+${g.sentiment      ? `• X/Twitter Sentiment: ${g.sentiment}` : ''}
+${g.trending_topics ? `• What People Are Saying: ${g.trending_topics}` : ''}
+${g.complaints     ? `• Market Complaints: ${g.complaints}` : ''}
+${g.praise         ? `• Market Praise: ${g.praise}` : ''}`.replace(/\n\n+/g, '\n').trim();
+    }
+
+    const prompt = `You are a senior Customer Success analyst at murmur.red — an AI Customer Lifecycle consultancy run by Lena Ry, based in Amsterdam. You are preparing a board-ready QBR for one of murmur.red's clients.
+
+murmur.red context: We specialise in AI-powered customer lifecycle automation — helping SaaS companies reduce churn, drive adoption, and build scalable CS operations. We bring AI tools, playbooks, and hands-on execution. Our value proposition is turning customer success from a cost centre into a growth engine.
 
 ACCOUNT DATA:
 Account: ${account_name} | Industry: ${industry}
@@ -79,25 +180,32 @@ Renewal: ${renewalStr}
 Seats: ${seats_active} active / ${seats_licensed} licensed → ${usage}% adoption
 NPS: ${nps} | Open Tickets: ${open_tickets} | CSM: ${csm}
 Challenge: ${challenge}${notes ? `\nNotes: ${notes}` : ''}${transcript ? `\n\nCALL TRANSCRIPT:\n${transcript.slice(0, 3000)}` : ''}
+${researchBlock ? `\n${researchBlock}` : ''}
 
-Generate a structured QBR. Be specific and direct. Use only the data provided — no invented numbers.
+Generate a comprehensive, structured QBR. Be specific and direct. Where account data is provided, use it exactly. Where research intel is available, reference it to add strategic depth.
 
 ## Executive Summary
-3 sentences max. Current state of the account, biggest risk, one clear recommendation.
+3 sentences max. Current state of the account, biggest risk, one clear recommendation. Frame from murmur.red's perspective as their CS partner.
 
 ## Health Dashboard
 | Metric | Value | Status |
 |--------|-------|--------|
 Cover: ARR, Health Score, Seat Adoption, NPS, Open Tickets, Renewal Risk. Use 🟢🟡🔴 status icons.
 
+## Market Intelligence
+What is happening at ${account_name} right now. Use the research intel — funding, hires, strategy, market signals. Connect each signal to implications for their relationship with murmur.red. If no research available, note that data was not provided.
+
 ## Key Risks
-3 risks ranked by urgency. For each: **Risk name** — evidence from data, business impact, mitigation action, owner, deadline.
+3 risks ranked by urgency. For each: **Risk name** — evidence from data and/or market intel, business impact, mitigation action, owner, deadline.
+
+## murmur.red Impact This Quarter
+What murmur.red specifically delivered for this account. Frame our AI automation work, playbooks, or lifecycle initiatives. Be concrete about the value we provided.
 
 ## 30-Day Action Plan
 5 concrete actions. Format each as: **Action** | Owner | Due | Success Metric
 
 ## Expansion Opportunity
-1 paragraph. Realistic upsell or expansion angle based on this account's actual data.
+1 paragraph. Realistic upsell or expansion angle based on this account's data and market signals. Connect to murmur.red's AI lifecycle capabilities.
 
 ## This Week
 One sentence only. The single most important action for ${csm} on Monday morning.`;
@@ -112,7 +220,7 @@ One sentence only. The single most important action for ${csm} on Monday morning
         },
         body: JSON.stringify({
           model: 'claude-sonnet-4-6',
-          max_tokens: 2000,
+          max_tokens: 2500,
           stream: true,
           messages: [{ role: 'user', content: prompt }]
         })

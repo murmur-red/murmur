@@ -5,5 +5,7 @@ account_id = "1d849fd649a986588e46f162c5d4322c"
 workers_dev = true
 
 [vars]
-# ANTHROPIC_KEY is stored as a secret — run:
+# Secrets — add via Cloudflare dashboard or:
 # wrangler secret put ANTHROPIC_KEY
+# wrangler secret put PERPLEXITY_KEY
+# wrangler secret put GROK_API_KEY

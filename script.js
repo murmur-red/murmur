@@ -186,6 +186,9 @@ function toggleTranscript() {
   if (icon) icon.textContent = open ? '+' : '−';
 }
 
+let _qbrResearch = null;
+let _qbrAccountName = '';
+
 async function runQBR() {
   const btn     = document.getElementById('qbtn');
   const st      = document.getElementById('qst');
@@ -199,18 +202,40 @@ async function runQBR() {
     return;
   }
 
-  btn.disabled = true; btn.textContent = 'Generating…'; st.textContent = '';
+  const accountName = document.getElementById('qa').value.trim() || 'Demo Company';
+  _qbrAccountName = accountName;
+  _qbrResearch = null;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="scur"></span> Researching…';
+  st.textContent = '';
   outWrap.style.display = 'block';
   tabBar.innerHTML = '';
-  out.innerHTML = '<div class="qloading">Generating QBR<span class="scur"></span></div>';
+  const oldBtn = document.getElementById('qreport-btn');
+  if (oldBtn) oldBtn.remove();
+  out.innerHTML = `<div class="qloading">Researching ${accountName}<span class="scur"></span></div>`;
   _qbrMarkdown = '';
+
+  // Step 1: research
+  try {
+    const rRes = await fetch(WORKER_URL + '/research', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ company: accountName })
+    });
+    if (rRes.ok) _qbrResearch = await rRes.json();
+  } catch {}
+
+  // Step 2: generate QBR
+  btn.innerHTML = '<span class="scur"></span> Generating…';
+  out.innerHTML = '<div class="qloading">Generating QBR<span class="scur"></span></div>';
 
   try {
     const res = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        account_name:   document.getElementById('qa').value.trim()          || 'Demo Company',
+        account_name:   accountName,
         industry:       document.getElementById('qindustry').value.trim()   || 'SaaS',
         arr:            document.getElementById('qr').value                 || 120000,
         health_score:   document.getElementById('qh').value                 || 72,
@@ -223,6 +248,7 @@ async function runQBR() {
         challenge:      document.getElementById('qc').value.trim()          || 'Improving product adoption',
         notes:          document.getElementById('qnotes').value.trim()      || '',
         transcript:     document.getElementById('qtranscript').value.trim() || '',
+        research:       _qbrResearch,
       })
     });
     if (!res.ok) throw new Error(`${res.status}`);
@@ -237,12 +263,230 @@ async function runQBR() {
     }
     renderQBRTabs(_qbrMarkdown);
     st.textContent = '✓ Done';
+    const actions = document.querySelector('.qactions');
+    if (actions && !document.getElementById('qreport-btn')) {
+      const reportBtn = document.createElement('button');
+      reportBtn.id = 'qreport-btn';
+      reportBtn.className = 'qact-btn';
+      reportBtn.style.cssText = 'background:var(--red);border-color:var(--red);color:#fff;font-weight:600;';
+      reportBtn.textContent = 'View Report →';
+      reportBtn.onclick = openQBRReport;
+      actions.prepend(reportBtn);
+    }
   } catch (err) {
     out.innerHTML = `<div class="qloading" style="color:var(--red)">Error: ${err.message}</div>`;
     st.textContent = 'Failed';
   }
   btn.disabled = false;
   btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 5.5h9M5.5 1l4.5 4.5L5.5 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Generate QBR';
+}
+
+function openQBRReport() {
+  const html = buildReportHTML(_qbrMarkdown, _qbrAccountName, _qbrResearch, {
+    arr:          document.getElementById('qr').value          || '',
+    health_score: document.getElementById('qh').value          || '',
+    renewal_date: document.getElementById('qrenew').value      || '',
+    nps:          document.getElementById('qnps').value        || '',
+    csm:          document.getElementById('qcsm').value.trim() || '',
+    industry:     document.getElementById('qindustry').value.trim() || '',
+  });
+  const blob = new Blob([html], { type: 'text/html' });
+  const url  = URL.createObjectURL(blob);
+  window.open(url, '_blank');
+}
+
+function buildReportHTML(markdown, company, research, meta) {
+  const md = typeof marked.parse === 'function' ? marked.parse : marked;
+  const date = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
+  const p = research?.perplexity || {};
+  const g = research?.grok || {};
+
+  const sentimentColor = g.sentiment
+    ? (g.sentiment.toLowerCase().includes('positive') ? '#34d399'
+      : g.sentiment.toLowerCase().includes('negative') ? '#ff2056' : '#fb923c')
+    : '#fb923c';
+
+  const intelCards = [
+    p.funding       && { label: 'Funding', icon: '💰', value: p.funding },
+    p.acquisitions  && { label: 'M&A', icon: '🤝', value: p.acquisitions },
+    p.new_hires     && { label: 'Leadership', icon: '👤', value: p.new_hires },
+    p.headcount     && { label: 'Team Size', icon: '📊', value: p.headcount },
+    p.strategy      && { label: 'Strategy', icon: '🎯', value: p.strategy },
+    g.trending_topics && { label: 'X Signals', icon: '𝕏', value: g.trending_topics },
+    g.complaints    && { label: 'Concerns', icon: '⚠️', value: g.complaints },
+    g.praise        && { label: 'Praise', icon: '⭐', value: g.praise },
+  ].filter(Boolean);
+
+  const sections = markdown.split(/\n(?=## )/).map(p => {
+    const m = p.match(/^## (.+)\n([\s\S]*)/);
+    return m ? { title: m[1].trim(), content: m[2].trim() } : null;
+  }).filter(Boolean);
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${company} — QBR · murmur.red</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#050509;--text:#f0f0ff;--dim:rgba(200,200,240,.5);--line:rgba(255,255,255,.08);--red:#ff2056;--pad:clamp(24px,5vw,64px);--max:860px}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:15px;line-height:1.7;min-width:320px}
+
+/* Print */
+@media print{
+  body{background:#fff;color:#111}
+  .no-print{display:none!important}
+  .page-break{page-break-before:always}
+  .section{border:1px solid #ddd;background:#fff}
+  .section h2{color:#c0001a}
+  table th{background:#f5f5f5}
+  .intel-card{border:1px solid #ddd;background:#fafafa}
+  .intel-val{color:#444}
+  .meta-val{color:#111}
+  footer{display:none}
+}
+
+/* Toolbar */
+.toolbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(5,5,9,.95);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--line);
+  padding:.7rem var(--pad);
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+}
+.tb-brand{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.14em;color:var(--red);text-decoration:none}
+.tb-title{font-size:.72rem;letter-spacing:.08em;color:var(--dim)}
+.tb-actions{display:flex;gap:.5rem}
+.btn{padding:.38rem 1rem;font-family:'Space Grotesk',sans-serif;font-size:.65rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;border-radius:2px;cursor:pointer;border:none;transition:all .18s}
+.btn-ghost{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--dim)}
+.btn-ghost:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+.btn-red{background:var(--red);color:#fff}
+.btn-red:hover{background:#d91545;box-shadow:0 0 16px rgba(255,32,86,.3)}
+
+/* Layout */
+.wrap{max-width:var(--max);margin:0 auto;padding:5.5rem var(--pad) 4rem}
+
+/* Cover */
+.cover{padding:3rem 0 2.5rem;border-bottom:1px solid var(--line);margin-bottom:2.5rem}
+.cover-label{font-size:.58rem;letter-spacing:.28em;text-transform:uppercase;color:var(--red);display:flex;align-items:center;gap:.5rem;margin-bottom:1rem}
+.cover-label::before{content:'';display:block;width:1.5rem;height:1px;background:var(--red)}
+.cover-company{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5.5rem);line-height:.9;letter-spacing:.02em;margin-bottom:.6rem}
+.cover-sub{font-size:.82rem;color:var(--dim);margin-bottom:2rem}
+.cover-meta{display:flex;flex-wrap:wrap;gap:.5rem}
+.meta-chip{padding:.3rem .85rem;border:1px solid var(--line);border-radius:20px;font-size:.62rem;letter-spacing:.08em;display:flex;gap:.4rem;align-items:center}
+.meta-label{color:var(--dim)}
+.meta-val{color:var(--text);font-weight:500}
+
+/* Sentiment badge */
+.sentiment-badge{padding:.28rem .9rem;border-radius:20px;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;border:1px solid}
+
+/* Intel grid */
+.intel-section{margin-bottom:2.5rem}
+.intel-label{font-size:.58rem;letter-spacing:.26em;text-transform:uppercase;color:var(--dim);margin-bottom:.9rem;display:flex;align-items:center;gap:.5rem}
+.intel-label::after{content:'';flex:1;height:1px;background:var(--line)}
+.intel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.6rem}
+.intel-card{background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:4px;padding:.85rem 1rem}
+.intel-card-top{display:flex;align-items:center;gap:.4rem;margin-bottom:.35rem}
+.intel-icon{font-size:.85rem}
+.intel-cat{font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.intel-val{font-size:.78rem;color:rgba(200,200,240,.7);line-height:1.55}
+
+/* Sections */
+.section{background:rgba(255,255,255,.018);border:1px solid var(--line);border-radius:4px;padding:1.6rem 1.8rem;margin-bottom:1rem;page-break-inside:avoid}
+.section h2{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:.06em;color:var(--red);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--line)}
+.section p{color:var(--dim);margin-bottom:.65rem;font-size:.85rem}
+.section ul,.section ol{padding-left:1.3rem;margin-bottom:.65rem}
+.section li{color:var(--dim);font-size:.85rem;margin-bottom:.25rem}
+.section strong{color:var(--text);font-weight:600}
+.section table{width:100%;border-collapse:collapse;font-size:.82rem;margin-bottom:.65rem}
+.section th{text-align:left;padding:.4rem .65rem;border-bottom:1px solid var(--line);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);font-weight:400}
+.section td{padding:.38rem .65rem;border-bottom:1px solid rgba(255,255,255,.03);color:var(--dim)}
+
+/* This Week highlight */
+.this-week{background:rgba(255,32,86,.06);border:1px solid rgba(255,32,86,.2);border-left:3px solid var(--red);border-radius:4px;padding:1.2rem 1.5rem;margin-bottom:1rem}
+.this-week-label{font-size:.56rem;letter-spacing:.22em;text-transform:uppercase;color:var(--red);margin-bottom:.4rem}
+.this-week p{color:var(--text)!important;font-size:.9rem!important;font-weight:500}
+
+/* Footer */
+footer{margin-top:3rem;padding:1.2rem 0;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;font-size:.6rem;letter-spacing:.06em;color:rgba(180,180,220,.2)}
+
+/* No-intel notice */
+.no-intel{font-size:.75rem;color:rgba(200,200,240,.25);font-style:italic;padding:.6rem 0}
+</style>
+</head>
+<body>
+
+<div class="toolbar no-print">
+  <div>
+    <a href="https://murmur.red" class="tb-brand">murmur.red</a>
+    <div class="tb-title">${company} · Quarterly Business Review · ${date}</div>
+  </div>
+  <div class="tb-actions">
+    <button class="btn btn-ghost" onclick="window.close()">← Back</button>
+    <button class="btn btn-red" onclick="window.print()">Download PDF</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- Cover -->
+  <div class="cover">
+    <div class="cover-label">Quarterly Business Review</div>
+    <div class="cover-company">${company}</div>
+    <div class="cover-sub">Prepared by murmur.red · ${date}</div>
+    <div class="cover-meta">
+      ${meta.industry    ? `<div class="meta-chip"><span class="meta-label">Industry</span><span class="meta-val">${meta.industry}</span></div>` : ''}
+      ${meta.arr         ? `<div class="meta-chip"><span class="meta-label">ARR</span><span class="meta-val">$${Number(meta.arr).toLocaleString()}</span></div>` : ''}
+      ${meta.health_score ? `<div class="meta-chip"><span class="meta-label">Health</span><span class="meta-val">${meta.health_score}/100</span></div>` : ''}
+      ${meta.nps         ? `<div class="meta-chip"><span class="meta-label">NPS</span><span class="meta-val">${meta.nps}</span></div>` : ''}
+      ${meta.renewal_date ? `<div class="meta-chip"><span class="meta-label">Renewal</span><span class="meta-val">${meta.renewal_date}</span></div>` : ''}
+      ${meta.csm         ? `<div class="meta-chip"><span class="meta-label">CSM</span><span class="meta-val">${meta.csm}</span></div>` : ''}
+      ${g.sentiment      ? `<div class="sentiment-badge" style="color:${sentimentColor};border-color:${sentimentColor}22;background:${sentimentColor}11">𝕏 ${g.sentiment.split(' ')[0]}</div>` : ''}
+    </div>
+  </div>
+
+  <!-- Market Intelligence -->
+  ${intelCards.length ? `
+  <div class="intel-section">
+    <div class="intel-label">Live Market Intelligence</div>
+    <div class="intel-grid">
+      ${intelCards.map(c => `
+      <div class="intel-card">
+        <div class="intel-card-top"><span class="intel-icon">${c.icon}</span><span class="intel-cat">${c.label}</span></div>
+        <div class="intel-val">${c.value}</div>
+      </div>`).join('')}
+    </div>
+  </div>` : `<div class="no-intel">No live market intelligence — company name not found or APIs unavailable.</div>`}
+
+  <!-- QBR Sections -->
+  ${sections.map((s, i) => {
+    const isThisWeek = s.title.toLowerCase().includes('this week');
+    if (isThisWeek) {
+      return `<div class="this-week">
+        <div class="this-week-label">This Week</div>
+        ${md(s.content)}
+      </div>`;
+    }
+    return `<div class="section${i > 0 ? ' page-break' : ''}">
+      <h2>${s.title}</h2>
+      ${md(s.content)}
+    </div>`;
+  }).join('')}
+
+  <footer>
+    <span>© 2026 murmur.red · Lena Ry · Amsterdam</span>
+    <span>Generated ${date} · Confidential</span>
+  </footer>
+
+</div>
+
+</body>
+</html>`;
 }
 
 function renderQBRTabs(markdown) {
