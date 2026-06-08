@@ -1,6 +1,15 @@
 {
-  "updated": "2026-06-05",
+  "updated": "2026-06-08",
   "articles": [
+    {
+      "id": "5c96358e-bfd8-4e1d-9007-63e22cbabe81",
+      "title": "Nobody Is Archiving What the Internet Argues About",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-06-08",
+      "status": "Published",
+      "url": "https://murmur-red.github.io/blog/tech/2026/06/08/nobody-is-archiving-what-the-internet-argues-about.html"
+    },
     {
       "id": "db381641-b1f9-470a-99a8-00cd414f3cbc",
       "title": "Down Syndrome Trended for 23 Hours and Nobody Can Tell You Why",
