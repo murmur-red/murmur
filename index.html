@@ -436,6 +436,31 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opa
 .stcard-use{font-size:.78rem;color:rgba(200,200,240,.58);line-height:1.65;
   border-left:1px solid rgba(255,255,255,.07);padding-left:.75rem}
 
+/* ── QBR single input row ── */
+.qinput-row{display:flex;gap:.6rem;align-items:flex-end;margin-bottom:.75rem;flex-wrap:wrap}
+.qinput-row .qf{flex:1;min-width:240px}
+.qinput-row input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:2px;color:var(--text);font-family:inherit;font-size:1rem;padding:.65rem 1rem;outline:none;transition:border-color .2s}
+.qinput-row input:focus{border-color:rgba(255,32,86,.4)}
+.qacc-simple{width:100%;max-width:420px;background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:2px;color:var(--dim);font-family:inherit;font-size:.76rem;padding:.42rem .85rem;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(200,200,240,.25)' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .85rem center;transition:border-color .2s}
+.qacc-simple:focus{border-color:rgba(255,255,255,.2)}
+.qacc-simple option{background:#0d0d14}
+
+/* ── Pipeline animation ── */
+.qpipeline{display:none;margin:1.6rem 0}
+.qpipeline.show{display:block}
+.qpipe-steps{position:relative;padding-left:1.6rem}
+.qpipe-steps::before{content:'';position:absolute;left:6px;top:12px;bottom:12px;width:1px;background:var(--line)}
+.qpipe-step{position:relative;display:flex;align-items:baseline;gap:.7rem;padding:.32rem 0;opacity:0;transform:translateY(5px);transition:opacity .28s ease,transform .28s ease}
+.qpipe-step.show{opacity:1;transform:none}
+.qpipe-dot{position:absolute;left:-1.6rem;top:.42rem;width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);transition:background .25s,border-color .25s,box-shadow .25s;flex-shrink:0}
+.qpipe-step.active .qpipe-dot{background:var(--red);border-color:var(--red);box-shadow:0 0 6px rgba(255,32,86,.5);animation:pulse 1s ease-in-out infinite}
+.qpipe-step.done .qpipe-dot{background:var(--c4);border-color:var(--c4);box-shadow:none;animation:none}
+.qpipe-tool{font-size:.7rem;font-weight:600;color:var(--text);min-width:88px;letter-spacing:.02em}
+.qpipe-label{font-size:.68rem;color:var(--dim);flex:1}
+.qpipe-step.active .qpipe-label{color:var(--text)}
+.qpipe-result{font-size:.62rem;color:var(--c4);margin-left:auto;opacity:0;transition:opacity .3s;white-space:nowrap;padding-left:.5rem}
+.qpipe-step.done .qpipe-result{opacity:1}
+
 /* ── QBR Intel preview ── */
 .qintel-wrap{background:rgba(255,255,255,.025);border:1px solid var(--line);border-left:2px solid var(--c1);border-radius:2px;padding:.65rem 1.1rem;margin-bottom:1rem;animation:aup .25s ease}
 .qintel-head{font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:var(--c1);margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
@@ -631,75 +656,32 @@ footer a:hover{color:var(--red)}
     <div class="rev" style="max-width:900px">
       <div class="qtag">Client Output</div>
       <div class="qtitle">AI QBR AGENT</div>
-      <p class="qsub">Type any company — the system researches it live. Add your internal data, Claude builds a full QBR. In production, the internal data pulls automatically from Salesforce, Mixpanel, and Stripe.</p>
+      <p class="qsub">Type a company name. We connect to your stack, pull the data, and build the QBR. You get the report.</p>
 
-      <!-- Data sources -->
-      <div class="qsources rev">
-        <button class="qsrc-btn" onclick="syncAccounts()">
-          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M11 6.5A4.5 4.5 0 012.5 5M2 6.5A4.5 4.5 0 0110.5 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M10.5 5V2h-3M2.5 8v3h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Sync from Google Sheets
-        </button>
-        <button class="qsrc-btn" disabled title="Connect your Salesforce org to pull live account data">
-          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="3" y="6" width="7" height="5.5" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 6V4.5a2 2 0 014 0V6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-          Connect Salesforce
-          <span class="qsrc-badge">Enterprise</span>
-        </button>
-        <span id="qsrc-status"></span>
-      </div>
-
-      <!-- Account selector -->
-      <div class="qacc-wrap rev">
+      <!-- Single input -->
+      <div class="qinput-row rev">
         <div class="qf">
-          <label>Load Account</label>
-          <select id="qacc" onchange="selectAccount(this.value)">
-            <option value="">— select account or fill manually —</option>
-          </select>
+          <input id="qa" type="text" placeholder="Company name — e.g. Leapsome, Spellbook, Coast…" oninput="autoResearch(this.value)" onkeydown="if(event.key==='Enter')runQBR()">
         </div>
+        <button id="qbtn" onclick="runQBR()">
+          Generate QBR →
+        </button>
       </div>
 
-      <!-- Form fields -->
-      <div class="qform-grid rev">
-        <div class="qf"><label>Account Name</label><input id="qa" type="text" placeholder="Acme Corp" oninput="autoResearch(this.value)"></div>
-        <div class="qf"><label>Industry</label><input id="qindustry" type="text" placeholder="HR Tech / FinTech..."></div>
-        <div class="qf"><label>ARR (USD)</label><input id="qr" type="number" placeholder="180000"></div>
-        <div class="qf"><label>Health Score (0–100)</label><input id="qh" type="number" placeholder="72" min="0" max="100"></div>
-        <div class="qf"><label>Renewal Date</label><input id="qrenew" type="date"></div>
-        <div class="qf"><label>CSM Owner</label><input id="qcsm" type="text" placeholder="Sarah Chen"></div>
-        <div class="qf"><label>Seats Licensed</label><input id="qseats_lic" type="number" placeholder="100"></div>
-        <div class="qf"><label>Seats Active</label><input id="qseats_act" type="number" placeholder="72"></div>
-        <div class="qf"><label>NPS Score</label><input id="qnps" type="number" placeholder="45"></div>
-        <div class="qf"><label>Open Support Tickets</label><input id="qtickets" type="number" placeholder="3"></div>
-        <div class="qf qf-wide"><label>Key Challenge</label><input id="qc" type="text" placeholder="Low adoption in new module, competitor evaluation..."></div>
-        <div class="qf qf-wide"><label>Account Notes</label><input id="qnotes" type="text" placeholder="Champion leaving, budget freeze, expansion interest..."></div>
-      </div>
+      <!-- Demo account picker -->
+      <select id="qacc" class="qacc-simple rev" onchange="selectAccount(this.value)">
+        <option value="">— or load a demo account —</option>
+      </select>
 
       <!-- Live intel preview -->
-      <div id="qintel" class="qintel-wrap rev" style="display:none">
+      <div id="qintel" class="qintel-wrap" style="display:none">
         <div class="qintel-head">Live Intel</div>
-        <div class="qintel-row" id="qintel-content"><span class="qintel-loading">Researching…</span></div>
+        <div class="qintel-row" id="qintel-content"></div>
       </div>
 
-      <!-- Production note -->
-      <p class="qpro-note rev"><span class="qpro-dot"></span>In production, the fields below sync automatically from Salesforce, Mixpanel &amp; Stripe — no manual entry.</p>
-
-      <!-- Transcript (collapsible) -->
-      <div class="qtranscript-wrap rev">
-        <button class="qtrans-toggle" onclick="toggleTranscript()" id="qtrans-btn">
-          <span class="qtrans-icon">+</span>
-          Add Gong Call Transcript
-          <span class="qtrans-hint">optional — AI extracts risks and insights</span>
-        </button>
-        <div class="qtrans-body" id="qtrans-body">
-          <textarea id="qtranscript" placeholder="Paste call transcript here — AI will extract key risks, sentiment, and action items and fold them into the QBR…"></textarea>
-        </div>
-      </div>
-
-      <div class="qrow rev">
-        <button id="qbtn" onclick="runQBR()">
-          <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 5.5h9M5.5 1l4.5 4.5L5.5 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          Generate QBR
-        </button>
-        <span id="qst"></span>
+      <!-- Pipeline animation -->
+      <div id="qpipeline" class="qpipeline">
+        <div class="qpipe-steps" id="qpipe-steps"></div>
       </div>
 
       <!-- Tabbed output -->

@@ -164,33 +164,103 @@ function selectAccount(idx) {
   if (idx === '') return;
   const a = _accounts[parseInt(idx)];
   if (!a) return;
-  document.getElementById('qa').value         = a.account_name   || '';
-  document.getElementById('qindustry').value  = a.industry       || '';
-  document.getElementById('qr').value         = a.arr            || '';
-  document.getElementById('qh').value         = a.health_score   || '';
-  document.getElementById('qrenew').value     = a.renewal_date   || '';
-  document.getElementById('qcsm').value       = a.csm            || '';
-  document.getElementById('qseats_lic').value = a.seats_licensed || '';
-  document.getElementById('qseats_act').value = a.seats_active   || '';
-  document.getElementById('qnps').value       = a.nps            || '';
-  document.getElementById('qtickets').value   = a.open_tickets   || '';
-  document.getElementById('qc').value         = a.key_challenge  || '';
-  document.getElementById('qnotes').value     = a.notes          || '';
+  const name = a.account_name || '';
+  document.getElementById('qa').value = name;
+  autoResearch(name);
 }
 
-function toggleTranscript() {
-  const body = document.getElementById('qtrans-body');
-  const icon = document.querySelector('.qtrans-icon');
-  const open = body.style.display === 'block';
-  body.style.display = open ? 'none' : 'block';
-  if (icon) icon.textContent = open ? '+' : '−';
-}
 
-let _qbrResearch = null;
+let _qbrResearch    = null;
 let _qbrAccountName = '';
-let _preResearch = null;
+let _qbrFakeData    = null;
+let _preResearch    = null;
 let _preResearchCompany = '';
-let _researchDebounce = null;
+let _researchDebounce   = null;
+
+// ── Fake data (deterministic per company name) ───────────
+function fakePipelineData(name) {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (Math.imul(h, 31) + name.charCodeAt(i)) | 0;
+  const r = n => { h = (Math.imul(h, 1664525) + 1013904223) | 0; return Math.abs(h) % n; };
+
+  const arrOptions   = [480000,720000,1100000,1800000,2400000,3600000,4800000,6200000];
+  const arr          = arrOptions[r(arrOptions.length)];
+  const health       = 61 + r(23);
+  const seatsLic     = [50,75,100,150,200,300,400][r(7)];
+  const seatsAct     = Math.round(seatsLic * (0.68 + r(22) / 100));
+  const nps          = 28 + r(36);
+  const tickets      = 1 + r(7);
+
+  const d = new Date(); d.setMonth(d.getMonth() + 2 + r(8));
+  const renewal      = d.toISOString().split('T')[0];
+  const renewalShort = d.toLocaleDateString('en-GB', {month:'short', year:'numeric'});
+
+  const csm = ['Sarah Chen','Marcus Webb','Anna Kowalski','James Osei','Priya Sharma','Tom Lindqvist','Elena Vasquez'][r(7)];
+  const ind = ['B2B SaaS','HR Tech','FinTech','Revenue Operations','Marketing Technology','DevOps / Platform','Customer Intelligence'][r(7)];
+  const challenge = [
+    'Low adoption in core reporting module',
+    'Champion contact has recently changed roles',
+    'Evaluating competitor at renewal',
+    'Budget consolidation heading into Q3',
+    'Slow rollout across regional offices',
+    'Onboarding new team after acquisition',
+  ][r(6)];
+
+  const arrFmt = arr >= 1e6 ? '$'+(arr/1e6).toFixed(1)+'M' : '$'+(arr/1e3).toFixed(0)+'k';
+  return { arr, arrFmt, health, seatsLic, seatsAct, nps, tickets, renewal, renewalShort, csm, ind, challenge };
+}
+
+// ── Pipeline animation ───────────────────────────────────
+const PIPE_STEPS = [
+  { tool:'Salesforce', label:'Pulling account & contract data', result: d => `${d.arrFmt} ARR`,                  delay:500 },
+  { tool:'Mixpanel',   label:'Fetching product usage metrics',  result: d => `${d.seatsAct}/${d.seatsLic} seats active`, delay:560 },
+  { tool:'Intercom',   label:'Scanning support queue',          result: d => `${d.tickets} open · NPS ${d.nps}`, delay:440 },
+  { tool:'HubSpot',    label:'Reading contact & activity log',  result: d => `CSM: ${d.csm}`,                    delay:380 },
+  { tool:'Stripe',     label:'Checking billing & renewal',      result: d => `Renewal ${d.renewalShort}`,         delay:420 },
+  { tool:'Perplexity', label:'Researching company news',        result: () => 'Intelligence ready',              real:true  },
+  { tool:'Grok',       label:'Reading X / market signals',      result: () => 'Signals captured',                real:true  },
+];
+
+async function runPipelineAnimation(data, researchPromise) {
+  const container = document.getElementById('qpipe-steps');
+  container.innerHTML = '';
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  const els = PIPE_STEPS.map((s, i) => {
+    const el = document.createElement('div');
+    el.className = 'qpipe-step';
+    el.innerHTML = `<div class="qpipe-dot"></div>
+      <span class="qpipe-tool">${s.tool}</span>
+      <span class="qpipe-label">${s.label}</span>
+      <span class="qpipe-result" id="qpr-${i}"></span>`;
+    container.appendChild(el);
+    return el;
+  });
+
+  // Fake steps 0-4
+  for (let i = 0; i < 5; i++) {
+    await sleep(100); els[i].classList.add('show');
+    await sleep(60);  els[i].classList.add('active');
+    await sleep(PIPE_STEPS[i].delay);
+    els[i].classList.remove('active'); els[i].classList.add('done');
+    document.getElementById(`qpr-${i}`).textContent = PIPE_STEPS[i].result(data);
+  }
+
+  // Real steps 5-6: show active while research runs
+  await sleep(100);
+  els[5].classList.add('show','active');
+  await sleep(120);
+  els[6].classList.add('show','active');
+
+  await researchPromise;
+
+  els[5].classList.remove('active'); els[5].classList.add('done');
+  document.getElementById('qpr-5').textContent = PIPE_STEPS[5].result();
+  await sleep(80);
+  els[6].classList.remove('active'); els[6].classList.add('done');
+  document.getElementById('qpr-6').textContent = PIPE_STEPS[6].result();
+  await sleep(200);
+}
 
 async function autoResearch(value) {
   const panel   = document.getElementById('qintel');
@@ -226,119 +296,96 @@ async function autoResearch(value) {
 }
 
 async function runQBR() {
-  const btn     = document.getElementById('qbtn');
-  const st      = document.getElementById('qst');
-  const outWrap = document.getElementById('qout-wrap');
-  const out     = document.getElementById('qout');
-  const tabBar  = document.getElementById('qtabs');
+  const btn      = document.getElementById('qbtn');
+  const outWrap  = document.getElementById('qout-wrap');
+  const out      = document.getElementById('qout');
+  const tabBar   = document.getElementById('qtabs');
+  const pipeline = document.getElementById('qpipeline');
 
-  if (WORKER_URL.includes('YOUR_SUBDOMAIN')) {
-    outWrap.style.display = 'block';
-    out.innerHTML = '<div class="qloading" style="color:var(--red)">Worker not deployed yet.</div>';
-    return;
-  }
-
-  const accountName = document.getElementById('qa').value.trim() || 'Demo Company';
+  const accountName = (document.getElementById('qa').value || '').trim() || 'Demo Company';
   _qbrAccountName = accountName;
-  _qbrResearch = null;
+  _qbrMarkdown    = '';
+  _qbrResearch    = null;
 
   btn.disabled = true;
-  st.textContent = '';
-  outWrap.style.display = 'block';
-  tabBar.innerHTML = '';
+  btn.textContent = 'Running…';
+  outWrap.style.display = 'none';
+  document.getElementById('qgen-cta').classList.remove('show');
+  document.getElementById('qintel').style.display = 'none';
   const oldBtn = document.getElementById('qreport-btn');
   if (oldBtn) oldBtn.remove();
-  document.getElementById('qgen-cta').classList.remove('show');
-  _qbrMarkdown = '';
 
-  // Step 1: research — skip if already pre-fetched for this company
-  if (_preResearch && _preResearchCompany.toLowerCase() === accountName.toLowerCase()) {
-    _qbrResearch = _preResearch;
-    btn.innerHTML = '<span class="scur"></span> Generating…';
-    out.innerHTML = `<div class="qloading">Building QBR for ${accountName}<span class="scur"></span></div>`;
-  } else {
-    btn.innerHTML = '<span class="scur"></span> Researching…';
-    out.innerHTML = `<div class="qloading">Researching ${accountName}<span class="scur"></span></div>`;
-    try {
-      const rRes = await fetch(WORKER_URL + '/research', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ company: accountName })
-      });
-      if (rRes.ok) _qbrResearch = await rRes.json();
-    } catch {}
-    btn.innerHTML = '<span class="scur"></span> Generating…';
-    out.innerHTML = `<div class="qloading">Building QBR for ${accountName}<span class="scur"></span></div>`;
-  }
+  const fd = fakePipelineData(accountName);
+  _qbrFakeData = fd;
 
-  // Step 2: generate QBR
-  btn.innerHTML = '<span class="scur"></span> Generating…';
-  out.innerHTML = '<div class="qloading">Generating QBR<span class="scur"></span></div>';
+  const researchP = (_preResearch && _preResearchCompany.toLowerCase() === accountName.toLowerCase())
+    ? Promise.resolve(_preResearch)
+    : fetch(WORKER_URL + '/research', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({company: accountName})
+      }).then(r => r.ok ? r.json() : null).catch(() => null);
+
+  pipeline.classList.add('show');
+  await runPipelineAnimation(fd, researchP);
+  _qbrResearch = await researchP;
+
+  tabBar.innerHTML = '';
+  outWrap.style.display = 'block';
+  out.innerHTML = '<div class="qloading">Building your QBR<span class="scur"></span></div>';
 
   try {
     const res = await fetch(WORKER_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
-        account_name:   accountName,
-        industry:       document.getElementById('qindustry').value.trim()   || 'SaaS',
-        arr:            document.getElementById('qr').value                 || 120000,
-        health_score:   document.getElementById('qh').value                 || 72,
-        renewal_date:   document.getElementById('qrenew').value             || '',
-        csm:            document.getElementById('qcsm').value.trim()        || 'CSM',
-        seats_licensed: document.getElementById('qseats_lic').value         || 100,
-        seats_active:   document.getElementById('qseats_act').value         || 70,
-        nps:            document.getElementById('qnps').value               || 45,
-        open_tickets:   document.getElementById('qtickets').value           || 3,
-        challenge:      document.getElementById('qc').value.trim()          || 'Improving product adoption',
-        notes:          document.getElementById('qnotes').value.trim()      || '',
-        transcript:     document.getElementById('qtranscript').value.trim() || '',
-        research:       _qbrResearch,
+        account_name:   accountName,  industry:       fd.ind,
+        arr:            fd.arr,       health_score:   fd.health,
+        renewal_date:   fd.renewal,   csm:            fd.csm,
+        seats_licensed: fd.seatsLic,  seats_active:   fd.seatsAct,
+        nps:            fd.nps,       open_tickets:   fd.tickets,
+        challenge:      fd.challenge, notes:          '',
+        transcript:     '',           research:       _qbrResearch,
       })
     });
     if (!res.ok) throw new Error(`${res.status}`);
+
     const reader = res.body.getReader(), dec = new TextDecoder();
     while (true) {
-      const { done, value } = await reader.read(); if (done) break;
-      for (const line of dec.decode(value, { stream: true }).split('\n')) {
+      const {done, value} = await reader.read(); if (done) break;
+      for (const line of dec.decode(value,{stream:true}).split('\n')) {
         if (!line.startsWith('data: ')) continue;
-        const pl = line.slice(6).trim(); if (pl === '[DONE]') break;
-        try { const j = JSON.parse(pl); const d = j?.delta?.text ?? ''; if (d) _qbrMarkdown += d; } catch {}
+        const pl = line.slice(6).trim(); if (pl==='[DONE]') break;
+        try { const j=JSON.parse(pl); const d=j?.delta?.text??''; if(d) _qbrMarkdown+=d; } catch {}
       }
     }
+
     renderQBRTabs(_qbrMarkdown);
-    st.textContent = '✓ Done';
+
     const actions = document.querySelector('.qactions');
     if (actions && !document.getElementById('qreport-btn')) {
-      const reportBtn = document.createElement('button');
-      reportBtn.id = 'qreport-btn';
-      reportBtn.className = 'qact-btn';
-      reportBtn.style.cssText = 'background:var(--red);border-color:var(--red);color:#fff;font-weight:600;letter-spacing:.1em;';
-      reportBtn.textContent = 'Open Full Report →';
-      reportBtn.onclick = openQBRReport;
-      actions.prepend(reportBtn);
+      const rb = document.createElement('button');
+      rb.id = 'qreport-btn'; rb.className = 'qact-btn';
+      rb.style.cssText = 'background:var(--red);border-color:var(--red);color:#fff;font-weight:600;letter-spacing:.1em;';
+      rb.textContent = 'Open Full Report →';
+      rb.onclick = openQBRReport;
+      actions.prepend(rb);
     }
     document.getElementById('qgen-cta').classList.add('show');
-  } catch (err) {
+
+  } catch(err) {
     out.innerHTML = `<div class="qloading" style="color:var(--red)">Error: ${err.message}</div>`;
-    st.textContent = 'Failed';
   }
+
   btn.disabled = false;
-  btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 5.5h9M5.5 1l4.5 4.5L5.5 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Generate QBR';
+  btn.textContent = 'Generate QBR →';
 }
 
 function openQBRReport() {
+  const fd = _qbrFakeData || {};
   const html = buildReportHTML(_qbrMarkdown, _qbrAccountName, _qbrResearch, {
-    arr:          document.getElementById('qr').value          || '',
-    health_score: document.getElementById('qh').value          || '',
-    renewal_date: document.getElementById('qrenew').value      || '',
-    nps:          document.getElementById('qnps').value        || '',
-    csm:          document.getElementById('qcsm').value.trim() || '',
-    industry:     document.getElementById('qindustry').value.trim() || '',
+    arr: fd.arr, health_score: fd.health, renewal_date: fd.renewal,
+    nps: fd.nps, csm: fd.csm,            industry:     fd.ind,
   });
-  const blob = new Blob([html], { type: 'text/html' });
-  const url  = URL.createObjectURL(blob);
-  window.open(url, '_blank');
+  window.open(URL.createObjectURL(new Blob([html],{type:'text/html'})), '_blank');
 }
 
 function buildReportHTML(markdown, company, research, meta) {
