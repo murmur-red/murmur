@@ -646,7 +646,7 @@ function downloadPPTX() {
   if (btn) { btn.textContent = 'Building…'; btn.disabled = true; }
 
   try {
-    const pres  = new pptxgen();
+    const pres  = new PptxGenJS();
     pres.layout = 'LAYOUT_WIDE'; // 13.33" × 7.5"
 
     const BG    = '07070F';
