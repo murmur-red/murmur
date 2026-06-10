@@ -436,6 +436,29 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opa
 .stcard-use{font-size:.78rem;color:rgba(200,200,240,.58);line-height:1.65;
   border-left:1px solid rgba(255,255,255,.07);padding-left:.75rem}
 
+/* ── QBR Intel preview ── */
+.qintel-wrap{background:rgba(255,255,255,.025);border:1px solid var(--line);border-left:2px solid var(--c1);border-radius:2px;padding:.65rem 1.1rem;margin-bottom:1rem;animation:aup .25s ease}
+.qintel-head{font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:var(--c1);margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
+.qintel-head::before{content:'';display:block;width:.45rem;height:.45rem;border-radius:50%;background:var(--c1);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.qintel-row{display:flex;flex-wrap:wrap;gap:.4rem 1.4rem}
+.qintel-item{display:flex;flex-direction:column;gap:.06rem;min-width:120px;max-width:220px}
+.qintel-lbl{font-size:.52rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.qintel-val{font-size:.72rem;color:var(--text);line-height:1.4}
+.qintel-loading{font-size:.72rem;color:var(--dim);font-style:italic}
+
+/* ── QBR production note ── */
+.qpro-note{font-size:.6rem;color:rgba(180,180,230,.2);margin-top:.25rem;display:flex;align-items:center;gap:.4rem;line-height:1.5}
+.qpro-dot{display:inline-block;width:.45rem;height:.45rem;border-radius:50%;background:var(--c4);flex-shrink:0}
+
+/* ── Post-gen CTA ── */
+.qgen-cta{margin-top:1.2rem;padding:.9rem 1.2rem;background:rgba(255,32,86,.04);border:1px solid rgba(255,32,86,.12);border-radius:2px;display:none;animation:aup .3s ease}
+.qgen-cta.show{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.qgen-cta-text{font-size:.76rem;color:var(--dim);line-height:1.55}
+.qgen-cta-text strong{color:var(--text)}
+.qgen-cta-btn{flex-shrink:0;padding:.45rem 1.2rem;background:var(--red);color:#fff;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;border-radius:2px;white-space:nowrap;transition:background .2s}
+.qgen-cta-btn:hover{background:#d91545}
+
 /* ═══════════ FOOTER ═══════════ */
 footer{padding:1.4rem var(--pad);border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;font-size:.62rem;letter-spacing:.05em;color:rgba(180,180,220,.22);position:relative;z-index:1}
 footer a{color:rgba(255,32,86,.4);text-decoration:none}
@@ -606,9 +629,9 @@ footer a:hover{color:var(--red)}
 <section id="qbr">
   <div class="inner">
     <div class="rev" style="max-width:900px">
-      <div class="qtag">Live Demo</div>
+      <div class="qtag">Client Output</div>
       <div class="qtitle">AI QBR AGENT</div>
-      <p class="qsub">Select an account to auto-fill — or enter data manually. AI builds an exec-quality QBR in real time.</p>
+      <p class="qsub">Type any company — the system researches it live. Add your internal data, Claude builds a full QBR. In production, the internal data pulls automatically from Salesforce, Mixpanel, and Stripe.</p>
 
       <!-- Data sources -->
       <div class="qsources rev">
@@ -636,7 +659,7 @@ footer a:hover{color:var(--red)}
 
       <!-- Form fields -->
       <div class="qform-grid rev">
-        <div class="qf"><label>Account Name</label><input id="qa" type="text" placeholder="Acme Corp"></div>
+        <div class="qf"><label>Account Name</label><input id="qa" type="text" placeholder="Acme Corp" oninput="autoResearch(this.value)"></div>
         <div class="qf"><label>Industry</label><input id="qindustry" type="text" placeholder="HR Tech / FinTech..."></div>
         <div class="qf"><label>ARR (USD)</label><input id="qr" type="number" placeholder="180000"></div>
         <div class="qf"><label>Health Score (0–100)</label><input id="qh" type="number" placeholder="72" min="0" max="100"></div>
@@ -649,6 +672,15 @@ footer a:hover{color:var(--red)}
         <div class="qf qf-wide"><label>Key Challenge</label><input id="qc" type="text" placeholder="Low adoption in new module, competitor evaluation..."></div>
         <div class="qf qf-wide"><label>Account Notes</label><input id="qnotes" type="text" placeholder="Champion leaving, budget freeze, expansion interest..."></div>
       </div>
+
+      <!-- Live intel preview -->
+      <div id="qintel" class="qintel-wrap rev" style="display:none">
+        <div class="qintel-head">Live Intel</div>
+        <div class="qintel-row" id="qintel-content"><span class="qintel-loading">Researching…</span></div>
+      </div>
+
+      <!-- Production note -->
+      <p class="qpro-note rev"><span class="qpro-dot"></span>In production, the fields below sync automatically from Salesforce, Mixpanel &amp; Stripe — no manual entry.</p>
 
       <!-- Transcript (collapsible) -->
       <div class="qtranscript-wrap rev">
@@ -675,12 +707,17 @@ footer a:hover{color:var(--red)}
         <div class="qtabs" id="qtabs"></div>
         <div id="qout"></div>
         <div class="qactions">
-          <button class="qact-btn" onclick="copyQBR()">Copy All</button>
-          <button class="qact-btn" onclick="downloadQBR()">Download .txt</button>
+          <button class="qact-btn" onclick="copyQBR()">Copy Text</button>
         </div>
       </div>
 
-      <p class="qnote">Powered by Claude Sonnet · murmur.red QBR Agent · No data stored</p>
+      <!-- Post-gen CTA -->
+      <div class="qgen-cta" id="qgen-cta">
+        <div class="qgen-cta-text"><strong>Like what you see?</strong> In production this runs for every account automatically — connected to your real data.</div>
+        <a href="#" class="qgen-cta-btn" onclick="Calendly.initPopupWidget({url:'https://calendly.com/murmur-red1/30min'});return false;">Book a call →</a>
+      </div>
+
+      <p class="qnote">Generated by murmur.red · Production systems connect to Salesforce, Mixpanel &amp; Stripe automatically</p>
     </div>
   </div>
 </section>

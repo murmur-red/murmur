@@ -188,6 +188,42 @@ function toggleTranscript() {
 
 let _qbrResearch = null;
 let _qbrAccountName = '';
+let _preResearch = null;
+let _preResearchCompany = '';
+let _researchDebounce = null;
+
+async function autoResearch(value) {
+  const panel   = document.getElementById('qintel');
+  const content = document.getElementById('qintel-content');
+  if (_researchDebounce) clearTimeout(_researchDebounce);
+  if (value.trim().length < 3) { panel.style.display = 'none'; _preResearch = null; _preResearchCompany = ''; return; }
+  _researchDebounce = setTimeout(async () => {
+    panel.style.display = 'block';
+    content.innerHTML = '<span class="qintel-loading">Researching ' + value.trim() + '…</span>';
+    try {
+      const res = await fetch(WORKER_URL + '/research', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({company:value.trim()}) });
+      if (!res.ok) throw new Error();
+      _preResearch = await res.json();
+      _preResearchCompany = value.trim();
+      const p = _preResearch?.perplexity || {};
+      const g = _preResearch?.grok || {};
+      if (p.industry && !document.getElementById('qindustry').value) document.getElementById('qindustry').value = p.industry;
+      const items = [
+        p.funding        && {lbl:'Funding',    val:p.funding},
+        p.headcount      && {lbl:'Team Size',  val:p.headcount},
+        p.new_hires      && {lbl:'Leadership', val:p.new_hires},
+        g.sentiment      && {lbl:'𝕏 Sentiment',val:g.sentiment},
+        p.strategy       && {lbl:'Strategy',   val:p.strategy},
+        g.trending_topics && {lbl:'𝕏 Signals', val:g.trending_topics},
+      ].filter(Boolean).slice(0, 4);
+      if (items.length) {
+        content.innerHTML = items.map(i => `<div class="qintel-item"><span class="qintel-lbl">${i.lbl}</span><span class="qintel-val">${i.val}</span></div>`).join('');
+      } else {
+        content.innerHTML = '<span class="qintel-loading">No public intel found — internal data will drive the QBR</span>';
+      }
+    } catch { panel.style.display = 'none'; _preResearch = null; _preResearchCompany = ''; }
+  }, 650);
+}
 
 async function runQBR() {
   const btn     = document.getElementById('qbtn');
@@ -207,24 +243,33 @@ async function runQBR() {
   _qbrResearch = null;
 
   btn.disabled = true;
-  btn.innerHTML = '<span class="scur"></span> Researching…';
   st.textContent = '';
   outWrap.style.display = 'block';
   tabBar.innerHTML = '';
   const oldBtn = document.getElementById('qreport-btn');
   if (oldBtn) oldBtn.remove();
-  out.innerHTML = `<div class="qloading">Researching ${accountName}<span class="scur"></span></div>`;
+  document.getElementById('qgen-cta').classList.remove('show');
   _qbrMarkdown = '';
 
-  // Step 1: research
-  try {
-    const rRes = await fetch(WORKER_URL + '/research', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ company: accountName })
-    });
-    if (rRes.ok) _qbrResearch = await rRes.json();
-  } catch {}
+  // Step 1: research — skip if already pre-fetched for this company
+  if (_preResearch && _preResearchCompany.toLowerCase() === accountName.toLowerCase()) {
+    _qbrResearch = _preResearch;
+    btn.innerHTML = '<span class="scur"></span> Generating…';
+    out.innerHTML = `<div class="qloading">Building QBR for ${accountName}<span class="scur"></span></div>`;
+  } else {
+    btn.innerHTML = '<span class="scur"></span> Researching…';
+    out.innerHTML = `<div class="qloading">Researching ${accountName}<span class="scur"></span></div>`;
+    try {
+      const rRes = await fetch(WORKER_URL + '/research', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ company: accountName })
+      });
+      if (rRes.ok) _qbrResearch = await rRes.json();
+    } catch {}
+    btn.innerHTML = '<span class="scur"></span> Generating…';
+    out.innerHTML = `<div class="qloading">Building QBR for ${accountName}<span class="scur"></span></div>`;
+  }
 
   // Step 2: generate QBR
   btn.innerHTML = '<span class="scur"></span> Generating…';
@@ -268,11 +313,12 @@ async function runQBR() {
       const reportBtn = document.createElement('button');
       reportBtn.id = 'qreport-btn';
       reportBtn.className = 'qact-btn';
-      reportBtn.style.cssText = 'background:var(--red);border-color:var(--red);color:#fff;font-weight:600;';
-      reportBtn.textContent = 'View Report →';
+      reportBtn.style.cssText = 'background:var(--red);border-color:var(--red);color:#fff;font-weight:600;letter-spacing:.1em;';
+      reportBtn.textContent = 'Open Full Report →';
       reportBtn.onclick = openQBRReport;
       actions.prepend(reportBtn);
     }
+    document.getElementById('qgen-cta').classList.add('show');
   } catch (err) {
     out.innerHTML = `<div class="qloading" style="color:var(--red)">Error: ${err.message}</div>`;
     st.textContent = 'Failed';
@@ -417,6 +463,15 @@ footer{margin-top:3rem;padding:1.2rem 0;border-top:1px solid var(--line);display
 
 /* No-intel notice */
 .no-intel{font-size:.75rem;color:rgba(200,200,240,.25);font-style:italic;padding:.6rem 0}
+
+/* Report CTA */
+.report-cta{margin-top:2.5rem;padding:2.5rem var(--pad);background:rgba(255,32,86,.04);border:1px solid rgba(255,32,86,.12);border-radius:4px;text-align:center}
+.rcta-eyebrow{font-size:.56rem;letter-spacing:.26em;text-transform:uppercase;color:var(--red);margin-bottom:.8rem}
+.rcta-headline{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.6rem,3vw,2.4rem);letter-spacing:.03em;color:var(--text);margin-bottom:.9rem;line-height:1.05}
+.rcta-body{font-size:.82rem;color:var(--dim);line-height:1.7;max-width:480px;margin:0 auto 1.6rem}
+.rcta-btn{display:inline-block;padding:.6rem 2rem;background:var(--red);color:#fff;text-decoration:none;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;border-radius:2px}
+.rcta-note{font-size:.6rem;color:rgba(180,180,220,.25);margin-top:.9rem}
+@media print{.report-cta{display:none}}
 </style>
 </head>
 <body>
@@ -478,6 +533,15 @@ footer{margin-top:3rem;padding:1.2rem 0;border-top:1px solid var(--line);display
     </div>`;
   }).join('')}
 
+  <!-- CTA -->
+  <div class="report-cta no-print">
+    <div class="rcta-eyebrow">murmur.red</div>
+    <div class="rcta-headline">Want this for every account, automatically?</div>
+    <p class="rcta-body">This QBR was generated in under 60 seconds. In production, your CS team receives one for every account — data pulled automatically from Salesforce, Mixpanel, and Stripe. No manual entry. No assembly time.</p>
+    <a href="https://calendly.com/murmur-red1/30min" target="_blank" class="rcta-btn">Book a 30-minute call →</a>
+    <div class="rcta-note">CS Automation Sprint · 6 weeks · €12,000 flat fee</div>
+  </div>
+
   <footer>
     <span>© 2026 murmur.red · Lena Ry · Amsterdam</span>
     <span>Generated ${date} · Confidential</span>
@@ -522,15 +586,6 @@ function copyQBR() {
     btn.textContent = 'Copied!';
     setTimeout(() => { btn.textContent = orig; }, 1800);
   });
-}
-
-function downloadQBR() {
-  const name = document.getElementById('qa').value.trim() || 'QBR';
-  const blob = new Blob([_qbrMarkdown], { type: 'text/plain' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `${name.replace(/\s+/g, '-')}-QBR.txt`;
-  a.click();
 }
 
 // ── Playbooks ────────────────────────────────────────────
