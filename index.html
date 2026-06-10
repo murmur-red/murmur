@@ -496,7 +496,7 @@ footer a:hover{color:var(--red)}
   <ul class="nlinks">
     <li><a href="https://seance.murmur.red" target="_blank" rel="noopener">Séance</a></li>
     <li><a href="#qbr">QBR Agent</a></li>
-    <li><a href="#stacks">AI Stacks</a></li>
+    <li><a href="#stacks">Playbooks</a></li>
     <li><a href="#arts">Articles</a></li>
     <li><a href="#cta" class="ncta">Let's talk</a></li>
   </ul>
@@ -506,7 +506,7 @@ footer a:hover{color:var(--red)}
 <div class="mnav" id="mnav">
   <a href="https://seance.murmur.red" target="_blank" rel="noopener" onclick="closeNav()">Séance</a>
   <a href="#qbr"    onclick="closeNav()">QBR Agent</a>
-  <a href="#stacks" onclick="closeNav()">AI Stacks</a>
+  <a href="#stacks" onclick="closeNav()">Playbooks</a>
   <a href="#arts"   onclick="closeNav()">Articles</a>
   <a href="#cta"    onclick="closeNav()">Let's talk</a>
 </div>
@@ -552,7 +552,7 @@ footer a:hover{color:var(--red)}
 
     <div class="hctas">
       <a href="#qbr"    class="bred">Try QBR Agent →</a>
-      <a href="#stacks" class="bghost">AI Stacks</a>
+      <a href="#stacks" class="bghost">Playbooks</a>
       <a href="https://seance.murmur.red" target="_blank" rel="noopener" class="bghost">SÉANCE ↗</a>
     </div>
   </div>
@@ -580,16 +580,17 @@ footer a:hover{color:var(--red)}
 <section id="stacks">
   <div class="inner">
     <div class="ahd rev">
-      <div class="cap">Toolkit</div>
-      <div class="bigtitle">AI STACKS</div>
-      <p class="stacksub">Curated tools and automation recipes. Pick a team to see the full stack and how the tools wire together.</p>
+      <div class="cap">Build Guides</div>
+      <div class="bigtitle">PLAYBOOKS</div>
+      <p class="stacksub">Real architecture for CS automation. Pick a use case — see exactly how the pieces connect, what to build first, and where teams get stuck.</p>
     </div>
 
     <div class="stabs">
-      <button class="stab on" onclick="switchStack('cs',this)">CS Teams</button>
-      <button class="stab" onclick="switchStack('ops',this)">Ops &amp; Growth</button>
-      <button class="stab" onclick="switchStack('creative',this)">Creative</button>
-      <button class="stab" onclick="switchStack('web',this)">Build a Website</button>
+      <button class="stab on" onclick="switchStack('qbr',this)">QBR Agent</button>
+      <button class="stab" onclick="switchStack('lifecycle',this)">CS Lifecycle</button>
+      <button class="stab" onclick="switchStack('churn',this)">Churn Detection</button>
+      <button class="stab" onclick="switchStack('onboarding',this)">Onboarding</button>
+      <button class="stab" onclick="switchStack('expansion',this)">Expansion Engine</button>
     </div>
 
     <div class="srecipewrap">
