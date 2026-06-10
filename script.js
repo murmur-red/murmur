@@ -600,6 +600,187 @@ footer{margin-top:3rem;padding:1.2rem 0;border-top:1px solid var(--line);display
 </html>`;
 }
 
+// ── Slide content extractor ──────────────────────────────
+function extractSlideContent(markdown) {
+  const sections = markdown.split(/\n(?=## )/).map(s => {
+    const m = s.match(/^## (.+)\n([\s\S]*)/);
+    return m ? { title: m[1].trim().toLowerCase(), raw: m[2].trim() } : null;
+  }).filter(Boolean);
+
+  const bullets = (raw, max = 4) =>
+    raw.split('\n')
+       .map(l => l.replace(/^[-*•]\s*/, '').replace(/\*\*(.*?)\*\*/g, '$1').replace(/^#{1,4}\s+/, '').trim())
+       .filter(l => l.length > 20 && l.length < 200 && !l.startsWith('|') && !l.startsWith('#') && !l.startsWith('-'))
+       .slice(0, max);
+
+  const riskKeys  = ['risk','concern','challenge','issue','churn','alert','health','watch'];
+  const nextKeys  = ['next','action','recommend','goal','plan','step','objective'];
+  let well = [], risk = [], next = [];
+
+  sections.forEach(s => {
+    const b = bullets(s.raw);
+    if (nextKeys.some(k => s.title.includes(k)))      next.push(...b);
+    else if (riskKeys.some(k => s.title.includes(k))) risk.push(...b);
+    else                                               well.push(...b);
+  });
+
+  // Fallback: distribute evenly if parser found nothing
+  if (!well.length && !risk.length && !next.length && sections.length) {
+    sections.forEach((s, i) => {
+      const b = bullets(s.raw);
+      if (i === 0) well.push(...b);
+      else if (i % 2 === 0) next.push(...b);
+      else risk.push(...b);
+    });
+  }
+
+  return { well: well.slice(0,4), risk: risk.slice(0,4), next: next.slice(0,4) };
+}
+
+// ── PPTX generator ───────────────────────────────────────
+function downloadPPTX() {
+  if (!_qbrMarkdown) return;
+
+  const btn = document.getElementById('pptx-btn');
+  if (btn) { btn.textContent = 'Building…'; btn.disabled = true; }
+
+  try {
+    const pres  = new pptxgen();
+    pres.layout = 'LAYOUT_WIDE'; // 13.33" × 7.5"
+
+    const BG    = '07070F';
+    const RED   = 'FF2056';
+    const WHITE = 'F0F0FF';
+    const DIM   = '55556A';
+    const DIM2  = '333348';
+    const GREEN = '34D399';
+    const AMBER = 'FB923C';
+    const BLUE  = '38BDF8';
+    const CARD  = '0F0F1E';
+
+    const fd      = _qbrFakeData || {};
+    const company = _qbrAccountName || 'Company';
+    const date    = new Date().toLocaleDateString('en-GB', {year:'numeric', month:'long', day:'numeric'});
+    const content = extractSlideContent(_qbrMarkdown);
+
+    const addFooter = (slide) =>
+      slide.addText(`${company} · QBR · ${date}`, {
+        x:0.4, y:7.1, w:12.5, h:0.3, fontSize:8, color:DIM2, fontFace:'Arial'
+      });
+
+    const accentBar = (slide, color) =>
+      slide.addShape('rect', {x:0, y:0, w:0.06, h:7.5, fill:{color}, line:{color}});
+
+    const rule = (slide) =>
+      slide.addShape('rect', {x:0.4, y:1.28, w:12.5, h:0.02, fill:{color:DIM2}, line:{color:DIM2}});
+
+    const brand = (slide) =>
+      slide.addText('murmur.red', {x:0.4, y:0.28, w:4, h:0.3, fontSize:9, color:RED, fontFace:'Arial', bold:true, charSpacing:3});
+
+    // ── Slide 1: Cover ────────────────────────────────────
+    const s1 = pres.addSlide();
+    s1.background = {color: BG};
+    accentBar(s1, RED);
+    s1.addText('murmur.red', {x:0.4, y:0.42, w:4, h:0.35, fontSize:11, color:RED, fontFace:'Arial', bold:true, charSpacing:3});
+    s1.addText(company, {x:0.4, y:1.35, w:12.5, h:2.4, fontSize:Math.max(28, Math.min(64, Math.floor(540/company.length))), color:WHITE, fontFace:'Arial', bold:true, wrap:true});
+    s1.addText('QUARTERLY BUSINESS REVIEW', {x:0.4, y:3.85, w:12, h:0.5, fontSize:13, color:RED, fontFace:'Arial', bold:true, charSpacing:4});
+    s1.addText(`Prepared by murmur.red · ${date}`, {x:0.4, y:4.45, w:9, h:0.4, fontSize:12, color:DIM, fontFace:'Arial'});
+
+    if (fd.arr) {
+      s1.addShape('rect', {x:0.4, y:5.7, w:12.5, h:0.02, fill:{color:DIM2}, line:{color:DIM2}});
+      [{l:'ARR', v: fd.arrFmt||'—'}, {l:'HEALTH', v: (fd.health||'—')+'/100'}, {l:'RENEWAL', v: fd.renewalShort||'—'}, {l:'NPS', v: String(fd.nps||'—')}]
+        .forEach((m, i) => {
+          const x = 0.4 + i * 3.2;
+          s1.addText(m.l, {x, y:5.88, w:3, h:0.28, fontSize:8, color:DIM, fontFace:'Arial', charSpacing:2});
+          s1.addText(m.v, {x, y:6.2,  w:3, h:0.55, fontSize:20, color:WHITE, fontFace:'Arial', bold:true});
+        });
+    }
+
+    // ── Slide 2: Key Metrics ──────────────────────────────
+    const s2 = pres.addSlide();
+    s2.background = {color: BG};
+    accentBar(s2, RED); brand(s2);
+    s2.addText('KEY METRICS', {x:0.4, y:0.62, w:12, h:0.58, fontSize:30, color:WHITE, fontFace:'Arial', bold:true});
+    rule(s2);
+
+    const hScore = Number(fd.health)||0;
+    const cards  = [
+      {l:'Annual Recurring Revenue', v: fd.arrFmt||'—',                         c: GREEN},
+      {l:'Health Score',             v: hScore ? `${hScore} / 100` : '—',        c: hScore>74?GREEN:hScore>54?AMBER:RED},
+      {l:'Active Seats',             v: fd.seatsAct&&fd.seatsLic ? `${fd.seatsAct} / ${fd.seatsLic}` : '—', c: WHITE},
+      {l:'NPS Score',                v: String(fd.nps||'—'),                     c: (fd.nps||0)>50?GREEN:(fd.nps||0)>30?AMBER:RED},
+      {l:'Open Support Tickets',     v: String(fd.tickets||'—'),                 c: (fd.tickets||0)>5?AMBER:WHITE},
+      {l:'Renewal Date',             v: fd.renewalShort||'—',                   c: BLUE},
+    ];
+    cards.forEach((c, i) => {
+      const col = i % 3, row = Math.floor(i / 3);
+      const x = 0.4 + col * 4.32, y = 1.58 + row * 2.7;
+      s2.addShape('rect', {x, y, w:4.1, h:2.45, fill:{color:CARD}, line:{color:DIM2, width:0.5}});
+      s2.addText(c.l.toUpperCase(), {x:x+0.2, y:y+0.22, w:3.7, h:0.35, fontSize:8, color:DIM, fontFace:'Arial', charSpacing:1.5});
+      s2.addText(c.v, {x:x+0.15, y:y+0.7, w:3.8, h:1.4, fontSize:28, color:c.c, fontFace:'Arial', bold:true, valign:'middle'});
+    });
+    addFooter(s2);
+
+    // ── Slide 3: What Went Well ───────────────────────────
+    const s3 = pres.addSlide();
+    s3.background = {color: BG};
+    accentBar(s3, GREEN); brand(s3);
+    s3.addText('WHAT WENT WELL', {x:0.4, y:0.62, w:12, h:0.58, fontSize:30, color:WHITE, fontFace:'Arial', bold:true});
+    rule(s3);
+
+    const wellPts = content.well.length ? content.well :
+      ['Strong engagement from key stakeholders this quarter','Core product adoption tracking above industry benchmark','Support ticket volume trending down quarter-over-quarter'];
+    wellPts.slice(0,4).forEach((pt, i) => {
+      const y = 1.62 + i * 1.35;
+      s3.addShape('rect', {x:0.4, y:y+0.05, w:0.36, h:0.36, fill:{color:GREEN+'18'}, line:{color:GREEN+'55', width:0.5}});
+      s3.addText('✓', {x:0.4, y:y+0.04, w:0.36, h:0.38, fontSize:11, color:GREEN, fontFace:'Arial', bold:true, align:'center', valign:'middle'});
+      s3.addText(pt, {x:0.9, y, w:12, h:1.2, fontSize:18, color:WHITE, fontFace:'Arial', valign:'middle', wrap:true});
+    });
+    addFooter(s3);
+
+    // ── Slide 4: What's At Risk ───────────────────────────
+    const s4 = pres.addSlide();
+    s4.background = {color: BG};
+    accentBar(s4, RED); brand(s4);
+    s4.addText("WHAT'S AT RISK", {x:0.4, y:0.62, w:12, h:0.58, fontSize:30, color:WHITE, fontFace:'Arial', bold:true});
+    rule(s4);
+
+    const riskPts = content.risk.length ? content.risk :
+      [fd.challenge||'Monitor engagement trends heading into renewal window','Review current adoption blockers with key stakeholders'];
+    riskPts.slice(0,4).forEach((pt, i) => {
+      const y = 1.62 + i * 1.35;
+      s4.addShape('rect', {x:0.4, y:y+0.05, w:0.36, h:0.36, fill:{color:RED+'18'}, line:{color:RED+'55', width:0.5}});
+      s4.addText('!', {x:0.4, y:y+0.04, w:0.36, h:0.38, fontSize:14, color:RED, fontFace:'Arial', bold:true, align:'center', valign:'middle'});
+      s4.addText(pt, {x:0.9, y, w:12, h:1.2, fontSize:18, color:WHITE, fontFace:'Arial', valign:'middle', wrap:true});
+    });
+    addFooter(s4);
+
+    // ── Slide 5: Next 90 Days ─────────────────────────────
+    const s5 = pres.addSlide();
+    s5.background = {color: BG};
+    accentBar(s5, BLUE); brand(s5);
+    s5.addText('NEXT 90 DAYS', {x:0.4, y:0.62, w:12, h:0.58, fontSize:30, color:WHITE, fontFace:'Arial', bold:true});
+    rule(s5);
+
+    const nextPts = content.next.length ? content.next :
+      ['Drive feature adoption to agreed activation threshold','Schedule executive business review before renewal window','Define expansion criteria and present growth proposal'];
+    nextPts.slice(0,4).forEach((pt, i) => {
+      const y = 1.62 + i * 1.35;
+      s5.addShape('rect', {x:0.4, y:y+0.02, w:0.4, h:0.42, fill:{color:BLUE+'18'}, line:{color:BLUE+'55', width:0.5}});
+      s5.addText(String(i+1).padStart(2,'0'), {x:0.4, y:y+0.02, w:0.4, h:0.42, fontSize:13, color:BLUE, fontFace:'Arial', bold:true, align:'center', valign:'middle'});
+      s5.addText(pt, {x:0.95, y, w:12, h:1.2, fontSize:18, color:WHITE, fontFace:'Arial', valign:'middle', wrap:true});
+      if (i < nextPts.length - 1)
+        s5.addShape('rect', {x:0.4, y:y+1.3, w:12.5, h:0.02, fill:{color:DIM2}, line:{color:DIM2}});
+    });
+    addFooter(s5);
+
+    pres.writeFile({fileName: `${company.replace(/[^\w\s-]/g,'').trim().replace(/\s+/g,'-')}-QBR.pptx`});
+
+  } finally {
+    if (btn) { btn.textContent = '↓ Download Slides'; btn.disabled = false; }
+  }
+}
+
 function renderQBRTabs(markdown) {
   const md    = typeof marked.parse === 'function' ? marked.parse : marked;
   const parts = markdown.split(/\n(?=## )/);
