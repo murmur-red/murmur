@@ -530,6 +530,7 @@ footer{margin-top:3rem;padding:1.2rem 0;border-top:1px solid var(--line);display
   </div>
   <div class="tb-actions">
     <button class="btn btn-ghost" onclick="window.close()">← Back</button>
+    <button class="btn btn-ghost" onclick="window.opener&&window.opener.downloadPPTX?window.opener.downloadPPTX():alert('Return to murmur.red to download slides')">↓ Download Slides</button>
     <button class="btn btn-red" onclick="window.print()">Download PDF</button>
   </div>
 </div>
