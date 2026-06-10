@@ -1,6 +1,15 @@
 {
-  "updated": "2026-06-08",
+  "updated": "2026-06-10",
   "articles": [
+    {
+      "id": "9dea1206-d9fc-49fa-b271-1107da5a0d74",
+      "title": "Two planets, one billion phone cameras, and the death of nature documentaries",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-06-10",
+      "status": "Published",
+      "url": "https://murmur-red.github.io/blog/tech/2026/06/10/two-planets-one-billion-phone-cameras-and-the-deat.html"
+    },
     {
       "id": "5c96358e-bfd8-4e1d-9007-63e22cbabe81",
       "title": "Nobody Is Archiving What the Internet Argues About",
