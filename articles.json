@@ -1,6 +1,15 @@
 {
-  "updated": "2026-06-10",
+  "updated": "2026-06-12",
   "articles": [
+    {
+      "id": "bc74a78f-4128-4d14-b6a5-b8418073a60a",
+      "title": "Your Gas Bill Is a War Casualty",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-06-12",
+      "status": "Published",
+      "url": "https://murmur-red.github.io/blog/tech/2026/06/12/your-gas-bill-is-a-war-casualty.html"
+    },
     {
       "id": "9dea1206-d9fc-49fa-b271-1107da5a0d74",
       "title": "Two planets, one billion phone cameras, and the death of nature documentaries",
