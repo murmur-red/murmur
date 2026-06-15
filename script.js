@@ -113,7 +113,7 @@ function triggerUnicorn(){
 }
 
 function initTW(){
-  const phrases=['AI Customer Lifecycle Expert','Growth & Operations Expert','Head of Customer Success','Co-Founder @ YGames','SaaS Churn Slayer','Unicorn'];
+  const phrases=['Head of AI Operations','AI Customer Lifecycle Expert','Growth & Operations Expert','Head of Customer Success','Co-Founder @ YGames','SaaS Churn Slayer','Unicorn'];
   const el=document.getElementById('tw');
   let pi=0,ci=0,del=false,w=0;
   (function tick(){
