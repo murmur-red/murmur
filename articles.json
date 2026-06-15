@@ -1,6 +1,15 @@
 {
-  "updated": "2026-06-12",
+  "updated": "2026-06-15",
   "articles": [
+    {
+      "id": "7271b9be-92dd-4d35-bfcb-f4d2edc45eb5",
+      "title": "The UFC Trended Higher Than Every AI Lab Combined and Nobody Noticed",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-06-15",
+      "status": "Published",
+      "url": "https://murmur-red.github.io/blog/tech/2026/06/15/the-ufc-trended-higher-than-every-ai-lab-combined.html"
+    },
     {
       "id": "bc74a78f-4128-4d14-b6a5-b8418073a60a",
       "title": "Your Gas Bill Is a War Casualty",
