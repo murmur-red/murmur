@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Building AI Resilience · murmur.red</title>
+<meta name="description" content="The portfolio approach: six moves that keep your operation running when the AI market consolidates to three vendors, and one of them blinks. By Lena Ry, murmur.red.">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#050509;
+    --text:#f0f0ff;
+    --dim:rgba(200,200,240,.5);
+    --faint:rgba(200,200,240,.28);
+    --line:rgba(255,255,255,.09);
+    --red:#ff2056;
+    --red-deep:#b81642;
+    --red-glow:rgba(255,32,86,.08);
+    --pad:clamp(20px,4vw,52px);
+  }
+
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;overflow-x:clip}
+
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Space Grotesk',sans-serif;
+    font-size:15px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    min-width:320px;
+  }
+
+  /* film-grain noise, like the rest of murmur.red */
+  body::before{
+    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.02;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size:200px;
+  }
+
+  .wrap{
+    position:relative;
+    z-index:1;
+    max-width:920px;
+    margin:0 auto;
+    padding:0 var(--pad);
+  }
+
+  /* ---- top bar ---- */
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:1.4rem 0;
+  }
+  .mark{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:1.2rem;
+    letter-spacing:.14em;
+    color:var(--red);
+    text-decoration:none;
+  }
+  .topbar .meta{
+    color:var(--dim);
+    font-size:.62rem;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+  }
+
+  /* ---- hero ---- */
+  .hero{padding:clamp(48px,8vw,84px) 0 60px}
+  .eyebrow{
+    font-size:.66rem;
+    letter-spacing:.26em;
+    text-transform:uppercase;
+    color:var(--dim);
+    margin-bottom:1.8rem;
+    display:flex;
+    align-items:center;
+    gap:.9rem;
+  }
+  .eyebrow::before{
+    content:'';
+    width:1.6rem;height:1px;
+    background:var(--red);
+    flex:none;
+  }
+  h1{
+    font-family:'Bebas Neue',sans-serif;
+    font-weight:400;
+    font-size:clamp(56px,12vw,128px);
+    line-height:.9;
+    letter-spacing:.02em;
+    margin-bottom:1.8rem;
+  }
+  h1 .accent{display:inline-block;position:relative;color:var(--red)}
+  .thesis{
+    font-size:clamp(15px,2.2vw,18px);
+    max-width:60ch;
+    color:var(--text);
+    font-weight:400;
+  }
+  .thesis .dim{color:var(--dim)}
+
+  /* ---- intro ---- */
+  .intro{
+    padding:.5rem 0 3.4rem;
+    border-bottom:1px solid var(--line);
+  }
+  .intro p{
+    max-width:66ch;
+    color:var(--dim);
+    font-size:15px;
+  }
+  .intro p strong{color:var(--text);font-weight:500}
+
+  /* ---- principles ---- */
+  .moves{padding:.5rem 0 0}
+  .move{
+    display:grid;
+    grid-template-columns:64px 1fr;
+    gap:0 28px;
+    padding:2.6rem 0;
+    border-bottom:1px solid var(--line);
+  }
+  .move .idx{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:1.15rem;
+    color:var(--faint);
+    letter-spacing:.06em;
+    padding-top:.35rem;
+  }
+  .move .body{min-width:0}
+  .move h2{
+    font-weight:600;
+    font-size:clamp(20px,3vw,26px);
+    letter-spacing:-.01em;
+    line-height:1.15;
+    margin-bottom:1rem;
+    transition:color .25s ease;
+  }
+  .move p{
+    color:var(--dim);
+    font-size:15px;
+    max-width:62ch;
+  }
+  .move p em{color:var(--text);font-style:normal;font-weight:500}
+
+  .fail{
+    margin-top:1.4rem;
+    display:inline-flex;
+    align-items:baseline;
+    gap:.8rem;
+    padding:.6rem 1rem .6rem .9rem;
+    background:var(--red-glow);
+    border-left:2px solid var(--red);
+    border-radius:2px;
+    font-size:.82rem;
+  }
+  .fail .tag{
+    color:var(--red);
+    font-size:.6rem;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    white-space:nowrap;
+    font-weight:500;
+  }
+  .fail .what{color:var(--text);font-weight:400}
+
+  .move:hover h2{color:var(--red)}
+  .move:hover .idx{color:var(--red)}
+
+  /* ---- tool map ---- */
+  .toolmap{padding:3.6rem 0 .3rem;border-bottom:1px solid var(--line)}
+  .toolmap .cap{
+    font-size:.62rem;
+    letter-spacing:.26em;
+    text-transform:uppercase;
+    color:var(--dim);
+  }
+  .toolmap h2.maphead{
+    font-family:'Bebas Neue',sans-serif;
+    font-weight:400;
+    font-size:clamp(30px,5vw,46px);
+    letter-spacing:.02em;
+    line-height:.98;
+    margin:.4rem 0 1rem;
+  }
+  .toolmap .lead{
+    color:var(--dim);
+    font-size:15px;
+    max-width:64ch;
+    margin-bottom:2.4rem;
+  }
+  .toolmap .lead em{color:var(--text);font-style:normal;font-weight:500}
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .cell{
+    background:var(--bg);
+    padding:1.7rem 1.6rem;
+    transition:background .25s ease;
+  }
+  .cell .num{
+    font-size:.6rem;
+    color:var(--faint);
+    letter-spacing:.16em;
+    text-transform:uppercase;
+  }
+  .cell h3{
+    font-weight:600;
+    font-size:1.05rem;
+    letter-spacing:-.01em;
+    margin:.5rem 0 1.1rem;
+    transition:color .25s ease;
+  }
+  .tools{display:flex;flex-wrap:wrap;gap:.45rem}
+  .tool{
+    font-size:.68rem;
+    letter-spacing:.02em;
+    padding:.28rem .7rem;
+    border:1px solid var(--line);
+    border-radius:20px;
+    color:var(--dim);
+    white-space:nowrap;
+    background:rgba(255,255,255,.02);
+    transition:border-color .2s,color .2s;
+  }
+  .cell:hover{background:rgba(255,255,255,.015)}
+  .cell:hover h3{color:var(--red)}
+  .tool:hover{border-color:rgba(255,32,86,.4);color:var(--text)}
+  .toolmap .note{
+    margin-top:1.2rem;
+    font-size:.66rem;
+    color:var(--faint);
+    letter-spacing:.04em;
+  }
+
+  /* ---- close / cta ---- */
+  .close{padding:4rem 0 1.5rem}
+  .close .kicker{
+    font-size:.62rem;
+    letter-spacing:.26em;
+    text-transform:uppercase;
+    color:var(--dim);
+    margin-bottom:1.4rem;
+  }
+  .close blockquote{
+    font-family:'Bebas Neue',sans-serif;
+    font-weight:400;
+    font-size:clamp(30px,5.5vw,52px);
+    line-height:1.02;
+    letter-spacing:.02em;
+    max-width:18ch;
+    margin-bottom:2.4rem;
+  }
+  .close blockquote .r{color:var(--red)}
+  .cta{
+    display:inline-flex;
+    align-items:center;
+    gap:.7rem;
+    color:var(--red);
+    text-decoration:none;
+    font-size:.8rem;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    padding:.7rem 1.4rem;
+    border:1px solid var(--red);
+    border-radius:2px;
+    transition:background .2s ease;
+  }
+  .cta::after{content:'→';transition:transform .25s ease}
+  .cta:hover{background:rgba(255,32,86,.1)}
+  .cta:hover::after{transform:translateX(5px)}
+
+  footer{
+    padding:2.6rem 0 3.4rem;
+    border-top:1px solid var(--line);
+    margin-top:2.6rem;
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:.8rem;
+    color:var(--faint);
+    font-size:.7rem;
+    letter-spacing:.04em;
+  }
+  footer a{color:var(--dim);text-decoration:none}
+  footer a:hover{color:var(--red)}
+
+  a:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+
+  /* ---- entrance motion ---- */
+  @media (prefers-reduced-motion:no-preference){
+    .reveal{opacity:0;transform:translateY(16px);animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards}
+    .move.reveal{animation-delay:calc(var(--i,0)*.06s)}
+  }
+  @keyframes rise{to{opacity:1;transform:none}}
+
+  @media (max-width:560px){
+    .move{grid-template-columns:1fr;gap:.8rem 0}
+    .move .idx{padding-top:0}
+    .grid{grid-template-columns:1fr}
+    .fail{flex-direction:column;gap:.35rem}
+  }
+</style>
+</head>
+<body>
+
+  <div class="wrap">
+
+    <div class="topbar">
+      <a class="mark" href="https://murmur.red">murmur.red</a>
+      <span class="meta">AI Operations · Field Notes</span>
+    </div>
+
+    <header class="hero">
+      <div class="eyebrow reveal">The Portfolio Approach · For small &amp; medium companies</div>
+      <h1 class="reveal">Building AI<br><span class="accent">Resilience</span></h1>
+      <p class="thesis reveal">Six moves that keep your operation running when the market consolidates to three vendors. <span class="dim">And one of them blinks.</span></p>
+    </header>
+
+    <section class="intro">
+      <p class="reveal">The technology is solved. The structure is fragile. Most companies building on AI today have a single point of failure that isn't technical. It's a vendor, a regulator, or a country away from being switched off. <strong>You can't own a frontier model. You can own everything around it.</strong> That's the work.</p>
+    </section>
+
+    <main class="moves">
+
+      <article class="move reveal" style="--i:1">
+        <div class="idx">01</div>
+        <div class="body">
+          <h2>Multimodel Architecture</h2>
+          <p>Don't bet the company on one vendor's API. Build your critical paths to run across multiple models: <em>OpenAI for some tasks, Anthropic for others, open source where it fits</em>. When one goes down or gets restricted, you degrade gracefully instead of stopping.</p>
+          <div class="fail"><span class="tag">Fails without it</span><span class="what">One API key away from zero.</span></div>
+        </div>
+      </article>
+
+      <article class="move reveal" style="--i:2">
+        <div class="idx">02</div>
+        <div class="body">
+          <h2>In-House Capability for Critical Paths</h2>
+          <p>Identify what actually matters to the business and <em>fine-tune smaller models on your own data</em> for those functions. You don't need frontier capability everywhere. You need ownership where it counts.</p>
+          <div class="fail"><span class="tag">Fails without it</span><span class="what">Renting your own core competency.</span></div>
+        </div>
+      </article>
+
+      <article class="move reveal" style="--i:3">
+        <div class="idx">03</div>
+        <div class="body">
+          <h2>Fallback Infrastructure</h2>
+          <p>Keep open-source models (<em>Llama, Mistral, others</em>) running on your own servers for essential operations. They're not as good as frontier models. They're good enough when the alternative is nothing.</p>
+          <div class="fail"><span class="tag">Fails without it</span><span class="what">Nothing is worse than good enough.</span></div>
+        </div>
+      </article>
+
+      <article class="move reveal" style="--i:4">
+        <div class="idx">04</div>
+        <div class="body">
+          <h2>Data Moat</h2>
+          <p>Build proprietary datasets and domain-specific fine-tuning. Your advantage isn't renting someone else's model. <em>It's knowing your domain better than the generic LLM does</em>.</p>
+          <div class="fail"><span class="tag">Fails without it</span><span class="what">The generic model knows your business as well as anyone's. Which is to say, not at all.</span></div>
+        </div>
+      </article>
+
+      <article class="move reveal" style="--i:5">
+        <div class="idx">05</div>
+        <div class="body">
+          <h2>Vendor Diversification</h2>
+          <p>Spread the dependency. <em>Multiple cloud providers. Multiple API vendors. Multiple model architectures.</em> Single points of failure kill companies faster than bad technology does.</p>
+          <div class="fail"><span class="tag">Fails without it</span><span class="what">One outage you didn't cause, charged to your name.</span></div>
+        </div>
+      </article>
+
+      <article class="move reveal" style="--i:6">
+        <div class="idx">06</div>
+        <div class="body">
+          <h2>Regulatory Hedging</h2>
+          <p>Know where the rules are moving. Build infrastructure that stays compliant across jurisdictions (<em>US, EU, others</em>), so a policy shift in one region doesn't freeze your entire operation.</p>
+          <div class="fail"><span class="tag">Fails without it</span><span class="what">A policy you didn't write, freezing a business you did.</span></div>
+        </div>
+      </article>
+
+    </main>
+
+    <section class="toolmap reveal">
+      <div class="cap">The Toolmap</div>
+      <h2 class="maphead">Six moves, mapped to what you actually use</h2>
+      <p class="lead">Principles are cheap. Here's the working stack: <em>the tools and utilities that turn each move into something running in production.</em> Pick one per layer and you have resilience by Friday.</p>
+
+      <div class="grid">
+
+        <div class="cell">
+          <div class="num">01 · Multimodel Architecture</div>
+          <h3>Routing &amp; Gateways</h3>
+          <div class="tools">
+            <span class="tool">OpenRouter</span>
+            <span class="tool">LiteLLM</span>
+            <span class="tool">Portkey</span>
+            <span class="tool">Vercel AI SDK</span>
+            <span class="tool">AWS Bedrock</span>
+            <span class="tool">Cloudflare AI Gateway</span>
+          </div>
+        </div>
+
+        <div class="cell">
+          <div class="num">02 · In-House Capability</div>
+          <h3>Fine-Tuning</h3>
+          <div class="tools">
+            <span class="tool">Unsloth</span>
+            <span class="tool">Axolotl</span>
+            <span class="tool">Hugging Face PEFT</span>
+            <span class="tool">Predibase</span>
+            <span class="tool">Together AI</span>
+            <span class="tool">Modal</span>
+          </div>
+        </div>
+
+        <div class="cell">
+          <div class="num">03 · Fallback Infrastructure</div>
+          <h3>Self-Hosted Serving</h3>
+          <div class="tools">
+            <span class="tool">Ollama</span>
+            <span class="tool">vLLM</span>
+            <span class="tool">llama.cpp</span>
+            <span class="tool">TGI</span>
+            <span class="tool">LM Studio</span>
+            <span class="tool">SkyPilot</span>
+          </div>
+        </div>
+
+        <div class="cell">
+          <div class="num">04 · Data Moat</div>
+          <h3>Data &amp; Retrieval</h3>
+          <div class="tools">
+            <span class="tool">LlamaIndex</span>
+            <span class="tool">pgvector</span>
+            <span class="tool">Qdrant</span>
+            <span class="tool">Weaviate</span>
+            <span class="tool">Unstructured</span>
+            <span class="tool">Label Studio</span>
+          </div>
+        </div>
+
+        <div class="cell">
+          <div class="num">05 · Vendor Diversification</div>
+          <h3>Portable Infrastructure</h3>
+          <div class="tools">
+            <span class="tool">Azure OpenAI</span>
+            <span class="tool">Google Vertex</span>
+            <span class="tool">AWS Bedrock</span>
+            <span class="tool">Terraform</span>
+            <span class="tool">Kubernetes</span>
+            <span class="tool">Docker</span>
+          </div>
+        </div>
+
+        <div class="cell">
+          <div class="num">06 · Regulatory Hedging</div>
+          <h3>Compliance &amp; Guardrails</h3>
+          <div class="tools">
+            <span class="tool">Mistral (EU)</span>
+            <span class="tool">Scaleway</span>
+            <span class="tool">OVHcloud</span>
+            <span class="tool">Guardrails AI</span>
+            <span class="tool">Lakera</span>
+            <span class="tool">Vanta</span>
+          </div>
+        </div>
+
+      </div>
+      <p class="note">Examples, not endorsements: one viable pick per layer. The point is coverage, not a specific logo.</p>
+    </section>
+
+    <section class="close">
+      <div class="kicker">The actual point</div>
+      <blockquote>The real risk isn't AI. It's an AI-dependent economy <span class="r">built without resilience.</span></blockquote>
+      <a class="cta" href="mailto:murmur.red1@gmail.com">Build it properly</a>
+    </section>
+
+    <footer>
+      <span>© 2026 Lena Ry · murmur.red · AI Operations, Amsterdam</span>
+      <a href="https://murmur.red">murmur.red</a>
+    </footer>
+
+  </div>
+
+</body>
+</html>
