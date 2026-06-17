@@ -1,6 +1,15 @@
 {
-  "updated": "2026-06-15",
+  "updated": "2026-06-17",
   "articles": [
+    {
+      "id": "7ffc9e9b-ebc1-4de7-8a80-c04680ff2583",
+      "title": "Salmon DNA Is the Skincare Trend Nobody Saw Coming",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-06-17",
+      "status": "Published",
+      "url": "https://murmur-red.github.io/blog/tech/2026/06/17/salmon-dna-is-the-skincare-trend-nobody-saw-coming.html"
+    },
     {
       "id": "7271b9be-92dd-4d35-bfcb-f4d2edc45eb5",
       "title": "The UFC Trended Higher Than Every AI Lab Combined and Nobody Noticed",
