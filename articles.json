@@ -1,6 +1,15 @@
 {
-  "updated": "2026-06-17",
+  "updated": "2026-06-19",
   "articles": [
+    {
+      "id": "400e5a03-4e89-41fa-bbee-9d4c44a18802",
+      "title": "A Ceasefire That Killed a Thousand People Is Not a Ceasefire",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-06-19",
+      "status": "Published",
+      "url": "https://murmur-red.github.io/blog/tech/2026/06/19/a-ceasefire-that-killed-a-thousand-people-is-not-a.html"
+    },
     {
       "id": "7ffc9e9b-ebc1-4de7-8a80-c04680ff2583",
       "title": "Salmon DNA Is the Skincare Trend Nobody Saw Coming",
