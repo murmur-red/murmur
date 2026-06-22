@@ -1,6 +1,15 @@
 {
-  "updated": "2026-06-19",
+  "updated": "2026-06-22",
   "articles": [
+    {
+      "id": "1062ead5-83ba-47fd-a61d-091300a5048a",
+      "title": "Is Claude Down\" Is the Scariest Search of the Day",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-06-22",
+      "status": "Published",
+      "url": "https://murmur-red.github.io/blog/tech/2026/06/22/is-claude-down-is-the-scariest-search-of-the-day.html"
+    },
     {
       "id": "400e5a03-4e89-41fa-bbee-9d4c44a18802",
       "title": "A Ceasefire That Killed a Thousand People Is Not a Ceasefire",
