@@ -1,6 +1,15 @@
 {
-  "updated": "2026-06-22",
+  "updated": "2026-06-24",
   "articles": [
+    {
+      "id": "e6024dcf-8d01-493e-a05a-ae72ba8636de",
+      "title": "There Is No Such Thing As \"Trending\" Anymore",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-06-24",
+      "status": "Published",
+      "url": "https://murmur-red.github.io/blog/tech/2026/06/24/there-is-no-such-thing-as-trending-anymore.html"
+    },
     {
       "id": "1062ead5-83ba-47fd-a61d-091300a5048a",
       "title": "Is Claude Down\" Is the Scariest Search of the Day",
