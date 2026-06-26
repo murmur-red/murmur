@@ -1,6 +1,15 @@
 {
-  "updated": "2026-06-24",
+  "updated": "2026-06-26",
   "articles": [
+    {
+      "id": "c42f1a50-66b4-4675-ae8d-16e96a3aba69",
+      "title": "A Cartoon Hashtag Beat Every National Team on Earth",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-06-26",
+      "status": "Published",
+      "url": "https://murmur-red.github.io/blog/tech/2026/06/26/a-cartoon-hashtag-beat-every-national-team-on-eart.html"
+    },
     {
       "id": "e6024dcf-8d01-493e-a05a-ae72ba8636de",
       "title": "There Is No Such Thing As \"Trending\" Anymore",
