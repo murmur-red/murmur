@@ -1,6 +1,15 @@
 {
-  "updated": "2026-07-03",
+  "updated": "2026-07-06",
   "articles": [
+    {
+      "id": "0b8ab46a-2079-4d96-b8ec-dbedf667551d",
+      "title": "There Is No Such Thing As \"What's Trending",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-07-06",
+      "status": "Published",
+      "url": "https://murmur-red.github.io/blog/tech/2026/07/06/there-is-no-such-thing-as-whats-trending.html"
+    },
     {
       "id": "b503893d-3a80-4fd3-b999-e00c983905a5",
       "title": "Hollywood Just Told You It Has No Ideas Left, and It Named the Movie Happy Gilmore 2",
