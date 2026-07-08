@@ -1,6 +1,15 @@
 {
-  "updated": "2026-07-06",
+  "updated": "2026-07-08",
   "articles": [
+    {
+      "id": "fae5a8ba-cf8e-4526-9385-4ba040fe6e94",
+      "title": "People Are Betting Money on How Often Elon Musk Tweets",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-07-08",
+      "status": "Published",
+      "url": "https://murmur-red.github.io/blog/tech/2026/07/08/people-are-betting-money-on-how-often-elon-musk-tw.html"
+    },
     {
       "id": "0b8ab46a-2079-4d96-b8ec-dbedf667551d",
       "title": "There Is No Such Thing As \"What's Trending",
