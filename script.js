@@ -49,7 +49,6 @@ window.addEventListener('load', () => {
             loader.style.display = 'none';
             initTW();
             initReveal();
-            initStacks();
             loadArticles();
             loadAccountsQBR();
           }, 400);
@@ -817,157 +816,1309 @@ function copyQBR() {
   });
 }
 
-// ── Playbooks ────────────────────────────────────────────
-const CATC={
-  'Input Layer':'#38bdf8','Core Layer':'#a78bfa','AI Engine':'#d97706',
-  'Output Layer':'#34d399','Memory':'#fb923c','Trigger':'#ff2056',
-  'Scoring':'#f59e0b','Communication':'#34d399','Detection':'#ff2056',
-  'Routing':'#a78bfa',
+// ── Playbooks — AI Build Loadouts ─────────────────────────
+const examples = [
+  "Gmail agent that answers emails and creates calendar events",
+  "Time machine that lets people explore historical moments",
+  "AI support assistant for a help inbox",
+  "Dashboard that turns spreadsheets into weekly reports",
+  "Client portal for requests, files, and status updates",
+  "Ecommerce workflow for orders, refunds, and support",
+  "Research agent that monitors competitors and drafts briefs"
+];
+
+const state = {
+  quest:
+    "Gmail agent that answers emails and creates calendar events",
+  selectedLoadout: "",
+  selectedAI: "codex",
+  selectedModel: "openai",
+  selectedChannel: "teams",
+  aiResult: null,
+  aiError: "",
+  isLoading: false,
+  copyNotice: ""
 };
-const STACKS={
-  qbr:{label:'QBR Agent',color:'#38bdf8',
-    recipe:{name:'QBR Agent Pipeline',steps:[
-      {tool:'Stripe / Salesforce',action:'account data pulled'},
-      {tool:'Mixpanel / Amplitude',action:'usage snapshot built'},
-      {tool:'Zendesk / Intercom',action:'support health pulled'},
-      {tool:'Claude Opus',action:'narrative generated'},
-      {tool:'Notion / Slides',action:'report delivered'}
-    ]},
-    tools:[
-      {name:'Account Mapping',cat:'Core Layer',desc:'Stitches the customer across Stripe, Salesforce, Mixpanel, and Zendesk. Without this join layer the agent cannot assemble a coherent picture. The hardest 60% of the build, and the part most teams skip.',connects:['Revenue Data','Usage Signals','Support Health','Claude Engine'],use:'Build a lookup table: Stripe customer_id → Salesforce account_id → Mixpanel org_id. Build this first. Every other component depends on it.'},
-      {name:'Revenue Data',cat:'Input Layer',desc:'MRR, ARR, renewal date, plan tier, payment status. Stripe for PLG, Salesforce + Chargebee for enterprise. The financial spine of the QBR, without renewal date, you cannot frame urgency.',connects:['Account Mapping','Claude Engine'],use:'Cache renewal dates locally. Don\'t call Stripe on every QBR run, pull weekly, store per account. One stale renewal date in a live QBR kills credibility.'},
-      {name:'Usage Signals',cat:'Input Layer',desc:'Feature adoption %, DAU/MAU ratio, core workflow completion. The most predictive section of any QBR. Lives in Mixpanel, Amplitude, or your data warehouse. This data changes the narrative more than any other input.',connects:['Account Mapping','Health Score','Claude Engine'],use:'Define 3 activation events per segment. Adoption score = % of accounts that fired all 3 last month. One number replaces ten dashboard screenshots in the QBR.'},
-      {name:'Support Health',cat:'Input Layer',desc:'Ticket volume trend, open critical issues, avg resolution time. High ticket count isn\'t bad, it\'s the trend and severity that matter. A spike that resolved fast tells a very different story.',connects:['Account Mapping','Claude Engine'],use:'Weight by severity: 1 critical ticket = 5 low-priority tickets in the health formula. This changes the QBR narrative for roughly 30% of accounts.'},
-      {name:'Goals Layer',cat:'Memory',desc:'Stores last quarter\'s objectives and compares against actuals. The hardest part to automate, most teams skip it. Without this, the QBR has no memory and every quarter starts from zero.',connects:['Claude Engine','Report Builder'],use:'Start simple: a JSON per account with {q1_goals:[], q2_goals:[]}. Claude reads it and writes "you hit 2 of 3 goals from last quarter", no template can do this.'},
-      {name:'Claude Engine',cat:'AI Engine',desc:'Reads the full customer snapshot and writes the QBR narrative: what improved, what\'s at risk, what the next 90 days should look like. Opus for executive accounts, Sonnet for volume runs.',connects:['Account Mapping','Goals Layer','Report Builder'],use:'Cache the system prompt. Pass only delta data, what changed this quarter. Token cost drops 70% with no quality loss. Never send the full account history on every call.'},
-      {name:'Report Builder',cat:'Output Layer',desc:'Formats Claude\'s output into a deliverable QBR document. Notion for speed, Google Slides for exec presentations, PDF for formal reviews. Don\'t over-engineer this layer first.',connects:['Claude Engine','Delivery Layer'],use:'Build Notion first, one API call creates the page, export to PDF from browser when needed. Move to Slides only when a specific customer requires it.'},
-      {name:'Delivery Layer',cat:'Output Layer',desc:'Sends the finished QBR to CSM and customer. Preview link 24 hours before the call. CSM approves, then it goes to the customer. Never auto-send QBRs without a human reviewing.',connects:['Report Builder','Account Mapping'],use:'CSM gets a "looks good?" email with a single approve button. Approval triggers the send. This one step protects against bad data ever reaching the customer.'},
-    ]
+
+const AI_LOADOUT_ENDPOINT = WORKER_URL + '/loadouts';
+let copyNoticeTimer = null;
+
+const aiChoices = {
+  codex: {
+    name: "Codex",
+    label: "Build in repo",
+    intro:
+      "Use this when the next step is implementation: scaffold files, wire APIs, add tests, and make the thing run.",
+    instruction:
+      "Act as a pragmatic coding agent. Read the existing project first, make the smallest working implementation, verify it locally, and report files changed."
   },
-  lifecycle:{label:'CS Lifecycle',color:'#a78bfa',
-    recipe:{name:'CS Lifecycle Automation',steps:[
-      {tool:'Product Event',action:'trigger fires'},
-      {tool:'Health Engine',action:'score evaluated'},
-      {tool:'Playbook Router',action:'action matched'},
-      {tool:'Intercom / HubSpot',action:'message sent'},
-      {tool:'Salesforce / Gainsight',action:'CRM updated'}
-    ]},
-    tools:[
-      {name:'Event Source',cat:'Input Layer',desc:'Product events that start lifecycle actions: user completes onboarding, feature unused for 21 days, health drops below 60. Fires from Intercom, Mixpanel, Segment, or a custom webhook.',connects:['Health Engine','Playbook Router'],use:'Start with 5 trigger events maximum. Validate each fires correctly before wiring downstream actions. Premature automation on bad triggers is worse than no automation.'},
-      {name:'Health Engine',cat:'Scoring',desc:'Composite score from usage (40%), revenue signals (30%), support load (20%), engagement (10%). The brain that drives every routing decision in the system. Recalculate weekly, not daily.',connects:['Event Source','Playbook Router','Escalation Engine','CRM Sync'],use:'Recalculate weekly. Daily creates noise. Flag accounts that dropped more than 10 points in one week, that\'s your true alert signal, not the absolute score.'},
-      {name:'Playbook Router',cat:'Core Layer',desc:'Matches trigger + health score to the right response. Low health + 45 days to renewal gets a different playbook than low health + just onboarded. This is the intelligence layer, the decision matrix.',connects:['Health Engine','Communication Layer','Escalation Engine'],use:'Build a 3×4 decision matrix: health tiers × lifecycle stages = 12 situations. Each maps to exactly one playbook. No overlapping rules, ambiguity kills automation.'},
-      {name:'Communication Layer',cat:'Communication',desc:'Sends the right message through the right channel. In-app via Intercom for product events. Email via HubSpot for lifecycle milestones. Slack to CSM for escalations. Channel discipline prevents fatigue.',connects:['Playbook Router','CRM Sync'],use:'Never use the same channel for different intent. In-app = usage nudges. Email = business milestones. Slack = CSM escalations. Mixing channels for the same trigger confuses customers.'},
-      {name:'Escalation Engine',cat:'Routing',desc:'Decides when to involve a human CSM. High-value account + red health = CSM call, not an automated email. The rule that stops automation from making a bad situation worse.',connects:['Playbook Router','Communication Layer','CRM Sync'],use:'Never auto-email an account with ARR above your threshold and health below 40. Route those to a CSM task instead. High-value accounts need judgment, not templates.'},
-      {name:'Expansion Trigger',cat:'Detection',desc:'Fires when usage signals indicate readiness for a larger plan: seats near capacity, feature adoption above threshold, power users spreading across departments. The revenue layer.',connects:['Health Engine','Playbook Router','CRM Sync'],use:'"Seats at 85% capacity" is the cleanest expansion signal. Set it precisely. Auto-create a CSM task with pre-written expansion talking points. Don\'t automate the conversation, prepare the CSM for it.'},
-      {name:'CRM Sync',cat:'Output Layer',desc:'Logs every triggered action back to Salesforce or HubSpot. CSMs need full visibility into what the system did. The audit trail that makes automation trustworthy and accountability clear.',connects:['Communication Layer','Escalation Engine','Expansion Trigger'],use:'Log to a custom object: automation_action_type, trigger_reason, timestamp, playbook_fired. CSMs should never wonder why a customer received an automated message.'},
-      {name:'Goals Tracker',cat:'Memory',desc:'Monitors account progress toward agreed success milestones. Triggers a check-in when they fall behind. The loop that turns one-time automation into an ongoing success system.',connects:['Health Engine','CRM Sync','Communication Layer'],use:'Define 2-3 measurable milestones per segment at onboarding. Milestone not hit by day 30 = automatic check-in trigger. Simple. Specific. Measurable. If you can\'t measure it, don\'t track it.'},
-    ]
+  claude: {
+    name: "Claude",
+    label: "Think it through",
+    intro:
+      "Use this when the next step is architecture, product reasoning, workflow design, or turning fuzzy intent into a clean spec.",
+    instruction:
+      "Act as a senior product-engineering architect. Clarify assumptions, design the workflow, identify risks, and produce a build-ready plan."
   },
-  churn:{label:'Churn Detection',color:'#ff2056',
-    recipe:{name:'Churn Detection Pipeline',steps:[
-      {tool:'Usage Events',action:'trend detected'},
-      {tool:'Risk Model',action:'score calculated'},
-      {tool:'Threshold Crossed',action:'alert fired'},
-      {tool:'CSM Assigned',action:'context delivered'},
-      {tool:'Outcome Logged',action:'model improved'}
-    ]},
-    tools:[
-      {name:'Usage Collector',cat:'Input Layer',desc:'Continuously collects usage events: logins, feature calls, core workflow triggers. The raw feed the risk model reads. Lives in Mixpanel, Amplitude, Segment, or your data warehouse.',connects:['Trend Analyzer','Risk Model'],use:'Define your "core event" per customer segment, the one action most predictive of retention. Usage of this single event is a better churn signal than any composite metric.'},
-      {name:'Trend Analyzer',cat:'Scoring',desc:'Detects usage trends over time, not just current usage, but the slope. An account at 40% trending down from 80% is a far bigger risk than one steady at 40%. Direction beats absolute level.',connects:['Usage Collector','Risk Model'],use:'30-day rolling average vs 90-day baseline. When 30-day drops 20%+ below baseline, that\'s your early signal, before the account says anything or CSM notices anything.'},
-      {name:'Risk Model',cat:'Core Layer',desc:'Combines usage trend, support load, billing signals, and engagement into a churn probability score. Updated weekly. The number that drives every downstream action in the system.',connects:['Trend Analyzer','Alert Engine','Dashboard'],use:'Start with 4 inputs: usage trend (40%), days since last login (25%), open critical tickets (20%), renewal proximity (15%). Validate weights against your historical churn data quarterly.'},
-      {name:'Alert Engine',cat:'Detection',desc:'Fires when risk score crosses a threshold. Routes high-risk accounts to CSM immediately, medium-risk to a nurture playbook, low-risk to monitoring. Three tiers, not binary.',connects:['Risk Model','CSM Assignment','Playbook Router'],use:'Set 3 thresholds: above 75% = urgent (CSM call within 24h), 50-75% = watch (automated nurture), below 50% = monitor. Alert fatigue kills the system, every non-actionable alert trains CSMs to ignore them.'},
-      {name:'CSM Assignment',cat:'Routing',desc:'Assigns the at-risk account to the right CSM with full context: score, main signals, last interaction date, suggested first action. Not just a ping, a briefing.',connects:['Alert Engine','CRM Sync','Playbook Router'],use:'"Usage dropped 45% in 30 days, last CSM contact 62 days ago, renewal in 41 days." The CSM should know exactly what to do before they open the account, zero archaeology.'},
-      {name:'Playbook Router',cat:'Core Layer',desc:'Matches the churn risk profile to the right intervention. Price-sensitive + low usage gets a different play than high usage + frustrated support. Risk type changes everything.',connects:['Alert Engine','Communication Layer'],use:'Build 5 churn archetypes from your historical data. Each maps to a specific save playbook. Generic save plays underperform archetype-specific ones by 3-4x, the data will prove this within 2 quarters.'},
-      {name:'Communication Layer',cat:'Communication',desc:'Executes the automated portion of the save play: check-in email, in-app prompt, executive outreach request. Timed and staged, not all interventions at once.',connects:['Playbook Router','CRM Sync'],use:'Space interventions 5-7 days apart. First touch is always a personal check-in, not a product tip. Lead with curiosity: "How are things going with X?" not "Try this feature."'},
-      {name:'Outcome Logger',cat:'Memory',desc:'Records whether each intervention worked: saved, churned, or expanded. This data trains the risk model over time, improving accuracy every quarter. The system should get smarter.',connects:['CRM Sync','Risk Model','Dashboard'],use:'After every churn: 5-field post-mortem. When did risk score first cross 50%? What interventions fired? What was the final CSM note? This is your model training data, never skip it.'},
-    ]
-  },
-  onboarding:{label:'Onboarding',color:'#34d399',
-    recipe:{name:'Onboarding Automation',steps:[
-      {tool:'Account Created',action:'kickoff triggered'},
-      {tool:'Milestones Tracked',action:'progress monitored'},
-      {tool:'Stall Detected',action:'intervention fired'},
-      {tool:'Activation Hit',action:'health score set'},
-      {tool:'CSM Handoff',action:'lifecycle begins'}
-    ]},
-    tools:[
-      {name:'Account Trigger',cat:'Trigger',desc:'Fires when a new account is confirmed in your billing system. The starting gun for the entire onboarding sequence. Stripe webhook, Salesforce flow, or HubSpot enrollment, pick the most reliable event.',connects:['Kickoff Engine','Milestone Tracker','CSM Assignment'],use:'Trigger on payment confirmed, not trial started. Paid accounts get the full sequence. Trials get a lighter version. One webhook, two sequences, segment at the source.'},
-      {name:'Kickoff Engine',cat:'Communication',desc:'Sends the onboarding kickoff: welcome email from the assigned CSM, booking link for kickoff call, access to the right resources. Personalized by tier and segment. First impression of the experience.',connects:['Account Trigger','Milestone Tracker'],use:'Subject line with company name and CSM first name. "Acme + Sarah, let\'s get you started." Open rates are 40% higher when it reads like a personal email rather than a sequence.'},
-      {name:'CSM Assignment',cat:'Routing',desc:'Assigns the right CSM by ARR tier, segment, and geography. High-ARR gets dedicated. SMB gets pooled. The logic lives here, not in a Slack message, not in someone\'s head.',connects:['Account Trigger','Kickoff Engine','Stall Detector'],use:'For accounts above your ARR threshold, auto-create a CSM task within 2 hours of payment. Speed of first contact is the highest single predictor of successful onboarding.'},
-      {name:'Milestone Tracker',cat:'Core Layer',desc:'Defines and monitors the activation milestones for each segment. Setup complete, first core action, team invited. Three milestones. Not ten. Complexity in milestone definitions kills adoption.',connects:['Account Trigger','Stall Detector','Health Scoring','CRM Sync'],use:'Week 1: setup complete. Week 2: first core action. Week 3: team invited. Miss any → intervention triggered. Hit all three → account is activated. This is the entire onboarding model.'},
-      {name:'Stall Detector',cat:'Detection',desc:'Detects when an account has gone quiet: no login in 5 days, milestone not hit by target date, no response to kickoff email. Fires before the stall becomes a churn risk.',connects:['Milestone Tracker','Intervention Layer','CSM Assignment'],use:'Day 3 no login = in-app nudge. Day 5 = CSM personal email. Day 8 = CSM task with escalation flag. Response escalates with each day, it doesn\'t repeat the same message louder.'},
-      {name:'Intervention Layer',cat:'Communication',desc:'Executes the right intervention for the right stall. Product tips for low-usage stalls, setup help for configuration stalls, executive outreach for strategic accounts.',connects:['Stall Detector','Milestone Tracker','CRM Sync'],use:'"You set up your first project but haven\'t invited your team yet" converts 3x better than "we noticed you haven\'t logged in." Name the specific milestone that was missed.'},
-      {name:'Health Scoring',cat:'Scoring',desc:'Tracks onboarding health in real time: milestones hit, time-to-activation, resource engagement. Seeds the main health score system once the customer crosses the activation threshold.',connects:['Milestone Tracker','CRM Sync','Handoff Trigger'],use:'"Time to first core action" is the single most predictive onboarding metric for 90-day retention. Measure it for every customer. Set a target. Optimize everything toward it.'},
-      {name:'Handoff Trigger',cat:'Output Layer',desc:'Fires when onboarding is complete: all milestones hit, health above threshold, first QBR booked. Transitions the account from onboarding mode to ongoing lifecycle management.',connects:['Milestone Tracker','Health Scoring','CRM Sync'],use:'Don\'t handoff on day 30 regardless of status. Handoff when milestones hit AND health above 70. Some accounts need 45 days, the system should accommodate that, not punish it.'},
-    ]
-  },
-  expansion:{label:'Expansion Engine',color:'#fb923c',
-    recipe:{name:'Expansion Signal Engine',steps:[
-      {tool:'Usage Spike',action:'signal detected'},
-      {tool:'Signal Scorer',action:'readiness calculated'},
-      {tool:'Claude Engine',action:'proposal drafted'},
-      {tool:'CSM Alerted',action:'conversation primed'},
-      {tool:'Outcome Logged',action:'model improved'}
-    ]},
-    tools:[
-      {name:'Usage Signals',cat:'Input Layer',desc:'Detects expansion readiness in product: seats near capacity, feature adoption above threshold, power users emerging, usage spreading across departments. The strongest revenue signal a CS team can monitor.',connects:['Signal Scorer','Account Context'],use:'"Seats at 85% capacity" is your cleanest trigger. Set it precisely. 85% = expansion conversation. 95% = urgent. Below 70% = don\'t bring it up. False expansion conversations destroy trust.'},
-      {name:'Revenue Signals',cat:'Input Layer',desc:'Billing and contract signals: plan tier relative to usage, annual renewal approaching, recent upsell conversation in CRM notes. Combines with usage signals for the highest-converting moment.',connects:['Signal Scorer','Account Context'],use:'"Seats near limit" + "renewal in 60-90 days" = highest-converting expansion window. Both signals together = CSM priority task. Either alone = monitor. The combination is the trigger.'},
-      {name:'Account Context',cat:'Core Layer',desc:'Pulls the full account picture at trigger time: ARR, tenure, health score, CSM notes, last interaction sentiment. Gives Claude everything it needs to write a relevant proposal instead of a generic one.',connects:['Usage Signals','Revenue Signals','Signal Scorer','Claude Engine'],use:'Include sentiment from last 3 Gong calls in the context. Positive sentiment = direct expansion ask. Neutral = value-reinforcement email first. Same signal, different play.'},
-      {name:'Signal Scorer',cat:'Scoring',desc:'Combines usage signals, revenue signals, and health into an expansion readiness score. Filters false positives, not every usage spike means the customer wants to expand.',connects:['Usage Signals','Revenue Signals','CSM Alert','Dashboard'],use:'Score = (usage × 0.4) + (revenue × 0.35) + (health × 0.25). Threshold above 7 = expansion opportunity. Below = keep monitoring. Validate this formula against your last 12 months of expansion data.'},
-      {name:'Claude Engine',cat:'AI Engine',desc:'Drafts the expansion proposal: what the account has achieved, why the next tier makes sense for where they\'re heading, specific ROI projection for their situation. Opus for enterprise, Sonnet for volume.',connects:['Account Context','Proposal Builder','CSM Alert'],use:'"Given this account\'s usage of [features] and their business outcome, write a one-page expansion proposal for upgrading from [current] to [next tier]." First draft in 30 seconds. CSM edits to taste.'},
-      {name:'CSM Alert',cat:'Communication',desc:'Notifies the CSM with readiness score, the 3 signals that triggered it, and the Claude-drafted proposal. CSM reviews and adjusts, never sends blind.',connects:['Signal Scorer','Claude Engine','CRM Sync'],use:'Alert format: company name, score, top 3 signals, one-click link to proposal draft, one-click to dismiss with reason. The CSM should decide in under 2 minutes, or the alert is too complex.'},
-      {name:'Proposal Builder',cat:'Output Layer',desc:'Formats the expansion proposal for delivery. One-pager in Notion, PDF for formal accounts, a well-crafted email for SMB. The format should match the account relationship.',connects:['Claude Engine','Delivery Layer'],use:'For accounts under €30k ARR, a well-written email IS the proposal. Don\'t send PDFs to SMB accounts, it signals you\'re running a corporate sales process, not a partnership conversation.'},
-      {name:'Outcome Tracker',cat:'Memory',desc:'Logs the result of every expansion conversation: expanded, not ready, lost. Feeds back into the signal scorer over time, improving readiness model accuracy every quarter.',connects:['CRM Sync','Signal Scorer','Dashboard'],use:'Track time-to-close on expansions that converted. If average is 22 days, time your CSM alert 30 days before renewal, align the signal timing to your actual sales motion, not a generic rule.'},
-    ]
+  gemini: {
+    name: "Gemini",
+    label: "Research and compare",
+    intro:
+      "Use this when the next step is comparing tools, checking options, or working through Google-heavy products and docs.",
+    instruction:
+      "Act as a research-heavy technical planner. Compare tool options, call out tradeoffs, and produce a concise recommendation with sources to verify."
   }
 };
 
-const CATC_ALPHA='18';
-let activeStack='qbr';
-function initStacks(){switchStack('qbr',document.querySelector('.stab'))}
-function switchStack(key,btn){
-  activeStack=key;
-  document.querySelectorAll('.stcard').forEach(c=>c.classList.remove('active','dimmed','highlight'));
-  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('on'));
-  if(btn)btn.classList.add('on');
-  const s=STACKS[key];
-  document.getElementById('stacks').style.setProperty('--scolor',s.color);
-  document.getElementById('srlabel').textContent=s.recipe.name;
-  const rc=document.getElementById('srecipe');
-  rc.innerHTML=s.recipe.steps.map((step,i)=>`
-    <div class="srstep" style="animation-delay:${i*70}ms">
-      <div class="srnum">0${i+1}</div>
-      <div class="srtool">${step.tool}</div>
-      <div class="sraction">${step.action}</div>
+const modelChoices = {
+  claude: {
+    name: "Claude",
+    label: "Anthropic",
+    note: "Strong for long context, careful writing, review, and planning-heavy automation."
+  },
+  openai: {
+    name: "OpenAI",
+    label: "GPT models",
+    note: "Strong default for structured outputs, app features, agents, and broad automation."
+  },
+  gemini: {
+    name: "Gemini",
+    label: "Google AI",
+    note: "Strong fit for Google Workspace-heavy builds and research/comparison tasks."
+  }
+};
+
+const channelChoices = {
+  teams: {
+    name: "Microsoft Teams",
+    label: "Work approvals",
+    note: "Best when the company already lives in Microsoft 365."
+  },
+  slack: {
+    name: "Slack",
+    label: "Startup ops",
+    note: "Best for fast internal routing, alerts, and lightweight approvals."
+  },
+  email: {
+    name: "Email",
+    label: "Universal",
+    note: "Best when users or clients are not in the same chat workspace."
+  }
+};
+
+function detectQuestType(text) {
+  const value = text.toLowerCase();
+  if (/(black hole|space|planet|orbit|gravity|star|galaxy|cosmos|universe|astronomy|physics)/.test(value)) return "space";
+  if (/(time machine|timeline|history|historical|memory|archive|past|future|simulation|world|story|game|experience|museum)/.test(value)) return "speculative";
+  if (/(gmail|email|inbox|calendar|meeting|event)/.test(value)) return "email";
+  if (/(support|ticket|helpdesk|customer|reply|triage)/.test(value)) return "support";
+  if (/(spreadsheet|report|dashboard|analytics|data|metric)/.test(value)) return "data";
+  if (/(portal|client|request|file|status)/.test(value)) return "portal";
+  if (/(shop|ecommerce|order|refund|inventory|store)/.test(value)) return "commerce";
+  if (/(research|competitor|brief|monitor|news|lead)/.test(value)) return "research";
+  return "custom";
+}
+
+function questName(type) {
+  const names = {
+    email: "Inbox Automation",
+    support: "Support Agent",
+    data: "Report Machine",
+    portal: "Client Portal",
+    commerce: "Commerce Ops",
+    research: "Research Agent",
+    speculative: "Speculative Build",
+    space: "Space/Science Build",
+    custom: "Custom AI Build"
+  };
+  return names[type] || names.custom;
+}
+
+function getLoadouts(type) {
+  const loadouts = {
+    email: [
+      {
+        id: "email-speed",
+        title: "Speed Run",
+        level: "Fastest",
+        score: "No-code",
+        tools: ["n8n", "Gmail", "Google Calendar", "AI model", "Google Sheets"],
+        why: "Best for proving the flow quickly: trigger from Gmail, classify the message, draft a reply, create an event, and log the action.",
+        moves: ["Trigger on new labeled Gmail messages.", "Classify intent with the selected AI model.", "Create reply draft or calendar event.", "Log every action in Sheets."]
+      },
+      {
+        id: "email-review",
+        title: "Review Queue",
+        level: "Safer",
+        score: "Human-in-loop",
+        tools: ["Zapier", "Gmail", "Google Calendar", "Airtable", "AI model"],
+        why: "Best when the AI should suggest actions but a person approves replies and meetings before anything is sent.",
+        moves: ["Push emails into Airtable.", "Generate recommended reply and event details.", "Approve or edit.", "Sync approved actions back to Google."]
+      },
+      {
+        id: "email-control",
+        title: "Control Build",
+        level: "Advanced",
+        score: "Product-grade",
+        tools: ["Google APIs", "Cloudflare Workers", "Supabase", "AI model", "Resend"],
+        why: "Best when this becomes a real product with custom rules, durable logs, retries, and user accounts.",
+        moves: ["Connect Google OAuth.", "Store rules and email events.", "Run classification in workers.", "Track every action and exception."]
+      }
+    ],
+    support: [
+      {
+        id: "support-fast",
+        title: "Ticket Boost",
+        level: "Fastest",
+        score: "Existing stack",
+        tools: ["Zendesk or Intercom", "AI model", "Zapier", "Airtable"],
+        why: "Best for adding AI drafting and triage on top of a helpdesk you already use.",
+        moves: ["Detect new tickets.", "Summarize issue and urgency.", "Draft reply.", "Track repeated issues."]
+      },
+      {
+        id: "support-router",
+        title: "Ops Router",
+        level: "Balanced",
+        score: "Team workflow",
+        tools: ["n8n", "Team channel", "Helpdesk API", "AI model", "Postgres"],
+        why: "Best when tickets need routing, escalation, owners, and an auditable trail.",
+        moves: ["Classify urgency.", "Assign owner.", "Notify the team channel.", "Store outcomes."]
+      },
+      {
+        id: "support-product",
+        title: "Support Product",
+        level: "Advanced",
+        score: "Custom app",
+        tools: ["Next.js", "Supabase", "AI model", "Vector search", "Vercel"],
+        why: "Best if the support assistant is part of the product experience rather than a back-office workflow.",
+        moves: ["Index docs.", "Build chat/review UI.", "Add source citations.", "Track answer quality."]
+      }
+    ],
+    data: [
+      {
+        id: "data-sheet",
+        title: "Report Sprint",
+        level: "Fastest",
+        score: "Lightweight",
+        tools: ["Google Sheets", "n8n", "AI model", "Looker Studio"],
+        why: "Best for turning recurring spreadsheet work into automated summaries and dashboards.",
+        moves: ["Clean input columns.", "Schedule refresh.", "Generate AI summary.", "Publish dashboard."]
+      },
+      {
+        id: "data-backbone",
+        title: "Data Backbone",
+        level: "Balanced",
+        score: "Reliable",
+        tools: ["Postgres", "dbt", "Metabase", "AI model"],
+        why: "Best when reports need trustworthy transformations, repeatable metrics, and explainable changes.",
+        moves: ["Model source tables.", "Add transforms.", "Build metric views.", "Generate insight notes."]
+      },
+      {
+        id: "data-product",
+        title: "Insight App",
+        level: "Advanced",
+        score: "Customer-facing",
+        tools: ["Next.js", "Supabase", "AI model", "Chart.js", "Vercel"],
+        why: "Best when reporting becomes a real product with users, permissions, and interactive analysis.",
+        moves: ["Build import flow.", "Create charts.", "Generate recommendations.", "Add saved reports."]
+      }
+    ],
+    portal: [
+      {
+        id: "portal-fast",
+        title: "Portal Sprint",
+        level: "Fastest",
+        score: "No-code",
+        tools: ["Softr", "Airtable", "Zapier", "AI model"],
+        why: "Best for quickly giving clients a place to submit requests and see status.",
+        moves: ["Create client records.", "Build request form.", "Automate status updates.", "Draft responses with AI."]
+      },
+      {
+        id: "portal-ops",
+        title: "Ops Portal",
+        level: "Balanced",
+        score: "Internal + client",
+        tools: ["Retool", "Postgres", "AI model", "Team channel"],
+        why: "Best when the team needs an internal command center connected to a client-facing workflow.",
+        moves: ["Model requests.", "Build review screen.", "Generate next action.", "Notify owners."]
+      },
+      {
+        id: "portal-product",
+        title: "Product Portal",
+        level: "Advanced",
+        score: "Scalable",
+        tools: ["Next.js", "Supabase", "AI model", "Resend", "Stripe"],
+        why: "Best when the portal needs accounts, billing, permissions, and polished UX.",
+        moves: ["Create auth.", "Build request workspace.", "Add AI summaries.", "Send lifecycle emails."]
+      }
+    ],
+    commerce: [
+      {
+        id: "commerce-zap",
+        title: "Store Ops Sprint",
+        level: "Fastest",
+        score: "Automation",
+        tools: ["Shopify", "Zapier", "Gmail", "AI model", "Google Sheets"],
+        why: "Best for automating order/support admin without touching the storefront.",
+        moves: ["Watch order events.", "Classify support email.", "Draft response.", "Track refund or exception."]
+      },
+      {
+        id: "commerce-hub",
+        title: "Ops Hub",
+        level: "Balanced",
+        score: "Operations",
+        tools: ["Airtable", "Make", "Shopify", "AI model", "Team channel"],
+        why: "Best when orders, refunds, content, and support need a visible workflow board.",
+        moves: ["Create ops table.", "Connect Shopify events.", "Generate task drafts.", "Alert owners."]
+      },
+      {
+        id: "commerce-app",
+        title: "Seller App",
+        level: "Advanced",
+        score: "Product-grade",
+        tools: ["Next.js", "Shopify API", "Supabase", "AI model", "Vercel"],
+        why: "Best when ecommerce automation becomes a reusable app for multiple sellers.",
+        moves: ["Connect Shopify OAuth.", "Model seller workspace.", "Add AI workflows.", "Deploy app shell."]
+      }
+    ],
+    research: [
+      {
+        id: "research-watch",
+        title: "Watchtower",
+        level: "Fastest",
+        score: "Monitoring",
+        tools: ["RSS", "n8n", "AI model", "Notion", "Team channel"],
+        why: "Best for monitoring competitors, news, or leads and sending readable briefs.",
+        moves: ["Collect sources.", "Filter relevant updates.", "Summarize findings.", "Send daily brief."]
+      },
+      {
+        id: "research-database",
+        title: "Intel Base",
+        level: "Balanced",
+        score: "Searchable",
+        tools: ["Apify", "Postgres", "AI model", "Metabase"],
+        why: "Best when research needs structured storage, scoring, and trend dashboards.",
+        moves: ["Scrape source data.", "Normalize records.", "Score importance.", "Build dashboard."]
+      },
+      {
+        id: "research-agent",
+        title: "Research Agent",
+        level: "Advanced",
+        score: "Autonomous",
+        tools: ["AI model", "Browser API", "Supabase", "Trigger.dev", "Next.js"],
+        why: "Best when the agent needs scheduled jobs, source checking, memory, and review.",
+        moves: ["Define research tasks.", "Schedule runs.", "Store sources.", "Review generated briefs."]
+      }
+    ],
+    speculative: [
+      {
+        id: "speculative-prototype",
+        title: "Interactive Prototype",
+        level: "Fastest",
+        score: "Playable",
+        tools: ["Lovable or Bolt", "Supabase", "AI model", "TimelineJS", "Vercel"],
+        why: "Best for making the idea tangible fast: users pick a time, see a generated scene, and explore a branching experience.",
+        moves: ["Define the core fantasy in one sentence.", "Create three eras or destinations.", "Generate scenes with the selected AI model.", "Publish a clickable prototype."]
+      },
+      {
+        id: "speculative-sim",
+        title: "Simulation Engine",
+        level: "Balanced",
+        score: "World model",
+        tools: ["Next.js", "Supabase", "AI model", "Three.js", "Vercel"],
+        why: "Best when the build needs a real interface, saved journeys, generated timelines, and immersive visuals.",
+        moves: ["Model time periods, characters, and events.", "Build the journey screen.", "Generate consequences and alternate paths.", "Add visual timeline or 3D scene."]
+      },
+      {
+        id: "speculative-research",
+        title: "Research-backed Explorer",
+        level: "Advanced",
+        score: "Grounded",
+        tools: ["Gemini or Perplexity", "Wikidata", "Supabase", "AI model", "Next.js"],
+        why: "Best when the experience should be historically grounded instead of pure fantasy.",
+        moves: ["Pull source facts for each era.", "Store citations and event data.", "Generate scenes from sourced facts.", "Show sources and uncertainty to users."]
+      }
+    ],
+    space: [
+      {
+        id: "space-visual",
+        title: "Cosmic Visualizer",
+        level: "Fastest",
+        score: "Interactive",
+        tools: ["Three.js", "AI model", "NASA APIs", "Vercel"],
+        why: "Best for making a space idea like a black hole tangible: users can see, rotate, and explore the concept instead of reading a static explanation.",
+        moves: ["Define the core space object or phenomenon.", "Create a 3D scene.", "Use the selected AI model to explain what users are seeing.", "Add one interactive control."]
+      },
+      {
+        id: "space-simulator",
+        title: "Physics Sandbox",
+        level: "Balanced",
+        score: "Simulation",
+        tools: ["Next.js", "Three.js", "Rapier or Cannon.js", "AI model", "Vercel"],
+        why: "Best when the idea needs motion, gravity, forces, or cause-and-effect play.",
+        moves: ["Choose the simplified physics rules.", "Build a sandbox scene.", "Add sliders for mass, speed, or distance.", "Explain outcomes in plain language."]
+      },
+      {
+        id: "space-learning",
+        title: "Learning Quest",
+        level: "Advanced",
+        score: "Educational",
+        tools: ["Next.js", "Supabase", "AI model", "Wikidata or NASA", "Vercel"],
+        why: "Best when the experience should teach, save progress, and adapt explanations to the user.",
+        moves: ["Create lesson checkpoints.", "Pull trustworthy source facts.", "Generate explanations and quizzes.", "Track what the user has explored."]
+      }
+    ],
+    custom: [
+      {
+        id: "custom-no-code",
+        title: "No-Code Quest",
+        level: "Fastest",
+        score: "Prototype",
+        tools: ["n8n", "Airtable", "AI model", "Team channel"],
+        why: "Best for validating whether the workflow is useful before building a custom app.",
+        moves: ["Define trigger.", "Create data table.", "Add AI action.", "Send result somewhere useful."]
+      },
+      {
+        id: "custom-app",
+        title: "App Quest",
+        level: "Balanced",
+        score: "Web app",
+        tools: ["Next.js", "Supabase", "AI model", "Vercel"],
+        why: "Best default for AI-enabled web products with users, data, and a clean interface.",
+        moves: ["Define records.", "Build first screen.", "Add one AI action.", "Deploy preview."]
+      },
+      {
+        id: "custom-agent",
+        title: "Agent Quest",
+        level: "Advanced",
+        score: "Agentic",
+        tools: ["AI model", "Trigger.dev", "Postgres", "Next.js"],
+        why: "Best when the AI needs jobs, retries, memory, and human review.",
+        moves: ["Define agent tasks.", "Add job execution.", "Store every run.", "Add review controls."]
+      }
+    ]
+  };
+  if (type === "custom") return createCustomLoadouts(state.quest);
+  if (loadouts[type]) return loadouts[type];
+  return createCustomLoadouts(state.quest);
+}
+
+function shortQuestName(text) {
+  return text
+    .replace(/^build\s+/i, "")
+    .replace(/^an?\s+/i, "")
+    .trim()
+    .split(/\s+/)
+    .slice(0, 5)
+    .join(" ") || "custom idea";
+}
+
+function createCustomLoadouts(quest) {
+  const name = shortQuestName(quest);
+  return [
+    {
+      id: "custom-prototype",
+      title: "Prototype Quest",
+      level: "Fastest",
+      score: "Playable",
+      tools: ["Lovable or Bolt", "Airtable", "AI model", "Vercel"],
+      why: `Best for quickly making "${name}" feel real enough to test with another person.`,
+      moves: ["Define the one core interaction.", "Create a clickable screen.", "Connect simple storage.", "Use the selected AI model for the magic moment."]
+    },
+    {
+      id: "custom-workflow",
+      title: "Workflow Quest",
+      level: "Balanced",
+      score: "Useful",
+      tools: ["n8n", "Airtable", "AI model", "Team channel"],
+      why: `Best if "${name}" is mostly a repeatable process, approval loop, or automation.`,
+      moves: ["Define the trigger.", "Create the data table.", "Add AI classification or generation.", "Send the result to the team channel."]
+    },
+    {
+      id: "custom-product",
+      title: "Product Quest",
+      level: "Advanced",
+      score: "Scalable",
+      tools: ["Next.js", "Supabase", "AI model", "Vercel"],
+      why: `Best if "${name}" needs users, saved state, permissions, and a polished interface.`,
+      moves: ["Model users and records.", "Build the first product screen.", "Add one AI action.", "Deploy and test with real users."]
+    }
+  ];
+}
+
+function escapeHTML(value) {
+  const map = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  };
+  return String(value ?? "").replace(/[&<>"']/g, (char) => map[char]);
+}
+
+function getActiveAIResult() {
+  if (!state.aiResult || state.aiResult.quest !== state.quest) return null;
+  return state.aiResult;
+}
+
+function getCurrentLoadouts(type) {
+  const activeAIResult = getActiveAIResult();
+  if (activeAIResult?.loadouts?.length) return activeAIResult.loadouts;
+  return getLoadouts(type);
+}
+
+function getCurrentQuestName(type) {
+  const activeAIResult = getActiveAIResult();
+  return activeAIResult?.category || questName(type);
+}
+
+function getCurrentInterpretation(quest, type) {
+  const activeAIResult = getActiveAIResult();
+  return activeAIResult?.interpretation || interpretQuest(quest, type);
+}
+
+function getAIStatus() {
+  if (state.isLoading) {
+    return { tone: "busy", text: "Building your loadouts..." };
+  }
+
+  if (getActiveAIResult()) {
+    return { tone: "ok", text: "Quest reward unlocked." };
+  }
+
+  if (state.aiError) {
+    return null;
+  }
+
+  return null;
+}
+
+function trackQuestEvent(action, payload = {}) {
+  const type = detectQuestType(state.quest);
+  const eventName = `playbook_${action}`;
+  const detail = {
+    quest: state.quest,
+    questType: type,
+    selectedLoadout: state.selectedLoadout,
+    selectedAI: state.selectedAI,
+    selectedModel: state.selectedModel,
+    selectedChannel: state.selectedChannel,
+    ...payload
+  };
+
+  window.dispatchEvent(new CustomEvent("playbookQuest:event", { detail: { action, ...detail } }));
+  window.dataLayer?.push({ event: eventName, ...detail });
+  window.gtag?.("event", eventName, detail);
+  window.plausible?.(`Playbook ${action}`, { props: detail });
+}
+
+function showCopyNotice(message) {
+  state.copyNotice = message;
+  renderPrompt();
+  bindEvents();
+
+  if (copyNoticeTimer) window.clearTimeout(copyNoticeTimer);
+  copyNoticeTimer = window.setTimeout(() => {
+    state.copyNotice = "";
+    renderPrompt();
+    bindEvents();
+  }, 2200);
+}
+
+function getSelectedLoadout(type) {
+  const loadouts = getCurrentLoadouts(type);
+  return loadouts.find((loadout) => loadout.id === state.selectedLoadout) || loadouts[0];
+}
+
+function cleanText(value, fallback, maxLength = 220) {
+  const text = String(value ?? "").replace(/\s+/g, " ").trim();
+  if (!text) return fallback;
+  return text.slice(0, maxLength);
+}
+
+function cleanList(value, fallback, limit, maxLength = 80) {
+  if (!Array.isArray(value)) return fallback;
+  const items = value
+    .map((item) => cleanText(item, "", maxLength))
+    .filter(Boolean)
+    .slice(0, limit);
+  return items.length ? items : fallback;
+}
+
+function cleanMultiline(value, fallback, maxLength = 1800) {
+  const text = String(value ?? "")
+    .replace(/\r\n?/g, "\n")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  return (text || fallback).slice(0, maxLength);
+}
+
+function normalizeBlueprint(rawBlueprint) {
+  if (!rawBlueprint || typeof rawBlueprint !== "object") return null;
+
+  return {
+    mvpDefinition: cleanText(
+      rawBlueprint.mvpDefinition,
+      `Build the smallest useful version of "${shortQuestName(state.quest)}" and prove the full loop end to end.`,
+      420
+    ),
+    architecture: cleanList(rawBlueprint.architecture, [], 8, 180),
+    devScope: cleanList(rawBlueprint.devScope, [], 14, 180),
+    buildPhases: cleanList(rawBlueprint.buildPhases, [], 5, 180),
+    loopEngineering: cleanList(rawBlueprint.loopEngineering, [], 12, 190),
+    testingPlan: cleanList(rawBlueprint.testingPlan, [], 8, 170),
+    acceptanceCriteria: cleanList(rawBlueprint.acceptanceCriteria, [], 8, 170),
+    implementationTasks: cleanList(rawBlueprint.implementationTasks, [], 12, 180),
+    filesServicesPackagesAccounts: cleanList(rawBlueprint.filesServicesPackagesAccounts, [], 14, 180),
+    dataModel: cleanList(rawBlueprint.dataModel, [], 10, 180),
+    apiContracts: cleanList(rawBlueprint.apiContracts, [], 6, 240),
+    aiPrompt: cleanMultiline(rawBlueprint.aiPrompt, "", 1600),
+    aiResponseSchema: cleanMultiline(rawBlueprint.aiResponseSchema, "", 1600),
+    blockers: cleanList(rawBlueprint.blockers, [], 8, 180),
+    decisions: cleanList(rawBlueprint.decisions, [], 8, 180)
+  };
+}
+
+function numberLines(items) {
+  return items.map((item, index) => `${index + 1}. ${item}`).join("\n");
+}
+
+function bulletLines(items) {
+  return items.map((item) => `- ${item}`).join("\n");
+}
+
+function makeLoadoutId(value, index) {
+  const id = cleanText(value, `ai-loadout-${index + 1}`, 60)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  return id || `ai-loadout-${index + 1}`;
+}
+
+function normalizeAIResponse(data) {
+  if (!data || typeof data !== "object" || !Array.isArray(data.loadouts)) return null;
+
+  const usedIds = new Set();
+  const loadouts = data.loadouts
+    .slice(0, 3)
+    .map((loadout, index) => {
+      const rawId = makeLoadoutId(loadout.id || loadout.title, index);
+      const id = usedIds.has(rawId) ? `${rawId}-${index + 1}` : rawId;
+      usedIds.add(id);
+
+      return {
+        id,
+        title: cleanText(loadout.title, `AI Path ${index + 1}`, 44),
+        level: cleanText(loadout.level, index === 0 ? "Fastest" : index === 1 ? "Balanced" : "Advanced", 28),
+        score: cleanText(loadout.score, index === 0 ? "Prototype" : index === 1 ? "Workflow" : "Product", 32),
+        tools: cleanList(loadout.tools, ["AI model", "Airtable", "n8n", "Vercel"], 6, 34),
+        why: cleanText(loadout.why, "Best for turning the custom idea into a practical first version.", 260),
+        moves: cleanList(loadout.moves, ["Define the first user action.", "Pick the data source.", "Add one AI step.", "Test with a real example."], 5, 90),
+        blueprint: normalizeBlueprint(loadout.blueprint)
+      };
+    });
+
+  if (loadouts.length < 3) return null;
+
+  return {
+    quest: state.quest,
+    category: cleanText(data.category, "AI Generated Build", 52),
+    interpretation: cleanText(
+      data.interpretation,
+      `I read "${shortQuestName(state.quest)}" as a custom AI build and generated practical paths for it.`,
+      280
+    ),
+    loadouts
+  };
+}
+
+async function fetchAILoadouts(quest) {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 12000);
+
+  try {
+    const response = await fetch(AI_LOADOUT_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        quest,
+        modelChoice: state.selectedModel,
+        teamChannel: state.selectedChannel
+      }),
+      signal: controller.signal
+    });
+
+    if (!response.ok) throw new Error(`AI endpoint returned ${response.status}`);
+    return normalizeAIResponse(await response.json());
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}
+
+async function generateLoadoutsForQuest() {
+  const input = document.querySelector("[data-quest-input]");
+  const nextQuest = (input?.value || "").trim();
+
+  state.quest = (nextQuest || state.quest).slice(0, 240);
+  state.selectedLoadout = "";
+  state.aiResult = null;
+  state.aiError = "";
+  state.copyNotice = "";
+  state.isLoading = true;
+  trackQuestEvent("input_submitted");
+  renderPrompt();
+  bindEvents();
+
+  try {
+    const aiResult = await fetchAILoadouts(state.quest);
+    if (aiResult) {
+      state.aiResult = aiResult;
+    } else {
+      state.aiError = "AI response did not match the expected blueprint shape.";
+    }
+  } catch (error) {
+    state.aiError = error instanceof Error ? error.message : "AI endpoint unavailable";
+  } finally {
+    state.isLoading = false;
+    renderPrompt();
+    bindEvents();
+  }
+}
+
+function renderPrompt() {
+  const host = document.querySelector(".loadout-stage");
+  const type = detectQuestType(state.quest);
+  const loadouts = getCurrentLoadouts(type);
+  const selected = getSelectedLoadout(type);
+  const selectedAI = aiChoices[state.selectedAI] || aiChoices.codex;
+  const selectedModel = modelChoices[state.selectedModel] || modelChoices.openai;
+  const selectedChannel = channelChoices[state.selectedChannel] || channelChoices.teams;
+  const currentQuestName = getCurrentQuestName(type);
+  const currentInterpretation = getCurrentInterpretation(state.quest, type);
+  const aiStatus = getAIStatus();
+  const generateLabel = state.isLoading ? "Building..." : "Generate loadouts";
+  const blueprintText = createBlueprint(selected, selectedAI);
+
+  host.innerHTML = `
+    <div class="quest-console">
+      <div>
+        <div class="cap">Quest input</div>
+        <h2>What do you want to build with AI?</h2>
+      </div>
+      <textarea class="quest-input" data-quest-input>${escapeHTML(state.quest)}</textarea>
+      <div class="quest-actions">
+        <button class="quest-run" data-run type="button" ${state.isLoading ? 'disabled aria-busy="true"' : ""}>${generateLabel}</button>
+        <div class="detected">Detected: <strong>${escapeHTML(currentQuestName)}</strong></div>
+      </div>
+      <div class="interpretation">${escapeHTML(currentInterpretation)}</div>
+      ${aiStatus ? `<div class="ai-status ${aiStatus.tone}">${escapeHTML(aiStatus.text)}</div>` : ""}
+      ${state.copyNotice ? `<div class="copy-notice" role="status">${escapeHTML(state.copyNotice)}</div>` : ""}
+      <div class="example-row">
+        ${examples.map((example) => `<button data-example="${escapeHTML(example)}" type="button">${escapeHTML(example)}</button>`).join("")}
+      </div>
     </div>
-    ${i<s.recipe.steps.length-1?'<span class="srarrow">→</span>':''}
-  `).join('');
-  const g=document.getElementById('sgrid');
-  g.innerHTML=s.tools.map((t,i)=>{
-    const cc=CATC[t.cat]||s.color;
-    return`<div class="stcard" data-name="${t.name}" style="--cc:${cc};animation-delay:${i*25}ms" onclick="toggleCard(this)">
-      <div class="stcard-top">
-        <div class="stcard-name">${t.name}</div>
-        <div class="stcard-cat">${t.cat}</div>
+    <div class="quest-brief">
+      <div>
+        <h3>${escapeHTML(currentQuestName)}</h3>
+        <p>Pick a version based on how fast, safe, or custom you want the build to be.</p>
       </div>
-      <div class="stcard-desc">${t.desc}</div>
-      <div class="stcard-conn">${t.connects.map(c=>`<span class="stconn" onmouseenter="hlConn('${c}')" onmouseleave="unhlConn()">${c}</span>`).join('')}</div>
-      <div class="stcard-detail">
-        <div class="stcard-uselabel">Try this</div>
-        <div class="stcard-use">${t.use}</div>
+      <div class="reward">
+        <span>Loadouts</span>
+        <strong>${loadouts.length} paths</strong>
       </div>
-    </div>`;
-  }).join('');
+    </div>
+    <div class="loadout-grid">
+      ${loadouts.map((loadout) => renderLoadout(loadout, selected.id)).join("")}
+    </div>
+    <div class="work-choice-panel">
+      <div>
+        <div class="cap">Work choices</div>
+        <h3>Pick the AI and team channel used in the build</h3>
+        <p>These choices update the tool stack and the blueprint. They are separate from the AI you paste the blueprint into.</p>
+      </div>
+      <div class="choice-columns">
+        <div>
+          <span class="choice-label">AI model in the product</span>
+          <div class="mini-choice-row">
+            ${Object.entries(modelChoices)
+              .map(
+        ([id, model]) => `
+                  <button class="mini-choice ${state.selectedModel === id ? "on" : ""}" data-model-choice="${id}" type="button">
+                    <b>${escapeHTML(model.name)}</b>
+                    <span>${escapeHTML(model.label)}</span>
+                  </button>
+                `
+              )
+              .join("")}
+          </div>
+          <p>${escapeHTML(selectedModel.note)}</p>
+        </div>
+        <div>
+          <span class="choice-label">Team channel</span>
+          <div class="mini-choice-row">
+            ${Object.entries(channelChoices)
+              .map(
+                ([id, channel]) => `
+                  <button class="mini-choice ${state.selectedChannel === id ? "on" : ""}" data-channel-choice="${id}" type="button">
+                    <b>${escapeHTML(channel.name)}</b>
+                    <span>${escapeHTML(channel.label)}</span>
+                  </button>
+                `
+              )
+              .join("")}
+          </div>
+          <p>${escapeHTML(selectedChannel.note)}</p>
+        </div>
+      </div>
+    </div>
+    <div class="selected-plan">
+      <div>
+        <span>Selected</span>
+        <h3>${escapeHTML(selected.title)}</h3>
+        <p>${escapeHTML(selected.why)}</p>
+      </div>
+      <button class="loadout-cta" data-copy type="button">Copy loadout</button>
+    </div>
+    <div class="blueprint-panel">
+      <div class="blueprint-head">
+        <div>
+          <div class="cap">Quest reward</div>
+          <h3>Blueprint unlocked</h3>
+          <p>${escapeHTML(selectedAI.intro)}</p>
+        </div>
+        <button class="loadout-cta" data-copy-blueprint type="button">Copy ${escapeHTML(selectedAI.name)} blueprint</button>
+      </div>
+      <div class="reward-strip" aria-label="Blueprint reward summary">
+        <div>
+          <span>Mission</span>
+          <strong>${escapeHTML(shortQuestName(state.quest))}</strong>
+        </div>
+        <div>
+          <span>Loadout</span>
+          <strong>${escapeHTML(selected.title)}</strong>
+        </div>
+        <div>
+          <span>Paste into</span>
+          <strong>${escapeHTML(selectedAI.name)}</strong>
+        </div>
+      </div>
+      <div class="ai-choice-row">
+        ${Object.entries(aiChoices)
+          .map(
+            ([id, ai]) => `
+              <button class="ai-choice ${state.selectedAI === id ? "on" : ""}" data-ai-choice="${id}" type="button">
+                <b>${escapeHTML(ai.name)}</b>
+                <span>${escapeHTML(ai.label)}</span>
+              </button>
+            `
+          )
+          .join("")}
+      </div>
+      <div class="blueprint-preview">
+        <div class="blueprint-preview-head">
+          <span>Build spec</span>
+          <strong>${escapeHTML(currentQuestName)}</strong>
+        </div>
+        <pre class="blueprint-box">${escapeHTML(blueprintText)}</pre>
+      </div>
+    </div>
+  `;
 }
-function toggleCard(el){
-  const was=el.classList.contains('active');
-  document.querySelectorAll('.stcard').forEach(c=>c.classList.remove('active','dimmed'));
-  if(!was){el.classList.add('active');document.querySelectorAll('.stcard').forEach(c=>{if(c!==el)c.classList.add('dimmed')})}
+
+function interpretQuest(quest, type) {
+  const subject = shortQuestName(quest);
+  const scripts = {
+    space:
+      `I read "${subject}" as a science/space experience. I will suggest visualizer, simulation, and learning loadouts.`,
+    speculative:
+      `I read "${subject}" as a creative/speculative experience. I will suggest prototype, simulation, and research-backed loadouts.`,
+    custom:
+      `I do not have an exact category for "${subject}" yet, so I will infer three build paths: quick prototype, workflow, and product-grade app.`,
+    email:
+      "I read this as inbox/calendar automation, so the loadouts focus on triggers, approvals, and message/event actions.",
+    support:
+      "I read this as support automation, so the loadouts focus on triage, routing, drafting, and review.",
+    data:
+      "I read this as a reporting/data product, so the loadouts focus on ingestion, dashboards, and insight generation.",
+    portal:
+      "I read this as a portal, so the loadouts focus on users, requests, status, and communication.",
+    commerce:
+      "I read this as commerce operations, so the loadouts focus on orders, exceptions, support, and store APIs.",
+    research:
+      "I read this as research automation, so the loadouts focus on source gathering, summarization, and brief generation."
+  };
+  return scripts[type] || scripts.custom;
 }
-function hlConn(name){
-  document.querySelectorAll('.stcard').forEach(c=>c.classList.toggle('highlight',c.dataset.name===name));
+
+function renderLoadout(loadout, selectedId) {
+  return `
+    <button class="loadout ${selectedId === loadout.id ? "on" : ""}" data-loadout="${escapeHTML(loadout.id)}" type="button">
+      <div class="loadout-head">
+        <h3>${escapeHTML(loadout.title)}</h3>
+        <span class="badge">${escapeHTML(loadout.level)}</span>
+      </div>
+      <div class="tool-row">
+        ${loadout.tools.map((tool) => `<span>${escapeHTML(resolveToolLabel(tool))}</span>`).join("")}
+      </div>
+      <p>${escapeHTML(loadout.why)}</p>
+      <ol class="moves">
+        ${loadout.moves.map((move) => `<li>${escapeHTML(move)}</li>`).join("")}
+      </ol>
+      <b>${escapeHTML(loadout.score)}</b>
+    </button>
+  `;
 }
-function unhlConn(){document.querySelectorAll('.stcard').forEach(c=>c.classList.remove('highlight'))}
+
+function resolveToolLabel(tool) {
+  if (tool === "AI model") return modelChoices[state.selectedModel]?.name || modelChoices.openai.name;
+  if (tool === "Team channel") return channelChoices[state.selectedChannel]?.name || channelChoices.teams.name;
+  return tool;
+}
+
+function resolveTools(tools) {
+  return tools.map(resolveToolLabel);
+}
+
+function bindEvents() {
+  document.querySelector("[data-run]")?.addEventListener("click", async () => {
+    await generateLoadoutsForQuest();
+  });
+
+  document.querySelectorAll("[data-example]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.quest = button.dataset.example;
+      state.selectedLoadout = "";
+      state.aiResult = null;
+      state.aiError = "";
+      state.copyNotice = "";
+      renderPrompt();
+      bindEvents();
+      trackQuestEvent("example_selected", { example: button.dataset.example });
+    });
+  });
+
+  document.querySelectorAll("[data-loadout]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedLoadout = button.dataset.loadout;
+      renderPrompt();
+      bindEvents();
+      trackQuestEvent("loadout_selected", { loadoutId: state.selectedLoadout });
+    });
+  });
+
+  document.querySelectorAll("[data-ai-choice]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedAI = button.dataset.aiChoice;
+      if (state.selectedAI === "claude") state.selectedModel = "claude";
+      if (state.selectedAI === "gemini") state.selectedModel = "gemini";
+      if (state.selectedAI === "codex") state.selectedModel = "openai";
+      renderPrompt();
+      bindEvents();
+    });
+  });
+
+  document.querySelectorAll("[data-model-choice]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedModel = button.dataset.modelChoice;
+      renderPrompt();
+      bindEvents();
+    });
+  });
+
+  document.querySelectorAll("[data-channel-choice]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedChannel = button.dataset.channelChoice;
+      renderPrompt();
+      bindEvents();
+    });
+  });
+
+  document.querySelector("[data-copy]")?.addEventListener("click", async () => {
+    const type = detectQuestType(state.quest);
+    const selected = getSelectedLoadout(type);
+    const text = `${state.quest}\n\n${selected.title}\nTools: ${resolveTools(selected.tools).join(", ")}\n\nWhy: ${selected.why}\n\nFirst moves:\n${selected.moves.map((move, index) => `${index + 1}. ${move}`).join("\n")}`;
+    await navigator.clipboard.writeText(text);
+    showCopyNotice("Loadout copied.");
+    trackQuestEvent("loadout_copied", { loadoutId: selected.id });
+  });
+
+  document.querySelector("[data-copy-blueprint]")?.addEventListener("click", async () => {
+    const type = detectQuestType(state.quest);
+    const selected = getSelectedLoadout(type);
+    const selectedAI = aiChoices[state.selectedAI] || aiChoices.codex;
+    await navigator.clipboard.writeText(createBlueprint(selected, selectedAI));
+    showCopyNotice(`${selectedAI.name} blueprint copied.`);
+    trackQuestEvent("blueprint_copied", { loadoutId: selected.id, ai: selectedAI.name });
+  });
+}
+
+function createArchitectureBlueprint(loadout) {
+  if (loadout.blueprint?.architecture?.length) return numberLines(loadout.blueprint.architecture);
+
+  const tools = resolveTools(loadout.tools);
+  return `1. Frontend / user surface: one clean screen where the user gives input, reviews the AI result, edits if needed, and confirms the next action.
+2. Backend API: a server-side endpoint that receives the request, validates it, calls the AI model, calls required tools, and returns structured results.
+3. AI layer: prompt + structured output contract for the main AI action. Keep the prompt versioned so it can be improved without rewriting the product.
+4. Workflow layer: use the selected orchestration tool or backend jobs to run multi-step actions, retries, approvals, and notifications.
+5. Data layer: store user request, generated output, selected action, status, errors, and final outcome.
+6. Integrations: connect only the APIs needed for the first working version: ${tools.join(", ")}.
+7. Human review: add approval before any risky external action such as sending, deleting, charging, publishing, or notifying a customer.
+8. Observability: log every run, model response, tool call, error, retry, and user correction.`;
+}
+
+function createDevScope(loadout) {
+  if (loadout.blueprint?.devScope?.length) return bulletLines(loadout.blueprint.devScope);
+
+  return `Frontend:
+- Input form for the user's build/task request.
+- Loadout selection and selected-tool explanation.
+- Review screen for AI output before action.
+- Copy/export action for the generated result.
+- Error, loading, empty, and retry states.
+
+Backend:
+- POST endpoint for the AI action.
+- Request validation and rate limiting.
+- Server-side API key handling.
+- Structured AI response parsing and fallback behavior.
+- Integration adapters for the selected tools.
+- Job/retry handling for slow or unreliable tool calls.
+
+Data:
+- Tables or collections for users, requests, runs, outputs, approvals, tool events, errors, and feedback.
+- Audit trail for what the AI suggested, what the user approved, and what actually happened.
+- Basic admin/debug view for failed runs.
+
+AI/prompting:
+- System prompt for role, constraints, and output format.
+- JSON schema or equivalent structured response contract.
+- Few-shot examples for good and bad outputs.
+- Version field for prompt/model changes.
+- Refusal or escalation rules when confidence is low.
+
+Deployment:
+- Environment variables for API keys.
+- Preview deployment.
+- Production deployment.
+- Monitoring for endpoint failures, latency, and malformed AI output.`;
+}
+
+function createLoopEngineeringPlan(loadout) {
+  if (loadout.blueprint?.loopEngineering?.length) return numberLines(loadout.blueprint.loopEngineering);
+
+  return `Core loop:
+1. Capture user input.
+2. Normalize and validate the input.
+3. Ask the AI model for a structured plan or action.
+4. Run tool calls only after the output passes validation.
+5. Show the result to the user for approval or correction.
+6. Execute the approved action.
+7. Log the outcome.
+8. Feed user corrections and outcomes back into prompt/eval improvements.
+
+Quality loop:
+- Save successful and failed examples.
+- Review failures weekly and tag the failure type: bad intent detection, wrong tool, bad copy, missing data, integration error, or unsafe action.
+- Turn repeated failures into eval cases.
+- Test every prompt/model change against those eval cases before release.
+- Track useful metrics: completion rate, correction rate, approval rate, retry rate, and user-reported usefulness.
+
+Safety loop:
+- Never let the AI silently perform high-impact actions.
+- Require user approval for external sends, writes, purchases, deletions, or calendar changes.
+- Keep scoped OAuth/API permissions.
+- Store minimal data.
+- Add rate limits and abuse checks.
+- Escalate to a person when the model is uncertain or required data is missing.`;
+}
+
+function createBuildPhases(loadout) {
+  if (loadout.blueprint?.buildPhases?.length) return numberLines(loadout.blueprint.buildPhases);
+
+  return `Phase 1 - Working prototype:
+- Build the input screen.
+- Wire one backend endpoint.
+- Call the AI model with a structured response.
+- Show the result in the UI.
+- Add copy/export.
+
+Phase 2 - Real workflow:
+- Connect the first real integration from the loadout.
+- Add auth and secure credential handling.
+- Store requests, runs, outputs, and status.
+- Add approval before external actions.
+- Add retry and error states.
+
+Phase 3 - Product-grade version:
+- Add user accounts and permissions if needed.
+- Add background jobs for slow work.
+- Add run history and admin/debug views.
+- Add eval set and prompt/version tracking.
+- Add monitoring, analytics, and production deployment checks.`;
+}
+
+function createAcceptanceCriteria(loadout) {
+  if (loadout.blueprint?.acceptanceCriteria?.length) return bulletLines(loadout.blueprint.acceptanceCriteria);
+
+  return `- A new user can understand what to do without reading docs.
+- A real example request can move through the full loop end to end.
+- The AI response always matches the expected structure or falls back cleanly.
+- The app stores every run and shows enough detail to debug failures.
+- Risky actions require review before execution.
+- The selected tools are actually connected or clearly marked as manual placeholders.
+- The blueprint can be handed to Codex/Claude/Gemini and used as a build-ready spec.`;
+}
+
+function createImplementationTasks(loadout) {
+  if (loadout.blueprint?.implementationTasks?.length) return numberLines(loadout.blueprint.implementationTasks);
+
+  return `1. Create the app/workflow shell for the selected loadout.
+2. Build the input screen or trigger that captures the user's request.
+3. Add the backend endpoint or workflow step that validates the request.
+4. Add the AI call with a strict response schema.
+5. Add tool adapters for the selected tools: ${resolveTools(loadout.tools).join(", ")}.
+6. Add a review/approval step before external actions.
+7. Store every run, output, approval, error, and final outcome.
+8. Add eval examples for normal, strange, empty, long, and failed inputs.
+9. Add monitoring/logging for AI failures, tool failures, retries, and user corrections.
+10. Ship the smallest end-to-end version, then improve based on real run logs.`;
+}
+
+function createBuildPieces(loadout) {
+  if (loadout.blueprint?.filesServicesPackagesAccounts?.length) {
+    return bulletLines(loadout.blueprint.filesServicesPackagesAccounts);
+  }
+
+  return `Files/modules:
+- Frontend screen: input form, result review, approval controls, run history.
+- API route or workflow trigger: receives user input and starts the run.
+- AI module: prompt, schema, model call, output parser, fallback.
+- Integration modules: one adapter per selected tool.
+- Data module: request/run/output/approval/error records.
+- Eval files: saved examples used to test prompt and model changes.
+- Test files: validation, schema parsing, endpoint, integration, and end-to-end tests.
+
+Services/accounts for this loadout:
+${resolveTools(loadout.tools).map((tool) => `- ${tool}`).join("\n")}
+- Hosting/deployment account.
+- AI provider account and server-side API key.
+- Database or storage account if the build needs saved state.
+- OAuth/app credentials for any user-owned external tool.
+- Team notification channel if approvals or alerts are part of the flow.
+
+Packages/capabilities:
+- UI framework or no-code workflow builder.
+- Server runtime or workflow execution runtime.
+- AI SDK/API client.
+- Schema validation.
+- Database client.
+- Integration SDKs or HTTP client.
+- Test runner and basic logging.`;
+}
+
+function createDataModelAndContracts(loadout) {
+  if (loadout.blueprint?.dataModel?.length || loadout.blueprint?.apiContracts?.length) {
+    const dataModel = loadout.blueprint?.dataModel?.length
+      ? bulletLines(loadout.blueprint.dataModel)
+      : "- Store user request, AI runs, tool events, approvals, outcomes, and eval cases.";
+    const apiContracts = loadout.blueprint?.apiContracts?.length
+      ? bulletLines(loadout.blueprint.apiContracts)
+      : "- POST /api/runs, GET /api/runs/:id, POST /api/runs/:id/approve.";
+
+    return `Data model:
+${dataModel}
+
+API contracts:
+${apiContracts}`;
+  }
+
+  return `Data model:
+- users: id, email, role, created_at.
+- build_requests: id, user_id, raw_input, normalized_input, selected_loadout, status, created_at.
+- ai_runs: id, request_id, model_provider, prompt_version, input_json, output_json, confidence, status, latency_ms, created_at.
+- approvals: id, request_id, ai_run_id, reviewer_id, decision, edited_output, decided_at.
+- tool_events: id, request_id, tool_name, action, payload_json, response_json, status, error, created_at.
+- outcomes: id, request_id, result_summary, user_feedback, success_score, created_at.
+- eval_cases: id, input, expected_shape, failure_type, notes, added_at.
+
+API contracts:
+- POST /api/runs
+  Input: { request: string, loadoutId: string, modelProvider: string, teamChannel: string }
+  Output: { runId: string, status: "queued" | "needs_review" | "completed" | "failed", result?: object, errors?: string[] }
+
+- GET /api/runs/:id
+  Output: { runId: string, request: object, aiRun: object, toolEvents: object[], outcome?: object }
+
+- POST /api/runs/:id/approve
+  Input: { decision: "approved" | "rejected", editedOutput?: object }
+  Output: { runId: string, status: "completed" | "rejected" | "failed", outcome?: object }
+
+- POST /api/evals/run
+  Input: { promptVersion: string, modelProvider: string }
+  Output: { passed: number, failed: number, failures: object[] }`;
+}
+
+function createPromptAndSchema(loadout) {
+  if (loadout.blueprint?.aiPrompt || loadout.blueprint?.aiResponseSchema) {
+    return `AI prompt:
+${loadout.blueprint.aiPrompt || `Generate a structured plan for "${state.quest}" using ${loadout.title}.`}
+
+AI response schema:
+${loadout.blueprint.aiResponseSchema || '{ "summary": "string", "plan": [], "actions": [], "risks": [], "fallback": "string" }'}`;
+  }
+
+  return `AI prompt:
+You are the planning and execution brain for this build: "${state.quest}".
+Use the selected loadout: ${loadout.title}.
+Use these tools when relevant: ${resolveTools(loadout.tools).join(", ")}.
+Return only structured JSON.
+Do not perform external actions directly.
+If the request is ambiguous, make the smallest useful assumption and mark it in assumptions.
+If the next action is risky, set needsApproval to true.
+
+AI response schema:
+{
+  "summary": "short explanation of what will be done",
+  "intent": "detected user intent",
+  "assumptions": ["assumption 1"],
+  "plan": [
+    { "step": "step name", "tool": "tool name", "reason": "why this step exists" }
+  ],
+  "requiredData": ["data needed before execution"],
+  "actions": [
+    { "tool": "tool name", "action": "action name", "payload": {}, "needsApproval": true }
+  ],
+  "reviewMessage": "what the user should approve or edit",
+  "risks": ["risk or failure point"],
+  "fallback": "what to do if AI or tools fail"
+}`;
+}
+
+function createAnsweredBlockers(loadout) {
+  if (loadout.blueprint?.blockers?.length || loadout.blueprint?.decisions?.length) {
+    const blockers = loadout.blueprint?.blockers?.length
+      ? bulletLines(loadout.blueprint.blockers)
+      : "- No true blocker identified before starting the MVP.";
+    const decisions = loadout.blueprint?.decisions?.length
+      ? bulletLines(loadout.blueprint.decisions)
+      : "- Build one complete loop first, keep API keys server-side, and require approval for risky actions.";
+
+    return `Known blockers and assumptions:
+${blockers}
+
+Decisions already made for the user:
+${decisions}`;
+  }
+
+  return `Known blockers and assumptions:
+- API keys and OAuth credentials must exist before real external actions can run.
+- If a selected tool does not expose the required API, use a manual review/export step for MVP.
+- If the user input is too vague, the MVP should still generate a draft plan and ask for approval before action.
+- If the AI output fails schema validation, return the fallback loadout/plan and log the malformed output.
+- If external tools fail, keep the run in failed/retryable status and show the exact failing tool.
+- If privacy-sensitive data is used, store only what is required for debugging and audit.
+
+Decisions already made for the user:
+- Build one complete loop before adding more features.
+- Keep AI keys server-side.
+- Keep human approval for risky actions.
+- Store run history from day one.
+- Treat user corrections as eval data for future prompt/model improvements.
+- Do not require the user to understand architecture before getting a usable plan.`;
+}
+
+function createBlueprint(loadout, ai) {
+  const type = detectQuestType(state.quest);
+  const currentQuestName = getCurrentQuestName(type);
+  const mvpDefinition =
+    loadout.blueprint?.mvpDefinition ||
+    `Build the smallest useful version of "${state.quest}" using the selected loadout. The first version should prove the core loop, use real or realistic data, and avoid unnecessary features until the loop works end to end.`;
+  const testingPlan = loadout.blueprint?.testingPlan?.length
+    ? numberLines(loadout.blueprint.testingPlan)
+    : `1. Unit test input validation, schema parsing, and fallback behavior.
+2. Integration test the AI endpoint with mocked model responses.
+3. Integration test each external tool adapter with sandbox credentials where possible.
+4. End-to-end test the full user loop from input to approval to final action.
+5. Regression test saved failure examples before changing prompts, models, or workflow logic.
+6. Manually test empty input, strange input, long input, API failure, malformed AI output, and permission failure.`;
+
+  return `You are ${ai.name}. ${ai.instruction}
+
+Goal:
+${state.quest}
+
+Detected build category:
+${currentQuestName}
+
+Selected tool loadout:
+${loadout.title}
+
+Tools to use:
+${resolveTools(loadout.tools).map((tool) => `- ${tool}`).join("\n")}
+
+AI model/provider in the product:
+${modelChoices[state.selectedModel]?.name || modelChoices.openai.name}
+
+Team channel:
+${channelChoices[state.selectedChannel]?.name || channelChoices.teams.name}
+
+Why this loadout:
+${loadout.why}
+
+MVP definition:
+${mvpDefinition}
+
+First build moves from the loadout:
+${loadout.moves.map((move, index) => `${index + 1}. ${move}`).join("\n")}
+
+Architecture:
+${createArchitectureBlueprint(loadout)}
+
+Full dev scope:
+${createDevScope(loadout)}
+
+Build phases:
+${createBuildPhases(loadout)}
+
+Loop engineering:
+${createLoopEngineeringPlan(loadout)}
+
+Testing plan:
+${testingPlan}
+
+Acceptance criteria:
+${createAcceptanceCriteria(loadout)}
+
+Implementation tasks:
+${createImplementationTasks(loadout)}
+
+Files, services, packages, and accounts:
+${createBuildPieces(loadout)}
+
+Data model and API contracts:
+${createDataModelAndContracts(loadout)}
+
+AI prompt and response schema:
+${createPromptAndSchema(loadout)}
+
+Answered blockers and decisions:
+${createAnsweredBlockers(loadout)}
+
+Constraints:
+- Keep the first version small.
+- Prefer working automation over a perfect architecture.
+- Do not invent credentials, API access, or product capabilities.
+- Answer with reasonable assumptions and flag only truly blocking missing information.
+- Keep all API keys server-side.
+`;
+}
+
+renderPrompt();
+bindEvents();
 
 // ── Articles ─────────────────────────────────────────────
 let arts=[];
