@@ -1,6 +1,15 @@
 {
-  "updated": "2026-07-12",
+  "updated": "2026-07-15",
   "articles": [
+    {
+      "id": "8959bcf6-277d-4e4d-b61e-50371109c6b4",
+      "title": "Rightstuf Is Dead and Your DVD Shelf Is the Warning",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-07-15",
+      "status": "Published",
+      "url": "https://blog.murmur.red/tech/2026/07/15/rightstuf-is-dead-and-your-dvd-shelf-is-the-warnin.html"
+    },
     {
       "id": "7f555b20-dc21-42bc-bc9d-43229f52783e",
       "title": "Apple's Lawsuit Against OpenAI Proves You Can't Patent What People Remember",
