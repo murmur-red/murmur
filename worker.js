@@ -188,8 +188,23 @@ function buildLoadoutInput(quest, modelChoice, teamChannel) {
   ].join('\n');
 }
 
+const PROVIDER_TIMEOUT_MS = 25_000;
+
+async function fetchWithTimeout(url, options, timeoutMs = PROVIDER_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } catch (err) {
+    if (err.name === 'AbortError') throw new Error(`Request timed out after ${timeoutMs}ms`);
+    throw err;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 async function callOpenAIForLoadouts({ apiKey, model, quest, modelChoice, teamChannel }) {
-  const res = await fetch('https://api.openai.com/v1/responses', {
+  const res = await fetchWithTimeout('https://api.openai.com/v1/responses', {
     method: 'POST',
     headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
     body: JSON.stringify({
@@ -219,10 +234,21 @@ async function callOpenAIForLoadouts({ apiKey, model, quest, modelChoice, teamCh
   return JSON.parse(text);
 }
 
+function stripArrayBounds(schema) {
+  if (Array.isArray(schema)) return schema.map(stripArrayBounds);
+  if (!schema || typeof schema !== 'object') return schema;
+  const { minItems, maxItems, ...rest } = schema;
+  const out = {};
+  for (const [key, value] of Object.entries(rest)) out[key] = stripArrayBounds(value);
+  return out;
+}
+
+const claudeLoadoutSchema = stripArrayBounds(loadoutResponseSchema);
+
 async function callClaudeForLoadouts({ apiKey, model, quest, modelChoice, teamChannel }) {
   const input = buildLoadoutInput(quest, modelChoice, teamChannel);
 
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  const res = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
     body: JSON.stringify({
@@ -233,7 +259,7 @@ async function callClaudeForLoadouts({ apiKey, model, quest, modelChoice, teamCh
       tools: [{
         name: 'emit_playbook_loadouts',
         description: 'Return the generated Playbooks loadouts and detailed blueprints. This tool must be called exactly once.',
-        input_schema: loadoutResponseSchema,
+        input_schema: claudeLoadoutSchema,
         strict: true
       }],
       tool_choice: { type: 'tool', name: 'emit_playbook_loadouts' }
