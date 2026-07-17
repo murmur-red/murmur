@@ -1,6 +1,15 @@
 {
-  "updated": "2026-07-15",
+  "updated": "2026-07-17",
   "articles": [
+    {
+      "id": "4c2dc4db-3cac-477a-a4c9-a6d1c8a6ba8c",
+      "title": "Taylor Farms Is Trending Because Your Bagged Salad Is a Recall Machine",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-07-17",
+      "status": "Published",
+      "url": "https://blog.murmur.red/tech/2026/07/17/taylor-farms-is-trending-because-your-bagged-salad.html"
+    },
     {
       "id": "8959bcf6-277d-4e4d-b61e-50371109c6b4",
       "title": "Rightstuf Is Dead and Your DVD Shelf Is the Warning",
