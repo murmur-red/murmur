@@ -85,6 +85,9 @@ Return ONLY valid JSON. No markdown, no explanation.`
 const loadoutInstructions =
   "You generate playful but practical AI build loadouts for the murmur.red Playbooks section. Do not ask follow-up questions. Infer a useful direction even for strange ideas like 'time machine' or 'black hole'. Return exactly three paths: fast prototype, balanced workflow/app, and product-grade build. For each path, include a detailed build-ready blueprint that answers implementation tasks, exact files/modules/services/packages/accounts, data model, API contracts, AI prompt/schema, MVP increments, loop engineering, evals, logging, failure handling, blockers, and architecture decisions. Make the blueprint specific to the user's exact idea. Prefer concrete tools. Use 'AI model' and 'Team channel' as tool placeholders when the user's chosen provider/channel should be inserted by the frontend.";
 
+const fastLoadoutInstructions =
+  "You generate playful but practical AI build loadouts for the murmur.red Playbooks section. Do not ask follow-up questions. Infer a useful direction even for strange ideas like 'time machine' or 'black hole'. Return exactly three paths: fast prototype, balanced workflow/app, and product-grade build. Return only concise card data: category, interpretation, and three loadouts with id, title, level, score, tools, why, and moves. Do not include a blueprint; the frontend builds the full copy/paste blueprint locally. Prefer concrete tools. Use 'AI model' and 'Team channel' as placeholders when the user's chosen provider/channel should be inserted by the frontend.";
+
 const stringList = (minItems, maxItems, description) => ({
   type: 'array', minItems, maxItems, description, items: { type: 'string' }
 });
@@ -138,6 +141,33 @@ const loadoutResponseSchema = {
           why: { type: 'string', description: 'One practical reason this loadout fits.' },
           moves: { type: 'array', minItems: 4, maxItems: 5, items: { type: 'string' } },
           blueprint: { ...blueprintSchema, description: 'Build-ready blueprint that answers implementation questions for this specific loadout.' }
+        }
+      }
+    }
+  }
+};
+
+const fastLoadoutResponseSchema = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['category', 'interpretation', 'loadouts'],
+  properties: {
+    category: { type: 'string', description: "Short name for the user's build category." },
+    interpretation: { type: 'string', description: 'One concise sentence explaining how the build request was interpreted.' },
+    loadouts: {
+      type: 'array', minItems: 3, maxItems: 3,
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['id', 'title', 'level', 'score', 'tools', 'why', 'moves'],
+        properties: {
+          id: { type: 'string', description: 'Slug-safe identifier.' },
+          title: { type: 'string', description: 'Short loadout name.' },
+          level: { type: 'string', description: 'Fastest, Balanced, Advanced, or another short difficulty label.' },
+          score: { type: 'string', description: 'Short payoff label, such as Prototype, Workflow, or Product-grade.' },
+          tools: { type: 'array', minItems: 4, maxItems: 6, items: { type: 'string' } },
+          why: { type: 'string', description: 'One practical reason this loadout fits.' },
+          moves: { type: 'array', minItems: 4, maxItems: 5, items: { type: 'string' } }
         }
       }
     }
@@ -208,16 +238,16 @@ async function callOpenAIForLoadouts({ apiKey, model, quest, modelChoice, teamCh
     method: 'POST',
     headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
     body: JSON.stringify({
-      model: model || 'gpt-5.1',
-      max_output_tokens: 4000,
-      instructions: loadoutInstructions,
+      model: model || 'gpt-5-nano-2025-08-07',
+      max_output_tokens: 1400,
+      instructions: fastLoadoutInstructions,
       input: buildLoadoutInput(quest, modelChoice, teamChannel),
       text: {
         format: {
           type: 'json_schema',
           name: 'playbook_loadouts',
           strict: true,
-          schema: loadoutResponseSchema
+          schema: fastLoadoutResponseSchema
         }
       }
     })
@@ -243,7 +273,7 @@ function stripArrayBounds(schema) {
   return out;
 }
 
-const claudeLoadoutSchema = stripArrayBounds(loadoutResponseSchema);
+const claudeLoadoutSchema = stripArrayBounds(fastLoadoutResponseSchema);
 
 async function callClaudeForLoadouts({ apiKey, model, quest, modelChoice, teamChannel }) {
   const input = buildLoadoutInput(quest, modelChoice, teamChannel);
@@ -252,9 +282,9 @@ async function callClaudeForLoadouts({ apiKey, model, quest, modelChoice, teamCh
     method: 'POST',
     headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
     body: JSON.stringify({
-      model: model || 'claude-sonnet-4-6',
-      max_tokens: 4000,
-      system: loadoutInstructions,
+      model: model || 'claude-haiku-4-5-20251001',
+      max_tokens: 1400,
+      system: fastLoadoutInstructions,
       messages: [{ role: 'user', content: input }],
       tools: [{
         name: 'emit_playbook_loadouts',
