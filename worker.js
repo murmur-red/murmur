@@ -99,20 +99,20 @@ const blueprintSchema = {
   ],
   properties: {
     mvpDefinition: { type: 'string', description: "Concrete MVP definition tailored to the user's exact build request." },
-    architecture: stringList(6, 8, 'Architecture components and how they connect.'),
-    devScope: stringList(8, 14, 'Full implementation scope across frontend, backend, data, AI, integrations, deployment.'),
-    buildPhases: stringList(3, 5, 'Small coherent build phases from prototype to product-grade.'),
-    loopEngineering: stringList(8, 12, 'Repeatable loop: input, AI, validation, tools, approval, execution, logging, feedback, evals.'),
-    testingPlan: stringList(5, 8, 'Unit, integration, e2e, eval, and failure-mode tests.'),
-    acceptanceCriteria: stringList(5, 8, 'Concrete conditions that prove the MVP works.'),
-    implementationTasks: stringList(8, 12, 'Specific implementation tasks answered for the user.'),
-    filesServicesPackagesAccounts: stringList(8, 14, 'Files/modules, services, packages, and accounts needed.'),
-    dataModel: stringList(6, 10, 'Data records/tables/collections needed.'),
-    apiContracts: stringList(3, 6, 'API endpoints or workflow contracts with inputs and outputs.'),
+    architecture: stringList(3, 3, 'Architecture components and how they connect.'),
+    devScope: stringList(3, 4, 'Full implementation scope across frontend, backend, data, AI, integrations, deployment.'),
+    buildPhases: stringList(3, 3, 'Small coherent build phases from prototype to product-grade.'),
+    loopEngineering: stringList(3, 4, 'Repeatable loop: input, AI, validation, tools, approval, execution, logging, feedback, evals.'),
+    testingPlan: stringList(3, 3, 'Unit, integration, e2e, eval, and failure-mode tests.'),
+    acceptanceCriteria: stringList(3, 3, 'Concrete conditions that prove the MVP works.'),
+    implementationTasks: stringList(3, 4, 'Specific implementation tasks answered for the user.'),
+    filesServicesPackagesAccounts: stringList(3, 4, 'Files/modules, services, packages, and accounts needed.'),
+    dataModel: stringList(3, 3, 'Data records/tables/collections needed.'),
+    apiContracts: stringList(2, 2, 'API endpoints or workflow contracts with inputs and outputs.'),
     aiPrompt: { type: 'string', description: 'The prompt for the AI step, tailored to this build.' },
     aiResponseSchema: { type: 'string', description: 'The response schema the AI step should return.' },
-    blockers: stringList(4, 8, 'True blockers and assumptions to flag before building.'),
-    decisions: stringList(4, 8, 'Architecture/product decisions already made for the user.')
+    blockers: stringList(3, 3, 'True blockers and assumptions to flag before building.'),
+    decisions: stringList(3, 3, 'Architecture/product decisions already made for the user.')
   }
 };
 
@@ -188,7 +188,7 @@ function buildLoadoutInput(quest, modelChoice, teamChannel) {
   ].join('\n');
 }
 
-const PROVIDER_TIMEOUT_MS = 25_000;
+const PROVIDER_TIMEOUT_MS = 7_500;
 
 async function fetchWithTimeout(url, options, timeoutMs = PROVIDER_TIMEOUT_MS) {
   const controller = new AbortController();
@@ -209,7 +209,7 @@ async function callOpenAIForLoadouts({ apiKey, model, quest, modelChoice, teamCh
     headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
     body: JSON.stringify({
       model: model || 'gpt-5.1',
-      max_output_tokens: 9000,
+      max_output_tokens: 4000,
       instructions: loadoutInstructions,
       input: buildLoadoutInput(quest, modelChoice, teamChannel),
       text: {
@@ -253,14 +253,13 @@ async function callClaudeForLoadouts({ apiKey, model, quest, modelChoice, teamCh
     headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
     body: JSON.stringify({
       model: model || 'claude-sonnet-4-6',
-      max_tokens: 9000,
+      max_tokens: 4000,
       system: loadoutInstructions,
       messages: [{ role: 'user', content: input }],
       tools: [{
         name: 'emit_playbook_loadouts',
         description: 'Return the generated Playbooks loadouts and detailed blueprints. This tool must be called exactly once.',
-        input_schema: claudeLoadoutSchema,
-        strict: true
+        input_schema: claudeLoadoutSchema
       }],
       tool_choice: { type: 'tool', name: 'emit_playbook_loadouts' }
     })
@@ -273,6 +272,174 @@ async function callClaudeForLoadouts({ apiKey, model, quest, modelChoice, teamCh
   const toolUse = (data.content || []).find(b => b.type === 'tool_use' && b.name === 'emit_playbook_loadouts');
   if (!toolUse?.input) throw new Error('Claude did not return the expected playbook loadout tool call.');
   return toolUse.input;
+}
+
+function shortLoadoutQuestName(text) {
+  return String(text || '')
+    .replace(/^build\s+/i, '')
+    .replace(/^an?\s+/i, '')
+    .trim()
+    .split(/\s+/)
+    .slice(0, 5)
+    .join(' ') || 'custom idea';
+}
+
+function detectLoadoutType(text) {
+  const value = String(text || '').toLowerCase();
+  if (/(black hole|space|planet|orbit|gravity|star|galaxy|cosmos|universe|astronomy|physics)/.test(value)) return 'space';
+  if (/(time machine|timeline|history|historical|memory|archive|past|future|simulation|world|story|game|experience|museum)/.test(value)) return 'speculative';
+  if (/(gmail|email|inbox|calendar|meeting|event)/.test(value)) return 'email';
+  if (/(support|ticket|helpdesk|customer|reply|triage)/.test(value)) return 'support';
+  if (/(spreadsheet|report|dashboard|analytics|data|metric)/.test(value)) return 'data';
+  if (/(portal|client|request|file|status)/.test(value)) return 'portal';
+  if (/(shop|ecommerce|order|refund|inventory|store)/.test(value)) return 'commerce';
+  if (/(research|competitor|brief|monitor|news|lead)/.test(value)) return 'research';
+  return 'custom';
+}
+
+function createLoadoutFallbackResponse(quest) {
+  const type = detectLoadoutType(quest);
+  const subject = shortLoadoutQuestName(quest);
+  const modelTool = 'AI model';
+  const channelTool = 'Team channel';
+
+  const responses = {
+    email: {
+      category: 'Inbox Automation',
+      interpretation: 'I read this as inbox/calendar automation, so the loadouts focus on triggers, approvals, and message/event actions.',
+      loadouts: [
+        {
+          id: 'email-speed',
+          title: 'Speed Run',
+          level: 'Fastest',
+          score: 'No-code',
+          tools: ['n8n', 'Gmail', 'Google Calendar', modelTool, 'Google Sheets'],
+          why: 'Best for proving the flow quickly: trigger from Gmail, classify the message, draft a reply, create an event, and log the action.',
+          moves: ['Trigger on new labeled Gmail messages.', 'Classify intent with the selected AI model.', 'Create reply draft or calendar event.', 'Log every action in Sheets.']
+        },
+        {
+          id: 'email-review',
+          title: 'Review Queue',
+          level: 'Safer',
+          score: 'Human-in-loop',
+          tools: ['Zapier', 'Gmail', 'Google Calendar', 'Airtable', modelTool],
+          why: 'Best when the AI should suggest actions but a person approves replies and meetings before anything is sent.',
+          moves: ['Push emails into Airtable.', 'Generate recommended reply and event details.', 'Approve or edit.', 'Sync approved actions back to Google.']
+        },
+        {
+          id: 'email-control',
+          title: 'Control Build',
+          level: 'Advanced',
+          score: 'Product-grade',
+          tools: ['Google APIs', 'Cloudflare Workers', 'Supabase', modelTool, 'Resend'],
+          why: 'Best when this becomes a real product with custom rules, durable logs, retries, and user accounts.',
+          moves: ['Connect Google OAuth.', 'Store rules and email events.', 'Run classification in workers.', 'Track every action and exception.']
+        }
+      ]
+    },
+    speculative: {
+      category: 'Speculative Build',
+      interpretation: `I read "${subject}" as a creative/speculative experience. I will suggest prototype, simulation, and research-backed loadouts.`,
+      loadouts: [
+        {
+          id: 'speculative-prototype',
+          title: 'Interactive Prototype',
+          level: 'Fastest',
+          score: 'Playable',
+          tools: ['Lovable or Bolt', 'Supabase', modelTool, 'TimelineJS', 'Vercel'],
+          why: 'Best for making the idea tangible fast: users pick a time, see a generated scene, and explore a branching experience.',
+          moves: ['Define the core fantasy in one sentence.', 'Create three eras or destinations.', 'Generate scenes with the selected AI model.', 'Publish a clickable prototype.']
+        },
+        {
+          id: 'speculative-sim',
+          title: 'Simulation Engine',
+          level: 'Balanced',
+          score: 'World model',
+          tools: ['Next.js', 'Supabase', modelTool, 'Three.js', 'Vercel'],
+          why: 'Best when the build needs a real interface, saved journeys, generated timelines, and immersive visuals.',
+          moves: ['Model time periods, characters, and events.', 'Build the journey screen.', 'Generate consequences and alternate paths.', 'Add visual timeline or 3D scene.']
+        },
+        {
+          id: 'speculative-research',
+          title: 'Research-backed Explorer',
+          level: 'Advanced',
+          score: 'Grounded',
+          tools: ['Gemini or Perplexity', 'Wikidata', 'Supabase', modelTool, 'Next.js'],
+          why: 'Best when the experience should be historically grounded instead of pure fantasy.',
+          moves: ['Pull source facts for each era.', 'Store citations and event data.', 'Generate scenes from sourced facts.', 'Show sources and uncertainty to users.']
+        }
+      ]
+    },
+    space: {
+      category: 'Space/Science Build',
+      interpretation: `I read "${subject}" as a science/space experience. I will suggest visualizer, simulation, and learning loadouts.`,
+      loadouts: [
+        {
+          id: 'space-visual',
+          title: 'Cosmic Visualizer',
+          level: 'Fastest',
+          score: 'Interactive',
+          tools: ['Three.js', modelTool, 'NASA APIs', 'Vercel'],
+          why: 'Best for making a space idea tangible: users can see, rotate, and explore the concept instead of reading a static explanation.',
+          moves: ['Define the core space object or phenomenon.', 'Create a 3D scene.', 'Use the selected AI model to explain what users are seeing.', 'Add one interactive control.']
+        },
+        {
+          id: 'space-simulator',
+          title: 'Physics Sandbox',
+          level: 'Balanced',
+          score: 'Simulation',
+          tools: ['Next.js', 'Three.js', 'Rapier or Cannon.js', modelTool, 'Vercel'],
+          why: 'Best when the idea needs motion, gravity, forces, or cause-and-effect play.',
+          moves: ['Choose the simplified physics rules.', 'Build a sandbox scene.', 'Add sliders for mass, speed, or distance.', 'Explain outcomes in plain language.']
+        },
+        {
+          id: 'space-learning',
+          title: 'Learning Quest',
+          level: 'Advanced',
+          score: 'Educational',
+          tools: ['Next.js', 'Supabase', modelTool, 'Wikidata or NASA', 'Vercel'],
+          why: 'Best when the experience should teach, save progress, and adapt explanations to the user.',
+          moves: ['Create lesson checkpoints.', 'Pull trustworthy source facts.', 'Generate explanations and quizzes.', 'Track what the user has explored.']
+        }
+      ]
+    }
+  };
+
+  if (responses[type]) return responses[type];
+
+  return {
+    category: 'Custom AI Build',
+    interpretation: `I do not have an exact category for "${subject}" yet, so I will infer three build paths: quick prototype, workflow, and product-grade app.`,
+    loadouts: [
+      {
+        id: 'custom-prototype',
+        title: 'Prototype Quest',
+        level: 'Fastest',
+        score: 'Playable',
+        tools: ['Lovable or Bolt', 'Airtable', modelTool, 'Vercel'],
+        why: `Best for quickly making "${subject}" feel real enough to test with another person.`,
+        moves: ['Define the one core interaction.', 'Create a clickable screen.', 'Connect simple storage.', 'Use the selected AI model for the magic moment.']
+      },
+      {
+        id: 'custom-workflow',
+        title: 'Workflow Quest',
+        level: 'Balanced',
+        score: 'Useful',
+        tools: ['n8n', 'Airtable', modelTool, channelTool],
+        why: `Best if "${subject}" is mostly a repeatable process, approval loop, or automation.`,
+        moves: ['Define the trigger.', 'Create the data table.', 'Add AI classification or generation.', 'Send the result to the team channel.']
+      },
+      {
+        id: 'custom-product',
+        title: 'Product Quest',
+        level: 'Advanced',
+        score: 'Scalable',
+        tools: ['Next.js', 'Supabase', modelTool, 'Vercel'],
+        why: `Best if "${subject}" needs users, saved state, permissions, and a polished interface.`,
+        moves: ['Model users and records.', 'Build the first product screen.', 'Add one AI action.', 'Deploy and test with real users.']
+      }
+    ]
+  };
 }
 
 export default {
@@ -355,22 +522,28 @@ export default {
 
       if (!providers.length) {
         await promptLogPromise;
-        console.warn('playbook loadout generation unavailable: no AI provider configured');
-        return new Response(JSON.stringify({ error: 'Loadout generation unavailable.' }), { status: 503, headers: { ...cors, 'Content-Type': 'application/json' } });
+        console.warn('playbook loadout generation using generated fallback: no AI provider configured');
+        return new Response(JSON.stringify(createLoadoutFallbackResponse(quest)), { headers: { ...cors, 'Content-Type': 'application/json' } });
       }
 
-      for (const provider of providers) {
+      const attempts = await Promise.allSettled(providers.map(async provider => {
         try {
-          const result = await provider.run();
-          await promptLogPromise;
-          return new Response(JSON.stringify(result), { headers: { ...cors, 'Content-Type': 'application/json' } });
+          return await provider.run();
         } catch (err) {
           console.error(`${provider.name} loadout generation failed`, err);
+          throw err;
         }
+      }));
+
+      const success = attempts.find(attempt => attempt.status === 'fulfilled' && attempt.value);
+      if (success) {
+        await promptLogPromise;
+        return new Response(JSON.stringify(success.value), { headers: { ...cors, 'Content-Type': 'application/json' } });
       }
 
       await promptLogPromise;
-      return new Response(JSON.stringify({ error: 'Loadout generation unavailable.' }), { status: 502, headers: { ...cors, 'Content-Type': 'application/json' } });
+      console.warn('playbook loadout generation using generated fallback: providers unavailable');
+      return new Response(JSON.stringify(createLoadoutFallbackResponse(quest)), { headers: { ...cors, 'Content-Type': 'application/json' } });
     }
 
     // POST / → generate QBR with optional research context
