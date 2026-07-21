@@ -1264,6 +1264,7 @@ function getActiveAIResult() {
 
 function getCurrentLoadouts(type) {
   const activeAIResult = getActiveAIResult();
+  if (activeAIResult?.needsClarification) return [];
   if (activeAIResult?.loadouts?.length) return activeAIResult.loadouts;
   return getLoadouts(type);
 }
@@ -1283,7 +1284,12 @@ function getAIStatus() {
     return { tone: "busy", text: "Building your loadouts..." };
   }
 
-  if (getActiveAIResult()) {
+  const activeAIResult = getActiveAIResult();
+  if (activeAIResult?.needsClarification) {
+    return null;
+  }
+
+  if (activeAIResult) {
     return { tone: "ok", text: "Quest reward unlocked." };
   }
 
@@ -1398,6 +1404,30 @@ function makeLoadoutId(value, index) {
 }
 
 function normalizeAIResponse(data) {
+  if (data?.needsClarification) {
+    return {
+      quest: state.quest,
+      needsClarification: true,
+      category: cleanText(data.category, "One More Detail", 52),
+      interpretation: cleanText(
+        data.interpretation,
+        "I need one clearer build target before I can make useful loadouts.",
+        280
+      ),
+      clarificationQuestion: cleanText(
+        data.clarificationQuestion,
+        "Tell me what the tool should do, who uses it, and what output it should create.",
+        180
+      ),
+      suggestions: cleanList(
+        data.suggestions,
+        examples.slice(0, 3),
+        3,
+        110
+      )
+    };
+  }
+
   if (!data || typeof data !== "object" || !Array.isArray(data.loadouts)) return null;
 
   const usedIds = new Set();
@@ -1446,6 +1476,7 @@ async function fetchAILoadouts(quest) {
       },
       body: JSON.stringify({
         quest,
+        buildRequest: quest,
         modelChoice: state.selectedModel,
         teamChannel: state.selectedChannel
       }),
@@ -1463,11 +1494,27 @@ async function generateLoadoutsForQuest() {
   const input = document.querySelector("[data-quest-input]");
   const nextQuest = (input?.value || "").trim();
 
-  state.quest = (nextQuest || state.quest).slice(0, 240);
+  state.quest = nextQuest.slice(0, 240);
   state.selectedLoadout = "";
   state.aiResult = null;
   state.aiError = "";
   state.copyNotice = "";
+
+  if (!state.quest) {
+    state.aiResult = {
+      quest: state.quest,
+      needsClarification: true,
+      category: "One More Detail",
+      interpretation: "I need one clearer build target before I can make useful loadouts.",
+      clarificationQuestion: "Tell me what the tool should do, who uses it, and what output it should create.",
+      suggestions: examples.slice(0, 3)
+    };
+    trackQuestEvent("clarification_requested");
+    renderPrompt();
+    bindEvents();
+    return;
+  }
+
   state.isLoading = true;
   trackQuestEvent("input_submitted");
   renderPrompt();
@@ -1492,8 +1539,10 @@ async function generateLoadoutsForQuest() {
 function renderPrompt() {
   const host = document.querySelector(".loadout-stage");
   const type = detectQuestType(state.quest);
+  const activeAIResult = getActiveAIResult();
+  const needsClarification = Boolean(activeAIResult?.needsClarification);
   const loadouts = getCurrentLoadouts(type);
-  const selected = getSelectedLoadout(type);
+  const selected = needsClarification ? null : getSelectedLoadout(type);
   const selectedAI = aiChoices[state.selectedAI] || aiChoices.codex;
   const selectedModel = modelChoices[state.selectedModel] || modelChoices.openai;
   const selectedChannel = channelChoices[state.selectedChannel] || channelChoices.teams;
@@ -1501,13 +1550,13 @@ function renderPrompt() {
   const currentInterpretation = getCurrentInterpretation(state.quest, type);
   const aiStatus = getAIStatus();
   const generateLabel = state.isLoading ? "Building..." : "Generate loadouts";
-  const blueprintText = createBlueprint(selected, selectedAI);
+  const blueprintText = selected ? createBlueprint(selected, selectedAI) : "";
 
   host.innerHTML = `
     <div class="quest-console">
       <div>
         <div class="cap">Quest input</div>
-        <h2>What do you want to build with AI?</h2>
+        <h2>What do you want to build?</h2>
       </div>
       <textarea class="quest-input" data-quest-input>${escapeHTML(state.quest)}</textarea>
       <div class="quest-actions">
@@ -1521,6 +1570,7 @@ function renderPrompt() {
         ${examples.map((example) => `<button data-example="${escapeHTML(example)}" type="button">${escapeHTML(example)}</button>`).join("")}
       </div>
     </div>
+    ${needsClarification ? renderClarification(activeAIResult) : `
     <div class="quest-brief">
       <div>
         <h3>${escapeHTML(currentQuestName)}</h3>
@@ -1625,6 +1675,26 @@ function renderPrompt() {
         </div>
         <pre class="blueprint-box">${escapeHTML(blueprintText)}</pre>
       </div>
+    </div>
+    `}
+  `;
+}
+
+function renderClarification(result) {
+  const suggestions = result?.suggestions?.length ? result.suggestions : examples.slice(0, 3);
+  return `
+    <div class="quest-brief">
+      <div>
+        <h3>${escapeHTML(result?.category || "One More Detail")}</h3>
+        <p>${escapeHTML(result?.clarificationQuestion || "Tell me what the tool should do, who uses it, and what output it should create.")}</p>
+      </div>
+      <div class="reward">
+        <span>Next step</span>
+        <strong>Clarify</strong>
+      </div>
+    </div>
+    <div class="example-row">
+      ${suggestions.map((example) => `<button data-example="${escapeHTML(example)}" type="button">${escapeHTML(example)}</button>`).join("")}
     </div>
   `;
 }

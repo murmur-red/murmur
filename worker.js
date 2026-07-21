@@ -178,6 +178,42 @@ function cleanLoadoutInput(value, maxLength = 240) {
   return String(value || '').replace(/\s+/g, ' ').trim().slice(0, maxLength);
 }
 
+function getLoadoutQuest(body) {
+  return cleanLoadoutInput(body?.quest ?? body?.buildRequest ?? body?.prompt);
+}
+
+function needsLoadoutClarification(quest) {
+  const value = cleanLoadoutInput(quest).toLowerCase();
+  const compact = value.replace(/[^a-z0-9]+/g, '');
+  const letters = (value.match(/[a-z]/g) || []).length;
+
+  if (value.length < 3 || letters < 3) return true;
+  if (/^(.)\1{2,}$/.test(compact)) return true;
+  if (/^(asdf|qwerty|qwertyuiop|zxcvbn|loremipsum|test|testing|random|whatever|anything|something|idk|dunno)$/i.test(compact)) return true;
+  if (/^(hi|hello|hey|help|help me|i do not know|i don't know|not sure|no idea|build something|make something|make ai|make a thing|build a thing|ai tool|ai app|bot|app|tool|workflow|automation)$/i.test(value)) return true;
+
+  return false;
+}
+
+function createLoadoutClarificationResponse(quest) {
+  const subject = shortLoadoutQuestName(quest);
+  const hasSubject = subject !== 'custom idea';
+
+  return {
+    needsClarification: true,
+    category: 'One More Detail',
+    interpretation: hasSubject
+      ? `I need one clearer build target for "${subject}" before I can make useful loadouts.`
+      : 'I need one clearer build target before I can make useful loadouts.',
+    clarificationQuestion: 'Tell me what the tool should do, who uses it, and what output it should create.',
+    suggestions: [
+      'A bot that reads invoices and tells a founder what to pay first.',
+      'A support assistant that drafts replies for a help inbox.',
+      'A dashboard that turns weekly spreadsheets into action items.'
+    ]
+  };
+}
+
 function redactPromptSample(value) {
   return cleanLoadoutInput(value)
     .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[email]')
@@ -526,12 +562,17 @@ export default {
 
     // POST /loadouts → AI Build Loadouts for Playbooks
     if (url.pathname === '/loadouts') {
-      const quest = cleanLoadoutInput(body.quest);
+      const quest = getLoadoutQuest(body);
       const modelChoice = cleanLoadoutInput(body.modelChoice, 40) || 'openai';
       const teamChannel = cleanLoadoutInput(body.teamChannel, 40) || 'teams';
 
-      if (!quest || quest.length < 2) {
-        return new Response(JSON.stringify({ error: 'Missing build request.' }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } });
+      if (needsLoadoutClarification(quest)) {
+        console.info('playbook loadout clarification requested', {
+          inputLength: quest.length,
+          modelChoice,
+          teamChannel
+        });
+        return new Response(JSON.stringify(createLoadoutClarificationResponse(quest)), { headers: { ...cors, 'Content-Type': 'application/json' } });
       }
 
       const promptLogPromise = logAnonymousPromptSample({ quest, modelChoice, teamChannel, logUrl: env.PLAYBOOK_PROMPT_LOG_URL });
