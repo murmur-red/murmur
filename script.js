@@ -22,11 +22,23 @@ function scramble(el, final, ms) {
 }
 
 // ── Loader ──────────────────────────────────────────────
+// Every page-level init runs from here. Kept in one place so pages without
+// the loader chrome (e.g. qbr.html) still initialise.
+function initPage(){
+  initTW();
+  initReveal();
+  loadArticles();
+  loadAccountsQBR();
+}
+
 window.addEventListener('load', () => {
   const loader = document.getElementById('loader');
   const bar    = document.getElementById('lBar');
   const pct    = document.getElementById('lPct');
   const logo   = document.getElementById('lLogo');
+
+  // Pages that don't render the loader init straight away.
+  if (!loader || !bar || !pct || !logo) { initPage(); return; }
 
   logo.textContent = '';
   scramble(logo, 'MURMUR.RED', 1500);
@@ -47,10 +59,7 @@ window.addEventListener('load', () => {
           loader.classList.add('out');
           setTimeout(() => {
             loader.style.display = 'none';
-            initTW();
-            initReveal();
-            loadArticles();
-            loadAccountsQBR();
+            initPage();
           }, 400);
         }, 90);
       }, 440);
@@ -112,8 +121,9 @@ function triggerUnicorn(){
 }
 
 function initTW(){
-  const phrases=['Head of AI Operations','AI Customer Lifecycle Expert','Growth & Operations Expert','Head of Customer Success','Co-Founder @ YGames','SaaS Churn Slayer','Unicorn'];
+  const phrases=['AI Operations Leader','AI Systems Builder','Growth & Operations Expert','Unicorn'];
   const el=document.getElementById('tw');
+  if(!el) return;
   let pi=0,ci=0,del=false,w=0;
   (function tick(){
     if(w-->0){setTimeout(tick,80);return}
@@ -837,7 +847,9 @@ const state = {
   aiResult: null,
   aiError: "",
   isLoading: false,
-  copyNotice: ""
+  copyNotice: "",
+  // Blueprint starts collapsed so the section doesn't dominate the page.
+  blueprintOpen: false
 };
 
 const AI_LOADOUT_ENDPOINT = WORKER_URL + '/loadouts';
@@ -1538,6 +1550,7 @@ async function generateLoadoutsForQuest() {
 
 function renderPrompt() {
   const host = document.querySelector(".loadout-stage");
+  if (!host) return;
   const type = detectQuestType(state.quest);
   const activeAIResult = getActiveAIResult();
   const needsClarification = Boolean(activeAIResult?.needsClarification);
@@ -1640,7 +1653,10 @@ function renderPrompt() {
           <h3>Blueprint unlocked</h3>
           <p>${escapeHTML(selectedAI.intro)}</p>
         </div>
-        <button class="loadout-cta" data-copy-blueprint type="button">Copy ${escapeHTML(selectedAI.name)} blueprint</button>
+        <div class="blueprint-actions">
+          <button class="loadout-cta" data-copy-blueprint type="button">Copy ${escapeHTML(selectedAI.name)} blueprint</button>
+          <button class="loadout-cta ghost" data-toggle-blueprint type="button" aria-expanded="${state.blueprintOpen ? "true" : "false"}" aria-controls="blueprint-body">${state.blueprintOpen ? "Hide blueprint" : "View blueprint"}</button>
+        </div>
       </div>
       <div class="reward-strip" aria-label="Blueprint reward summary">
         <div>
@@ -1656,25 +1672,33 @@ function renderPrompt() {
           <strong>${escapeHTML(selectedAI.name)}</strong>
         </div>
       </div>
-      <div class="ai-choice-row">
-        ${Object.entries(aiChoices)
-          .map(
-            ([id, ai]) => `
-              <button class="ai-choice ${state.selectedAI === id ? "on" : ""}" data-ai-choice="${id}" type="button">
-                <b>${escapeHTML(ai.name)}</b>
-                <span>${escapeHTML(ai.label)}</span>
-              </button>
-            `
-          )
-          .join("")}
-      </div>
-      <div class="blueprint-preview">
-        <div class="blueprint-preview-head">
-          <span>Build spec</span>
-          <strong>${escapeHTML(currentQuestName)}</strong>
+      ${
+        state.blueprintOpen
+          ? `
+      <div class="blueprint-body" id="blueprint-body">
+        <div class="ai-choice-row">
+          ${Object.entries(aiChoices)
+            .map(
+              ([id, ai]) => `
+                <button class="ai-choice ${state.selectedAI === id ? "on" : ""}" data-ai-choice="${id}" type="button">
+                  <b>${escapeHTML(ai.name)}</b>
+                  <span>${escapeHTML(ai.label)}</span>
+                </button>
+              `
+            )
+            .join("")}
         </div>
-        <pre class="blueprint-box">${escapeHTML(blueprintText)}</pre>
-      </div>
+        <div class="blueprint-preview">
+          <div class="blueprint-preview-head">
+            <span>Build spec</span>
+            <strong>${escapeHTML(currentQuestName)}</strong>
+          </div>
+          <pre class="blueprint-box">${escapeHTML(blueprintText)}</pre>
+        </div>
+      </div>`
+          : `
+      <p class="blueprint-hint" id="blueprint-body">Full build spec ready for ${escapeHTML(selectedAI.name)} — open it to pick a target tool and read the steps.</p>`
+      }
     </div>
     `}
   `;
@@ -1814,6 +1838,13 @@ function bindEvents() {
     await navigator.clipboard.writeText(text);
     showCopyNotice("Loadout copied.");
     trackQuestEvent("loadout_copied", { loadoutId: selected.id });
+  });
+
+  document.querySelector("[data-toggle-blueprint]")?.addEventListener("click", () => {
+    state.blueprintOpen = !state.blueprintOpen;
+    trackQuestEvent(state.blueprintOpen ? "blueprint_opened" : "blueprint_closed", {});
+    renderPrompt();
+    bindEvents();
   });
 
   document.querySelector("[data-copy-blueprint]")?.addEventListener("click", async () => {
@@ -2194,6 +2225,7 @@ bindEvents();
 let arts=[];
 async function loadArticles(){
   const g=document.getElementById('agrid');
+  if(!g) return;
   try{
     const d=(await(await fetch(ARTICLES_URL+'?t='+Date.now())).json());
     arts=d.articles||[];
@@ -2203,15 +2235,38 @@ async function loadArticles(){
   }catch{g.innerHTML='<div class="aempty">Could not load articles.</div>'}
 }
 function filterA(type,btn){
+  artsExpanded=false;
   document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');
   renderA(type==='all'?arts:arts.filter(a=>a.type===type));
 }
+const ARTS_PREVIEW=6;
+let artsExpanded=false;
+
 function renderA(list){
   const g=document.getElementById('agrid');
+  const more=document.getElementById('arts-more');
+  if(!g) return;
+  if(more) more.innerHTML='';
   if(!list.length){g.innerHTML='<div class="aempty">No articles found.</div>';return}
-  g.innerHTML=list.map((a,i)=>{
+
+  // Cap the homepage list so it doesn't become a wall on mobile.
+  const capped=!artsExpanded&&list.length>ARTS_PREVIEW;
+  const shown=capped?list.slice(0,ARTS_PREVIEW):list;
+
+  g.innerHTML=shown.map((a,i)=>{
     const d=a.date?new Date(a.date).toLocaleDateString('en-GB',{year:'numeric',month:'short',day:'numeric'}):'';
     const h=(a.url&&a.url!=='#')?a.url:'#';
     return`<a class="acard" href="${h}"${h!=='#'?' target="_blank" rel="noopener"':''} style="animation-delay:${i*30}ms"><div class="atype">${a.type||'Article'}</div>${a.flag?`<div class="aflag">⚑ ${a.flag}</div>`:''}<div class="atitle">${a.title}</div><div class="ameta">${d}${a.topic?' · '+a.topic:''}</div></a>`;
   }).join('');
+
+  if(more&&capped){
+    more.innerHTML=`<button type="button" onclick="expandA()">View all ${list.length} articles →</button>`;
+  }
+}
+
+function expandA(){
+  artsExpanded=true;
+  const active=document.querySelector('.ftab.on');
+  const type=(active&&active.textContent.trim()!=='All')?active.textContent.trim():'all';
+  renderA(type==='all'?arts:arts.filter(a=>a.type===type));
 }

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI QBR Agent · Live Demo | murmur.red</title>
+<meta name="description" content="A live AI QBR agent by Lena Ry. Type a company name and it researches the account, runs the pipeline, and builds a full quarterly business review you can copy or download as slides.">
+<meta name="keywords" content="AI QBR agent, quarterly business review automation, customer success AI, account research agent, AI operations, Lena Ry, murmur.red">
+<meta name="author" content="Lena Ry">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://murmur.red/qbr.html">
+<meta name="theme-color" content="#050509">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="murmur.red">
+<meta property="og:title" content="AI QBR Agent · Live Demo">
+<meta property="og:description" content="Type a company name. The agent pulls the data, runs the pipeline, and builds the QBR. A live system by Lena Ry.">
+<meta property="og:url" content="https://murmur.red/qbr.html">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://murmur.red/public/images/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI QBR Agent by Lena Ry">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI QBR Agent · Live Demo">
+<meta name="twitter:description" content="Type a company name. The agent pulls the data, runs the pipeline, and builds the QBR.">
+<meta name="twitter:image" content="https://murmur.red/public/images/og.jpg">
+
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" media="print" onload="this.media='all'">
+<script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+<link rel="stylesheet" href="site.css">
+<style>
+  /* QBR standalone page: nav is fixed, so offset the first section */
+  #qbr{padding-top:8rem}
+  /* No hero behind the nav here, so keep it solid at every scroll position */
+  #nav{background:rgba(5,5,9,.92);backdrop-filter:blur(20px);border-color:var(--line)}
+  .nactive{color:var(--text)!important}
+</style>
+</head>
+<body>
+
+<!-- Announcement -->
+<a id="announce" href="https://optic.murmur.red" target="_blank" rel="noopener">
+  <span class="an-dot"></span>
+  <span><b>Optic</b> — an AI Ops tool I'm building</span>
+  <span class="an-soon">Coming soon</span>
+</a>
+
+<div id="cd"></div>
+<div id="cr"></div>
+<canvas id="bgc"></canvas>
+
+<!-- Nav -->
+<nav id="nav" class="on">
+  <a href="index.html" class="nlogo">murmur.red</a>
+  <ul class="nlinks">
+    <li><a href="index.html#lab">Work</a></li>
+    <li><a href="index.html#stacks">Playbooks</a></li>
+    <li><a href="qbr.html" class="nactive">QBR Agent</a></li>
+    <li><a href="index.html#arts">Writing</a></li>
+    <li><a href="#" class="ncta" onclick="Calendly.initPopupWidget({url:'https://calendly.com/murmur-red1/30min'});return false;">Let's talk</a></li>
+  </ul>
+  <div id="hbg" onclick="toggleNav()"><span></span><span></span><span></span></div>
+</nav>
+<div class="mov" id="mov" onclick="closeNav()"></div>
+<div class="mnav" id="mnav">
+  <a href="index.html#lab"    onclick="closeNav()">Work</a>
+  <a href="index.html#stacks" onclick="closeNav()">Playbooks</a>
+  <a href="qbr.html">QBR Agent</a>
+  <a href="index.html#arts"   onclick="closeNav()">Writing</a>
+  <a href="ai-resilience.html" target="_blank" rel="noopener" onclick="closeNav()">AI Resilience</a>
+  <div class="mnav-sep">Products</div>
+  <a href="https://carto.murmur.red" target="_blank" rel="noopener" onclick="closeNav()">Carto</a>
+  <a href="https://orbital.murmur.red" target="_blank" rel="noopener" onclick="closeNav()">Orbital</a>
+  <a href="https://seance.murmur.red" target="_blank" rel="noopener" onclick="closeNav()">Séance</a>
+  <a href="https://spend.murmur.red" target="_blank" rel="noopener" onclick="closeNav()">Spend Control</a>
+  <a href="https://churn.murmur.red" target="_blank" rel="noopener" onclick="closeNav()">Churn Engine</a>
+  <a href="#" onclick="closeNav();Calendly.initPopupWidget({url:'https://calendly.com/murmur-red1/30min'});return false;">Let's talk</a>
+</div>
+
+<section id="qbr">
+  <div class="inner">
+    <div class="rev" style="max-width:900px">
+      <div class="qtag">Client Output</div>
+      <div class="qtitle">AI QBR AGENT</div>
+      <p class="qsub">Type a company name. We connect to your stack, pull the data, and build the QBR. You get the report.</p>
+
+      <!-- Single input -->
+      <div class="qinput-row rev">
+        <div class="qf">
+          <input id="qa" type="text" placeholder="Company name, e.g. Leapsome, Spellbook, Coast…" oninput="autoResearch(this.value)" onkeydown="if(event.key==='Enter')runQBR()">
+        </div>
+        <button id="qbtn" onclick="runQBR()">
+          Generate QBR →
+        </button>
+      </div>
+
+      <!-- Demo account picker -->
+      <select id="qacc" class="qacc-simple rev" onchange="selectAccount(this.value)">
+        <option value="">Load a demo account</option>
+      </select>
+
+      <!-- Live intel preview -->
+      <div id="qintel" class="qintel-wrap" style="display:none">
+        <div class="qintel-head">Live Intel</div>
+        <div class="qintel-row" id="qintel-content"></div>
+      </div>
+
+      <!-- Pipeline animation -->
+      <div id="qpipeline" class="qpipeline">
+        <div class="qpipe-steps" id="qpipe-steps"></div>
+      </div>
+
+      <!-- Tabbed output -->
+      <div id="qout-wrap" class="qout-wrap" style="display:none">
+        <div class="qtabs" id="qtabs"></div>
+        <div id="qout"></div>
+        <div class="qactions">
+          <button class="qact-btn" onclick="copyQBR()">Copy Text</button>
+          <button class="qact-btn" onclick="downloadPPTX()" id="pptx-btn">↓ Download Slides</button>
+        </div>
+      </div>
+
+      <!-- Post-gen CTA -->
+      <div class="qgen-cta" id="qgen-cta">
+        <div class="qgen-cta-text"><strong>Like what you see?</strong> In production this runs for every account automatically, connected to your real data.</div>
+        <a href="#" class="qgen-cta-btn" onclick="Calendly.initPopupWidget({url:'https://calendly.com/murmur-red1/30min'});return false;">Book a call →</a>
+      </div>
+
+      <p class="qnote">Generated by murmur.red · Production systems connect to Salesforce, Mixpanel &amp; Stripe automatically</p>
+    </div>
+  </div>
+</section>
+
+<section id="cta">
+  <div class="ctain rev">
+    <div class="ctahead">LET'S BUILD<br>SOMETHING</div>
+    <p class="ctasub">I help companies use AI to optimize how they run, turning operations, customer success, and growth into systems that run themselves.</p>
+    <div class="clinks">
+      <a href="#" class="clink prim" onclick="Calendly.initPopupWidget({url:'https://calendly.com/murmur-red1/30min'});return false;">Book a Call</a>
+      <a href="https://www.linkedin.com/in/lena-ry-8baa8716/" target="_blank" rel="noopener" class="clink">LinkedIn</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 Lena Ry / murmur.red</span>
+  <span>Amsterdam</span>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
