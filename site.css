@@ -674,3 +674,28 @@ footer a:hover{color:var(--red)}
 .work-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,5vw,3.2rem);
   letter-spacing:.02em;line-height:.98;margin:.6rem 0 0;text-wrap:balance}
 .work-sub{color:var(--dim);font-size:.96rem;line-height:1.6;max-width:52ch;margin:1rem 0 0}
+
+/* ── QBR pinned scorecard banner ────────────── */
+.qbanner{margin:1.4rem 0 0;padding:1.1rem 1.2rem 1.2rem;border:1px solid rgba(167,139,250,.28);
+  border-top:2px solid var(--c2);border-radius:3px;
+  background:linear-gradient(135deg,rgba(167,139,250,.07),transparent 52%),rgba(255,255,255,.025)}
+.qbanner p{margin:0;color:var(--text);font-size:.9rem;line-height:1.55}
+.qbanner p strong{color:var(--c2)}
+.qbanner p + p{margin-top:.2rem}
+/* one-liner first, Monday move last, scorecard in the middle */
+.qbanner p:last-child{color:var(--dim);font-size:.84rem;margin-top:.7rem}
+.qbanner p:last-child strong{color:var(--red)}
+/* scorecard table -> 4 stat tiles */
+.qbanner table{width:100%;border-collapse:collapse;table-layout:fixed;margin:.9rem 0}
+.qbanner thead th{padding:.1rem .5rem .45rem;border:0;border-right:1px solid rgba(167,139,250,.16);
+  text-align:center;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:.5rem;letter-spacing:.11em;text-transform:uppercase;color:var(--c2);font-weight:600;vertical-align:bottom}
+.qbanner tbody td{padding:.15rem .5rem 0;border:0;border-right:1px solid rgba(167,139,250,.16);
+  text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.55rem;letter-spacing:.03em;
+  color:var(--text);font-variant-numeric:tabular-nums;line-height:1.05;word-break:break-word}
+.qbanner thead th:last-child,.qbanner tbody td:last-child{border-right:0}
+@media(max-width:520px){
+  /* keep the 4-column label-above-value pairing; just tighten */
+  .qbanner thead th{font-size:.44rem;letter-spacing:.06em;padding:.1rem .3rem .4rem}
+  .qbanner tbody td{font-size:1.15rem;padding:.15rem .3rem 0}
+}

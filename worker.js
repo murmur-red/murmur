@@ -665,10 +665,40 @@ NPS: ${nps} | Open Tickets: ${open_tickets} | CSM: ${csm}
 Challenge: ${challenge}${notes ? `\nNotes: ${notes}` : ''}${transcript ? `\n\nCALL TRANSCRIPT:\n${transcript.slice(0, 3000)}` : ''}
 ${researchBlock ? `\n${researchBlock}` : ''}
 
-Generate a comprehensive, structured QBR. Be specific and direct. Where account data is provided, use it exactly. Where research intel is available, reference it to add strategic depth.
+Generate a comprehensive, decision-ready QBR. Be specific and direct. Every claim ties to a number from ACCOUNT DATA. Where research intel is available, reference it. This is a working tool for a CSM, not a report to file — bias toward "what do I do and what do I say."
+
+Output EXACTLY in the structure below. Start with the pinned summary block FIRST, before any "## " heading, in this exact format:
+
+**In one line:** <one crisp sentence ${csm} can paste into Slack — the account's status, the single biggest lever, and the timing. No preamble.>
+
+| ARR at Risk | Renewal Probability | Expansion Upside | Churn-Risk Score |
+|---|---|---|---|
+| $<amount> | <0–100>% | $<low>–<high> | <0–100>/100 |
+
+**Monday move —** <the single most important action for ${csm} first thing Monday, one sentence>
+
+Rules for the scorecard row (estimates, but grounded — never exceed logical bounds):
+- ARR at Risk: a dollar figure ≤ total ARR ($${Number(arr).toLocaleString()}), scaled by churn risk and how close renewal is.
+- Renewal Probability: derive from health (${health_score}), adoption (${usage}%), NPS (${nps}), open tickets (${open_tickets}), and days to renewal. Lower health/adoption/NPS ⇒ lower %.
+- Expansion Upside: a realistic dollar range for upsell/cross-sell given seat headroom and account size.
+- Churn-Risk Score: 0 = safe, 100 = critical. Must move inversely to Renewal Probability.
+
+Then the sections, in this order:
 
 ## Executive Summary
-3 sentences max. Current state of the account, biggest risk, one clear recommendation. Frame from murmur.red's perspective as their CS partner.
+3 sentences max. Current state, biggest risk, one clear recommendation. From murmur.red's perspective as their CS partner.
+
+## Priority Actions
+The 3 highest-leverage moves this quarter, ranked most urgent first. Output ONLY a 3-row table:
+| # | Action | Why now (data trigger) | Owner | Due | Effort | Success metric |
+Each "Why now" MUST cite a specific number from ACCOUNT DATA (e.g. "adoption 61% vs 80% target", "renewal in 47 days"). Effort is S / M / L. Success metric must be measurable.
+
+## Talk Track
+**What to say** — 3 short talking points for ${csm} to open the QBR, framed around the customer's wins first, then the one issue to raise.
+**Likely objections** — 2 objections the customer may raise, each with a one-line response. Format each as: **"<objection>"** → <response>.
+
+## Key Risks
+3 risks ranked by urgency. For each: **Risk name** — evidence from data and/or market intel, business impact ($ where possible), mitigation action, owner, deadline.
 
 ## Health Dashboard
 | Metric | Value | Status |
@@ -676,22 +706,16 @@ Generate a comprehensive, structured QBR. Be specific and direct. Where account 
 Cover: ARR, Health Score, Seat Adoption, NPS, Open Tickets, Renewal Risk. Use 🟢🟡🔴 status icons.
 
 ## Market Intelligence
-What is happening at ${account_name} right now. Use the research intel — funding, hires, strategy, market signals. Connect each signal to implications for their relationship with murmur.red. If no research available, note that data was not provided.
-
-## Key Risks
-3 risks ranked by urgency. For each: **Risk name** — evidence from data and/or market intel, business impact, mitigation action, owner, deadline.
-
-## murmur.red Impact This Quarter
-What murmur.red specifically delivered for this account. Frame our AI automation work, playbooks, or lifecycle initiatives. Be concrete about the value we provided.
+What is happening at ${account_name} right now. Use the research intel — funding, hires, strategy, market signals. Connect each signal to an implication for their relationship with murmur.red. If no research available, say so in one line.
 
 ## 30-Day Action Plan
-5 concrete actions. Format each as: **Action** | Owner | Due | Success Metric
+The full plan — 5 concrete actions (the 3 priorities above plus 2 more). Format each as: **Action** | Owner | Due | Success Metric
+
+## murmur.red Impact This Quarter
+What murmur.red specifically delivered for this account — AI automation work, playbooks, lifecycle initiatives. Be concrete about the value provided.
 
 ## Expansion Opportunity
-1 paragraph. Realistic upsell or expansion angle based on this account's data and market signals. Connect to murmur.red's AI lifecycle capabilities.
-
-## This Week
-One sentence only. The single most important action for ${csm} on Monday morning.`;
+1 paragraph. Realistic upsell or expansion angle based on this account's data and market signals, sized to the Expansion Upside above. Connect to murmur.red's AI lifecycle capabilities.`;
 
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -703,7 +727,7 @@ One sentence only. The single most important action for ${csm} on Monday morning
         },
         body: JSON.stringify({
           model: 'claude-sonnet-4-6',
-          max_tokens: 2500,
+          max_tokens: 3600,
           stream: true,
           messages: [{ role: 'user', content: prompt }]
         })

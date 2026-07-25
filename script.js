@@ -794,10 +794,21 @@ function downloadPPTX() {
 function renderQBRTabs(markdown) {
   const md    = typeof marked.parse === 'function' ? marked.parse : marked;
   const parts = markdown.split(/\n(?=## )/);
-  const sections = parts.map(p => {
+
+  // Leading block before the first "## " = pinned scorecard + one-liner banner
+  let banner = '';
+  const sections = [];
+  parts.forEach(p => {
     const m = p.match(/^## (.+)\n([\s\S]*)/);
-    return m ? { title: m[1].trim(), content: m[2].trim() } : null;
-  }).filter(Boolean);
+    if (m) sections.push({ title: m[1].trim(), content: m[2].trim() });
+    else if (p.trim() && !banner) banner = p.trim().replace(/\n?-{3,}\s*$/, '').trim();
+  });
+
+  const bannerEl = document.getElementById('qbanner');
+  if (bannerEl) {
+    if (banner) { bannerEl.innerHTML = md(banner); bannerEl.hidden = false; }
+    else { bannerEl.innerHTML = ''; bannerEl.hidden = true; }
+  }
 
   const tabBar = document.getElementById('qtabs');
   const out    = document.getElementById('qout');
