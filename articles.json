@@ -1,6 +1,15 @@
 {
-  "updated": "2026-07-27",
+  "updated": "2026-07-31",
   "articles": [
+    {
+      "id": "7ba36974-6d2b-4d53-9814-75f9a25b3d24",
+      "title": "Your AI Agent Is a While Loop Wearing a Blazer",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-07-31",
+      "status": "Published",
+      "url": "https://blog.murmur.red/tech/2026/07/31/your-ai-agent-is-a-while-loop-wearing-a-blazer.html"
+    },
     {
       "id": "5fef21ee-4798-4b94-a4b8-524b2450682d",
       "title": "Errol Spence Retired at 36 With a Broken Face, and That Is the Whole Sport",
