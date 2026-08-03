@@ -1,6 +1,15 @@
 {
-  "updated": "2026-07-31",
+  "updated": "2026-08-03",
   "articles": [
+    {
+      "id": "f219176a-dc96-4256-b56a-95c7c85b9799",
+      "title": "Remote Work Didn't Kill Mentorship. Managers Did.",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-08-03",
+      "status": "Published",
+      "url": "https://blog.murmur.red/tech/2026/08/03/remote-work-didnt-kill-mentorship-managers-did.html"
+    },
     {
       "id": "7ba36974-6d2b-4d53-9814-75f9a25b3d24",
       "title": "Your AI Agent Is a While Loop Wearing a Blazer",
