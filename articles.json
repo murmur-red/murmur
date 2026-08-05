@@ -1,6 +1,15 @@
 {
-  "updated": "2026-08-03",
+  "updated": "2026-08-05",
   "articles": [
+    {
+      "id": "040ebca7-6321-42d8-baf9-ddb814ccea12",
+      "title": "The S&P 500 Crossed 7,600 Because a Factory Number Went Positive",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-08-05",
+      "status": "Published",
+      "url": "https://blog.murmur.red/tech/2026/08/05/the-sp-500-crossed-7600-because-a-factory-number-w.html"
+    },
     {
       "id": "f219176a-dc96-4256-b56a-95c7c85b9799",
       "title": "Remote Work Didn't Kill Mentorship. Managers Did.",
