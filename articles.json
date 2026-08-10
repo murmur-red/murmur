@@ -1,6 +1,15 @@
 {
-  "updated": "2026-08-07",
+  "updated": "2026-08-10",
   "articles": [
+    {
+      "id": "6d450c00-c738-48a3-a0d3-38af8a4e53d8",
+      "title": "Tropical Storm Ivo Doesn't Care That You Live in a City",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-08-10",
+      "status": "Published",
+      "url": "https://blog.murmur.red/tech/2026/08/10/tropical-storm-ivo-doesnt-care-that-you-live-in-a.html"
+    },
     {
       "id": "3afa8a48-6e9a-4569-8df0-100b5872fe16",
       "title": "The FCRA Is the Quiet Law That Decides Which Charities Survive in India",
