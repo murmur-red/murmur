@@ -1,6 +1,15 @@
 {
-  "updated": "2026-08-14",
+  "updated": "2026-08-17",
   "articles": [
+    {
+      "id": "0650e6ee-7b2a-4ed6-84d7-4dc29830c58a",
+      "title": "A Fintech Breach Just Handed Scammers Your Home Address, and You'll Never Know",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-08-17",
+      "status": "Published",
+      "url": "https://blog.murmur.red/tech/2026/08/17/a-fintech-breach-just-handed-scammers-your-home-ad.html"
+    },
     {
       "id": "34f70f4c-9b9e-43c6-9d6d-430e9d3288a6",
       "title": "Left-Handers Day Is a Reminder That Right-Handed People Designed Your Whole Life",
