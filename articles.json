@@ -1,6 +1,15 @@
 {
-  "updated": "2026-08-17",
+  "updated": "2026-08-19",
   "articles": [
+    {
+      "id": "f7ca12e9-7103-4089-85b4-420ba97af70a",
+      "title": "Meta Is Standing Trial for Building the Same Machine That Runs a Slot Floor",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-08-19",
+      "status": "Published",
+      "url": "https://blog.murmur.red/tech/2026/08/19/meta-is-standing-trial-for-building-the-same-machi.html"
+    },
     {
       "id": "0650e6ee-7b2a-4ed6-84d7-4dc29830c58a",
       "title": "A Fintech Breach Just Handed Scammers Your Home Address, and You'll Never Know",
