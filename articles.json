@@ -1,6 +1,15 @@
 {
-  "updated": "2026-08-19",
+  "updated": "2026-08-21",
   "articles": [
+    {
+      "id": "3045bd81-0135-4a81-b6df-39b9e834c06f",
+      "title": "Steam Slaps a Warning Label on AI Games and a Guy Making Pixel Art in His Bedroom Pays For It",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-08-21",
+      "status": "Published",
+      "url": "https://blog.murmur.red/tech/2026/08/21/steam-slaps-a-warning-label-on-ai-games-and-a-guy.html"
+    },
     {
       "id": "f7ca12e9-7103-4089-85b4-420ba97af70a",
       "title": "Meta Is Standing Trial for Building the Same Machine That Runs a Slot Floor",
