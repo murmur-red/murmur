@@ -1,6 +1,15 @@
 {
-  "updated": "2026-08-21",
+  "updated": "2026-08-24",
   "articles": [
+    {
+      "id": "e45fa6ec-c733-40f9-a3ba-047b0bbadccf",
+      "title": "India Named a Day After a Moon Landing, and It's Doing Real Work",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-08-24",
+      "status": "Published",
+      "url": "https://blog.murmur.red/tech/2026/08/24/india-named-a-day-after-a-moon-landing-and-its-doi.html"
+    },
     {
       "id": "3045bd81-0135-4a81-b6df-39b9e834c06f",
       "title": "Steam Slaps a Warning Label on AI Games and a Guy Making Pixel Art in His Bedroom Pays For It",
