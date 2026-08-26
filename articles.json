@@ -1,6 +1,15 @@
 {
-  "updated": "2026-08-24",
+  "updated": "2026-08-26",
   "articles": [
+    {
+      "id": "10bca67f-f366-43f9-946a-e8687a1376c4",
+      "title": "TikTok Bought a Store So It Could Sell to You Without You Noticing",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-08-26",
+      "status": "Published",
+      "url": "https://blog.murmur.red/tech/2026/08/26/tiktok-bought-a-store-so-it-could-sell-to-you-with.html"
+    },
     {
       "id": "e45fa6ec-c733-40f9-a3ba-047b0bbadccf",
       "title": "India Named a Day After a Moon Landing, and It's Doing Real Work",
