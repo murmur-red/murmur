@@ -1,6 +1,15 @@
 {
-  "updated": "2026-08-26",
+  "updated": "2026-08-28",
   "articles": [
+    {
+      "id": "e8ff0436-440b-47c3-a2c3-b2e6398427d6",
+      "title": "The Right to Repair Farm Equipment Just Won, and John Deere Fought It for a Decade",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-08-28",
+      "status": "Published",
+      "url": "https://blog.murmur.red/tech/2026/08/28/the-right-to-repair-farm-equipment-just-won-and-jo.html"
+    },
     {
       "id": "10bca67f-f366-43f9-946a-e8687a1376c4",
       "title": "TikTok Bought a Store So It Could Sell to You Without You Noticing",
