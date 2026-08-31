@@ -1,6 +1,15 @@
 {
-  "updated": "2026-08-28",
+  "updated": "2026-08-31",
   "articles": [
+    {
+      "id": "734cd42e-667c-425d-b47a-f60b96e59be9",
+      "title": "Your Team Argues About Semicolons Because It's Scared to Argue About Logic",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-08-31",
+      "status": "Published",
+      "url": "https://blog.murmur.red/tech/2026/08/31/your-team-argues-about-semicolons-because-its-scar.html"
+    },
     {
       "id": "e8ff0436-440b-47c3-a2c3-b2e6398427d6",
       "title": "The Right to Repair Farm Equipment Just Won, and John Deere Fought It for a Decade",
