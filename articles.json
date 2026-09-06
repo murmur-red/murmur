@@ -1,6 +1,15 @@
 {
-  "updated": "2026-08-31",
+  "updated": "2026-09-06",
   "articles": [
+    {
+      "id": "b95071a6-634d-404e-a17c-81cd9fb910fb",
+      "title": "Open Source AI Won the War Nobody Was Watching, and Your Doctor Is the Prize",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-09-06",
+      "status": "Published",
+      "url": "https://blog.murmur.red/tech/2026/09/06/open-source-ai-won-the-war-nobody-was-watching-and.html"
+    },
     {
       "id": "734cd42e-667c-425d-b47a-f60b96e59be9",
       "title": "Your Team Argues About Semicolons Because It's Scared to Argue About Logic",
