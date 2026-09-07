@@ -1,6 +1,15 @@
 {
-  "updated": "2026-09-06",
+  "updated": "2026-09-07",
   "articles": [
+    {
+      "id": "72c066a1-01fc-4916-92e6-5a041ba1a205",
+      "title": "Elizabeth Holmes Is Trending Because Prison Didn't Stop the Pitch",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-09-07",
+      "status": "Published",
+      "url": "https://blog.murmur.red/tech/2026/09/07/elizabeth-holmes-is-trending-because-prison-didnt.html"
+    },
     {
       "id": "b95071a6-634d-404e-a17c-81cd9fb910fb",
       "title": "Open Source AI Won the War Nobody Was Watching, and Your Doctor Is the Prize",
