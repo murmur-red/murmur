@@ -1,6 +1,15 @@
 {
-  "updated": "2026-09-16",
+  "updated": "2026-09-18",
   "articles": [
+    {
+      "id": "2d73d45b-ed87-40af-83f6-e198d066263e",
+      "title": "The Navy Just Deleted Its Own Bosses From Public View, and You Paid For That Information",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-09-18",
+      "status": "Published",
+      "url": "https://blog.murmur.red/tech/2026/09/18/the-navy-just-deleted-its-own-bosses-from-public-v.html"
+    },
     {
       "id": "ace6bb5e-88ec-41e6-a431-fd6967286e8f",
       "title": "The House Voted to Kill the Penny, and Your Corner Store Just Became a Rounding Machine",
