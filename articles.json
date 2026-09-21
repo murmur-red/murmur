@@ -1,6 +1,15 @@
 {
-  "updated": "2026-09-18",
+  "updated": "2026-09-21",
   "articles": [
+    {
+      "id": "bde1ef90-f26f-429a-98cb-70eeb2ee9a03",
+      "title": "The VA Is Betting on Video Calls, and Rural Veterans Are the Ones Who Win or Lose",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-09-21",
+      "status": "Published",
+      "url": "https://blog.murmur.red/tech/2026/09/21/the-va-is-betting-on-video-calls-and-rural-veteran.html"
+    },
     {
       "id": "2d73d45b-ed87-40af-83f6-e198d066263e",
       "title": "The Navy Just Deleted Its Own Bosses From Public View, and You Paid For That Information",
