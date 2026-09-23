@@ -1,6 +1,15 @@
 {
-  "updated": "2026-09-21",
+  "updated": "2026-09-23",
   "articles": [
+    {
+      "id": "68fc05e3-be30-4132-963c-a78aed872178",
+      "title": "Six Flags Has Over 100 Brain Injury Claims, and Nobody Regulates the Ride You Just Bought a Ticket For",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-09-23",
+      "status": "Published",
+      "url": "https://blog.murmur.red/tech/2026/09/23/six-flags-has-over-100-brain-injury-claims-and-nob.html"
+    },
     {
       "id": "bde1ef90-f26f-429a-98cb-70eeb2ee9a03",
       "title": "The VA Is Betting on Video Calls, and Rural Veterans Are the Ones Who Win or Lose",
