@@ -1,6 +1,15 @@
 {
-  "updated": "2026-09-23",
+  "updated": "2026-09-25",
   "articles": [
+    {
+      "id": "6f703dab-d27d-427c-bc8e-964e4cab3aa6",
+      "title": "Starbucks Is Closing 250 Stores, and Your Third Place Was Never Real",
+      "type": "Blog",
+      "topic": "Tech & AI",
+      "date": "2026-09-25",
+      "status": "Published",
+      "url": "https://blog.murmur.red/tech/2026/09/25/starbucks-is-closing-250-stores-and-your-third-pla.html"
+    },
     {
       "id": "68fc05e3-be30-4132-963c-a78aed872178",
       "title": "Six Flags Has Over 100 Brain Injury Claims, and Nobody Regulates the Ride You Just Bought a Ticket For",
